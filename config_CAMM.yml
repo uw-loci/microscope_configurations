@@ -1,31 +1,7 @@
-# =============== config_CAMM.yml - CORRECTED VERSION ===============
-
 # ========== CAMM MICROSCOPE CONFIGURATION ==========
-# References hardware from resources_LOCI.yml
-
-# ========== REUSABLE DEFINITIONS ==========
-
-# Autofocus parameters
-autofocus:
-  af_4x: &af_4x
-    n_steps: 7
-    search_range_um: 100
-    n_tiles: 3
-  af_20x: &af_20x
-    n_steps: 11
-    search_range_um: 25
-    n_tiles: 5
-
-# Stage positions for objectives
-stage_positions:
-  pos_4x: &pos_4x
-    z_um: -9200
-    f_um: -3200
-  pos_20x: &pos_20x
-    z_um: -10502
-    f_um: -13350
-
-# ========== MICROSCOPE CONFIGURATION ==========
+# Hardware and physical configuration only
+# Imaging conditions (exposure, gain, etc.) are in imageprocessing_CAMM.yml
+# Autofocus settings are in autofocus_CAMM.yml
 
 microscope:
   name: 'CAMM'
@@ -35,8 +11,6 @@ microscope:
   modality: null
 
 # ========== MODALITY-SPECIFIC SETTINGS ==========
-# Only inherent properties of the imaging modality
-
 modalities:
   brightfield:
     type: 'brightfield'
@@ -48,7 +22,7 @@ modalities:
       method: 'divide'
       base_folder: "D:/2025QPSC/data/background_tiles"
       # Path: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
-      
+
   shg:  # Second Harmonic Generation
     type: 'multiphoton'
     laser:
@@ -62,103 +36,30 @@ modalities:
     background_correction:
       enabled: false  # No background correction for SHG
 
-# ========== DETECTOR CAPABILITIES ==========
-# Hardware capabilities only
+# ========== AVAILABLE HARDWARE ==========
+# Lists of available hardware components on this microscope.
+hardware:
+  objectives:
+    - id: 'LOCI_4x_001'
+      pixel_size_xy_um:
+        LOCI_CAMERA_001: 1.105  # Fixed for camera-based detection
+    - id: 'LOCI_20x_001'
+      pixel_size_xy_um:
+        LOCI_CAMERA_001: 0.222  # Fixed for camera-based detection
+      # For scanning modalities with variable pixel size
+      scan_parameters:
+        base_fov_um: 500  # Field of view at zoom = 1.0
+        # Pixel size = base_fov_um / (scan_resolution * zoom_factor)
 
-detectors:
-  LOCI_CAMERA_001:
-    compatible_modalities: ['brightfield']
-    
-  LOCI_PMT_001:
-    compatible_modalities: ['shg']
-
-# ========== OBJECTIVE-SPECIFIC SETTINGS ==========
-# Only lens-specific properties
-
-objectives:
-  LOCI_4x_001:
-    autofocus: *af_4x
-    pixel_size_xy_um:
-      LOCI_CAMERA_001: 1.105  # Fixed for camera
-    # No scan parameters - not used with SHG
-      
-  LOCI_20x_001:
-    autofocus: *af_20x
-    pixel_size_xy_um:
-      LOCI_CAMERA_001: 0.222  # Fixed for camera
-    # For scanning modalities - defines FOV at zoom=1.0
-    scan_parameters:
-      base_fov_um: 500  # Field of view at zoom = 1.0
-
-# ========== ACQUISITION PROFILES ==========
-# All combination-specific settings (modality + objective + detector)
-
-acquisition_profiles:
-  bf_4x:
-    modality: 'brightfield'
-    objective: 'LOCI_4x_001'
-    detector: 'LOCI_CAMERA_001'
-    stage_positions: *pos_4x
-    objective_turret_position: 'Position-2'
-    acquisition_settings:
-      exposure_ms: 40
-      lamp_voltage: 4.0
-      gain: 1.0
-      binning: 1
-      
-  bf_20x:
-    modality: 'brightfield'
-    objective: 'LOCI_20x_001'
-    detector: 'LOCI_CAMERA_001'
-    stage_positions: *pos_20x
-    objective_turret_position: 'Position-1'
-    acquisition_settings:
-      exposure_ms: 80
-      lamp_voltage: 5.0
-      gain: 1.2
-      binning: 1
-      
-  shg_20x:
-    modality: 'shg'
-    objective: 'LOCI_20x_001'
-    detector: 'LOCI_PMT_001'
-    stage_positions: *pos_20x
-    objective_turret_position: 'Position-1'
-    acquisition_settings:
-      pmt_gain: 0.75
-      pixel_dwell_time_us: 4.0
-      averaging: 2
-      scan_mode: 'unidirectional'
-      laser_power_percent: 30
-      zoom_factor: 1.0  # Affects pixel size calculation
-      scan_resolution_px: [512, 512]
-      # Actual FOV = base_fov_um / zoom_factor = 500 / 1.0 = 500um
-      # Pixel size = FOV / resolution = 500 / 512 = 0.977um/px
-      
-  shg_20x_highres:  # High resolution variant
-    modality: 'shg'
-    objective: 'LOCI_20x_001'
-    detector: 'LOCI_PMT_001'
-    stage_positions: *pos_20x
-    objective_turret_position: 'Position-1'
-    acquisition_settings:
-      pmt_gain: 0.75
-      pixel_dwell_time_us: 8.0  # Longer dwell for better SNR
-      averaging: 4
-      scan_mode: 'unidirectional'
-      laser_power_percent: 30
-      zoom_factor: 2.0  # 2x zoom = smaller FOV = better resolution
-      scan_resolution_px: [1024, 1024]
-      # Actual FOV = 500 / 2.0 = 250um
-      # Pixel size = 250 / 1024 = 0.244um/px
+  detectors:
+    - 'LOCI_CAMERA_001'   # Brightfield camera
+    - 'LOCI_PMT_001'      # PMT for multiphoton imaging
 
 # ========== STAGE CONFIGURATION ==========
-# Only references XYZ stage for sample positioning
-
 stage:
-  stage_id: 'LOCI_STAGE_001'  # References ASI XYZ stage in resources
-  # Note: Device mappings (z_device, f_device) are defined in resources_LOCI.yml
+  stage_id: 'LOCI_STAGE_001'  # ASI XYZ stage
   limits:
+    # XY limits define the movement range
     x_um:
       low: 0
       high: 40000
@@ -166,19 +67,17 @@ stage:
       low: 0
       high: 30000
     z_um:
-      low: -10700
-      high: 100
+      low: -10700  # Stage raised with sample close to objective
+      high: 100    # Stage lowered far from objective
     f_um:
-      low: -18000
+      low: -18000  # Separate focus axis
       high: 0
 
 # ========== GENERAL SETTINGS ==========
-
 slide_size_um:
   x: 40000
   y: 20000
-  
+
 objective_slider:
   device: 'Turret:O:35'
   label_device: 'Label'
-

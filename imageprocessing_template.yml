@@ -1,0 +1,284 @@
+# ========== IMAGE PROCESSING CONFIGURATION TEMPLATE ==========
+# Software-related settings for image acquisition and processing.
+# Includes: exposure times, gains, white balance, background correction.
+#
+# File naming convention: imageprocessing_<microscope_name>.yml
+# (e.g., imageprocessing_PPM.yml, imageprocessing_CAMM.yml)
+#
+# This file contains ONLY imaging parameters and processing settings.
+# Hardware configuration is in config_<microscope>.yml.
+
+# ========== BACKGROUND CORRECTION ==========
+# Define background correction method and paths for each modality.
+# Background images are stored in the base_folder using modality-specific patterns.
+
+background_correction:
+  # Modality name must match the modality definition in config_<microscope>.yml
+  brightfield:
+    enabled: true                       # Enable/disable background correction
+    method: 'divide'                    # Options: 'divide', 'subtract', 'none'
+    base_folder: "D:/2025QPSC/data/background_tiles"
+    # Path pattern: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
+
+  ppm:
+    enabled: true
+    method: 'divide'
+    base_folder: "D:/2025QPSC/data/background_tiles"
+    # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
+    # Where angle_name is from rotation_angles in config file (e.g., 'crossed', 'uncrossed')
+
+  fluorescence:
+    enabled: true
+    method: 'subtract'                  # Dark subtraction typical for fluorescence
+    base_folder: "D:/2025QPSC/data/background_tiles"
+    # Path pattern: {base_folder}/{microscope}/fluorescence/{filter_name}/{magnification}x/{detector}/background.tif
+
+  shg:
+    enabled: false                      # Multiphoton typically doesn't use background correction
+    method: 'none'
+    base_folder: null
+
+# ========== IMAGING PROFILES ==========
+# Settings for each modality/objective/detector combination.
+# Organized as: modality -> objective -> detector
+#
+# All IDs must match entries in config_<microscope>.yml and resources_LOCI.yml.
+
+imaging_profiles:
+  # ===== BRIGHTFIELD PROFILES =====
+  # Single-channel transmitted light imaging
+  brightfield:
+    # ----- Low Magnification Objective -----
+    LOCI_OBJECTIVE_001:
+      # Simple monochrome camera
+      LOCI_DETECTOR_001:
+        white_balance:
+          enabled: false                # No white balance for monochrome
+        exposures_ms:
+          single: 50                    # Single exposure value
+        gains:
+          single: 1.0                   # Single gain value
+
+      # RGB camera with simple exposure control
+      LOCI_DETECTOR_002:
+        white_balance:
+          enabled: true                 # Software white balance via gains
+        exposures_ms:
+          single: 50                    # Same exposure for R, G, B channels
+        gains:
+          r: 1.2                        # Per-channel gains for white balance
+          g: 1.0
+          b: 1.1
+
+      # RGB camera with full per-channel exposure control
+      LOCI_DETECTOR_003:
+        white_balance:
+          enabled: false                # Disable if using per-channel exposures
+        exposures_ms:
+          single:
+            all: 50                     # Option 1: Single exposure for all channels
+            r: 45                       # Option 2: Individual channel exposures
+            g: 50
+            b: 55
+        gains:
+          single: 1.0                   # Single gain if not using white balance
+
+    # ----- High Magnification Objective -----
+    LOCI_OBJECTIVE_002:
+      LOCI_DETECTOR_002:
+        white_balance:
+          enabled: true
+        exposures_ms:
+          single: 120                   # Longer exposure for higher mag
+        gains:
+          r: 1.2
+          g: 1.0
+          b: 1.1
+
+  # ===== PPM (POLARIZED) PROFILES =====
+  # Multi-angle polarized light imaging
+  ppm:
+    # ----- 10x Objective -----
+    LOCI_OBJECTIVE_OLYMPUS_10X_001:
+      # Simple camera with per-angle exposures
+      LOCI_DETECTOR_TELEDYNE_001:
+        white_balance:
+          enabled: true
+        # Per-angle exposure settings
+        exposures_ms:
+          negative: 500                 # Exposure for -7 degree position
+          crossed: 800                  # Exposure for 0 degree (crossed polars)
+          positive: 500                 # Exposure for +7 degree position
+          uncrossed: 10                 # Exposure for 90 degree (parallel polars)
+        # Gains applied across all angles
+        gains:
+          r: 1.2
+          g: 1.0
+          b: 1.1
+
+      # RGB camera with per-angle, per-channel control
+      LOCI_DETECTOR_JAI_001:
+        white_balance:
+          enabled: false                # Using per-channel exposures instead
+        exposures_ms:
+          # Each angle can have 'all' mode or individual r,g,b
+          negative:
+            all: 500                    # Single exposure for all channels
+            r: 480                      # OR individual exposures
+            g: 500
+            b: 520
+          crossed:
+            all: 800
+            r: 780
+            g: 800
+            b: 820
+          positive:
+            all: 500
+            r: 480
+            g: 500
+            b: 520
+          uncrossed:
+            all: 10
+            r: 9
+            g: 10
+            b: 11
+        # Per-angle gains for fine-tuning
+        gains:
+          negative: {r: 1.0, g: 1.0, b: 1.0}
+          crossed: {r: 1.1, g: 1.0, b: 1.05}
+          positive: {r: 1.0, g: 1.0, b: 1.0}
+          uncrossed: {r: 1.2, g: 1.0, b: 1.1}
+
+    # ----- 20x Objective -----
+    LOCI_OBJECTIVE_OLYMPUS_20X_POL_001:
+      LOCI_DETECTOR_TELEDYNE_001:
+        white_balance:
+          enabled: true
+        exposures_ms:
+          negative: 800                 # Longer exposures for higher mag
+          crossed: 1200
+          positive: 800
+          uncrossed: 15
+        gains:
+          r: 1.2
+          g: 1.0
+          b: 1.1
+
+  # ===== FLUORESCENCE PROFILES =====
+  fluorescence:
+    LOCI_OBJECTIVE_001:
+      LOCI_DETECTOR_001:
+        white_balance:
+          enabled: false                # Typically disabled for fluorescence
+        # Per-channel/filter exposures
+        exposures_ms:
+          DAPI: 200                     # Filter name from config file
+          FITC: 150
+          TRITC: 180
+        gains:
+          DAPI: 1.5
+          FITC: 1.2
+          TRITC: 1.3
+
+  # ===== MULTIPHOTON PROFILES =====
+  # For scanning-based acquisition (SHG, 2P, etc.)
+  shg:
+    LOCI_OBJECTIVE_002:
+      LOCI_PMT_001:
+        # PMT-specific settings
+        acquisition_settings:
+          pmt_gain: 0.75                # PMT gain (0.0-1.0)
+          pixel_dwell_time_us: 4.0      # Microseconds per pixel
+          averaging: 2                  # Frame averaging
+          scan_mode: 'unidirectional'   # Options: 'bidirectional', 'unidirectional'
+          laser_power_percent: 30       # Laser power (0-100%)
+          zoom_factor: 1.0              # Scanning zoom (affects pixel size)
+          scan_resolution_px: [512, 512]  # [width, height] in pixels
+          # Actual FOV = base_fov_um / zoom_factor (from config file)
+          # Pixel size = FOV / resolution
+
+# ========== FUTURE SETTINGS (Placeholder) ==========
+# These sections are reserved for future image processing features.
+# Uncomment and configure when implemented.
+
+# denoising:
+#   enabled: false
+#   method: 'gaussian'                  # Options: 'gaussian', 'bilateral', 'non_local_means'
+#   strength: 1.0
+#   profiles:
+#     brightfield: {enabled: true, strength: 0.5}
+#     fluorescence: {enabled: true, strength: 1.5}
+
+# color_correction:
+#   enabled: false
+#   method: 'matrix'                    # Options: 'matrix', 'lut'
+#   profiles:
+#     brightfield:
+#       correction_matrix: [[1.0, 0.0, 0.0],
+#                          [0.0, 1.0, 0.0],
+#                          [0.0, 0.0, 1.0]]
+
+# shading_correction:
+#   enabled: false
+#   method: 'polynomial'                # Options: 'polynomial', 'spline'
+#   degree: 3
+
+# ========== CONFIGURATION NOTES ==========
+#
+# 1. EXPOSURE MODES:
+#    Simple cameras (monochrome, basic RGB):
+#      exposures_ms:
+#        single: 50                    # One value applies to all channels
+#
+#    RGB cameras with white balance via gains:
+#      exposures_ms:
+#        single: 50                    # Same exposure for R,G,B
+#      gains:
+#        r: 1.2                        # Different gains per channel
+#        g: 1.0
+#        b: 1.1
+#
+#    RGB cameras with per-channel exposure control:
+#      exposures_ms:
+#        single:
+#          all: 50                     # Use 'all' for simple mode
+#          r: 45                       # OR use r,g,b for full control
+#          g: 50
+#          b: 55
+#
+# 2. MODALITY-SPECIFIC EXPOSURE KEYS:
+#    - Brightfield: Use 'single' key
+#    - PPM: Use angle names from config (e.g., 'crossed', 'uncrossed', 'negative', 'positive')
+#    - Fluorescence: Use filter names from config (e.g., 'DAPI', 'FITC', 'TRITC')
+#    - SHG/Multiphoton: Use acquisition_settings dict instead of exposures_ms
+#
+# 3. WHITE BALANCE:
+#    - Set enabled: true to apply software white balance via per-channel gains
+#    - Set enabled: false if using camera's internal white balance or per-channel exposures
+#    - For monochrome cameras, always use enabled: false
+#
+# 4. BACKGROUND CORRECTION:
+#    - 'divide': Flatfield correction (typical for brightfield, PPM)
+#    - 'subtract': Dark subtraction (typical for fluorescence)
+#    - 'none': No correction (typical for multiphoton)
+#    - Path patterns use variables: {microscope}, {modality}, {magnification}, {detector}, {angle_name}, {filter_name}
+#
+# 5. GAINS:
+#    - For white balance: Use r,g,b keys with values around 1.0
+#    - For monochrome: Use single key
+#    - For per-angle PPM: Use angle names as keys with r,g,b sub-keys
+#    - Typical range: 0.8-1.5 for white balance, higher for signal amplification
+#
+# 6. PMT/SCANNING SETTINGS:
+#    - pmt_gain: 0.0-1.0 (detector voltage/gain)
+#    - pixel_dwell_time_us: Time spent per pixel (affects SNR and speed)
+#    - averaging: Number of frames to average (improves SNR but slows acquisition)
+#    - zoom_factor: Affects actual FOV and pixel size calculation
+#
+# 7. OPTIMIZATION TIPS:
+#    - Start with manufacturer-recommended exposures
+#    - Aim for 50-80% of detector's dynamic range
+#    - Avoid saturation (clipping) in regions of interest
+#    - For PPM: 'crossed' typically needs longest exposure, 'uncrossed' shortest
+#    - For fluorescence: Balance exposure to minimize photobleaching
+#    - Test settings on representative samples before large acquisitions

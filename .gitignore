@@ -1,7 +1,60 @@
-.ipynb_checkpoints
-*.tif
+# ========== SMARTPATH CONFIGURATIONS REPOSITORY ==========
+# This .gitignore ensures only templates and shared resources are tracked
+# User-created microscope-specific configurations are excluded
 
-# Test results directories
+# ========== IGNORE ALL USER CONFIGURATIONS ==========
+# Ignore all YAML config files by default
+*.yml
+*.yaml
+
+# ========== INCLUDE TEMPLATES ==========
+# Re-include template files (these are tracked in the repository)
+!*template*.yml
+!*template*.yaml
+
+# Specifically include template files by name
+!config_template.yml
+!autofocus_template.yml
+!imageprocessing_template.yml
+
+# ========== INCLUDE SHARED RESOURCES ==========
+# Always include the resources folder and its contents
+!resources/
+!resources/**
+
+# ========== IGNORE TEST AND TEMPORARY FILES ==========
+# Test result directories
 autofocus_tests/
 ppm_sensitivity_tests/
 ppm_birefringence_tests/
+*_tests/
+
+# Image files
+*.tif
+*.tiff
+*.png
+*.jpg
+*.jpeg
+
+# Jupyter notebooks and checkpoints
+.ipynb_checkpoints/
+*.ipynb
+
+# Temporary and backup files
+*.bak
+*.tmp
+*~
+.DS_Store
+Thumbs.db
+
+# Saved state files
+saved_transforms.json
+*.json
+
+# Archive directories
+archive/
+_*/
+
+# Testing files
+testing*
+test_*

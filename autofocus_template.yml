@@ -1,0 +1,166 @@
+# ========== AUTOFOCUS CONFIGURATION TEMPLATE ==========
+# Autofocus parameters optimized for each objective lens.
+# These settings control the autofocus behavior during image acquisition.
+#
+# File naming convention: autofocus_<microscope_name>.yml
+# (e.g., autofocus_PPM.yml, autofocus_CAMM.yml)
+#
+# All objective IDs must match entries in the corresponding microscope config file
+# (config_<microscope>.yml) and resources_LOCI.yml.
+
+# ========== PARAMETER DESCRIPTIONS ==========
+#
+# n_steps: Number of Z positions to sample during autofocus search
+#   - Higher values: More accurate focus but slower
+#   - Typical range: 7-50 steps
+#   - Lower magnification (larger DOF): fewer steps needed (7-15)
+#   - Higher magnification (smaller DOF): more steps needed (15-50)
+#
+# search_range_um: Total Z range to search in micrometers (centered on current position)
+#   - Typical range: 10-100 micrometers
+#   - Lower magnification: larger range (50-100um)
+#   - Higher magnification: smaller range (10-25um)
+#
+# n_tiles: Spatial frequency - autofocus runs every N tiles during large acquisitions
+#   - Higher values: Faster acquisition but less frequent refocusing
+#   - Lower values: More frequent refocusing but slower
+#   - Typical range: 1-10 tiles
+#   - For flat samples: use higher values (5-10)
+#   - For warped samples: use lower values (1-3)
+#
+# interp_strength: Interpolation density factor for focus curve fitting
+#   - Controls smoothness of fitted focus curve
+#   - Typical range: 50-200
+#   - Higher values: smoother curve, may miss sharp peaks
+#   - Lower values: more responsive to data, may be noisy
+#   - Recommended: 100 for most applications
+#
+# interp_kind: Interpolation method for focus curve fitting
+#   - Options: 'linear', 'quadratic', 'cubic'
+#   - 'linear': Fastest, simplest, good for well-behaved samples
+#   - 'quadratic': Balanced, recommended for most applications
+#   - 'cubic': Smoothest, best for noisy data
+#
+# score_metric: Focus sharpness metric algorithm
+#   - 'laplacian_variance': Fast (~5ms), robust, recommended default
+#   - 'sobel': Fast (~5ms), edge-based, good for sharp features
+#   - 'brenner_gradient': Fastest (~3ms), simple gradient-based
+#   - 'robust_sharpness': Particle-resistant (~20ms), best for noisy backgrounds
+#   - 'hybrid_sharpness': Balanced (~8ms), combines multiple metrics
+#
+# texture_threshold: Minimum texture variance for tissue detection
+#   - Determines minimum image complexity to be considered "tissue" vs "background"
+#   - Typical range: 0.005-0.030
+#   - Lower values: Accept smoother, less textured tissue
+#   - Higher values: Require more texture/detail to accept as tissue
+#   - Start with 0.010 and adjust based on sample characteristics
+#
+# tissue_area_threshold: Minimum fraction of image that must contain tissue
+#   - Fraction of image area that must exceed texture_threshold (0.0-1.0)
+#   - Typical range: 0.05-0.30
+#   - Lower values: Accept sparse tissue coverage
+#   - Higher values: Require fuller tissue coverage
+#   - Use 0.05-0.10 for sparse samples, 0.20-0.30 for dense tissue
+#
+# ========== ADAPTIVE AUTOFOCUS PARAMETERS (Optional) ==========
+# These parameters enable adaptive autofocus for faster focusing on subsequent tiles.
+#
+# adaptive_initial_step_um: Initial step size for coarse search (micrometers)
+#   - Larger for low magnification (5-10um), smaller for high magnification (0.5-2um)
+#
+# adaptive_min_step_um: Minimum step size for fine search (micrometers)
+#   - Should be smaller than depth of field
+#   - Low mag: 1-2um, High mag: 0.2-0.5um
+#
+# adaptive_max_steps: Maximum number of steps for adaptive search
+#   - Typical range: 15-30 steps
+#   - Prevents excessive searching if focus is lost
+#
+# adaptive_focus_threshold: Confidence threshold for accepting focus (0.0-1.0)
+#   - Typical range: 0.90-0.98
+#   - Higher values: More stringent, slower but more accurate
+#   - Lower values: More permissive, faster but may accept suboptimal focus
+
+# ========== AUTOFOCUS SETTINGS ==========
+autofocus_settings:
+  # Example: Low magnification objective (4x-10x)
+  # - Larger depth of field -> fewer steps, larger range
+  - objective: LOCI_OBJECTIVE_001       # Must match config file
+    n_steps: 35
+    search_range_um: 50.0
+    n_tiles: 5                          # Less frequent refocusing
+    interp_strength: 100
+    interp_kind: quadratic
+    score_metric: laplacian_variance
+    texture_threshold: 0.005            # Lower threshold for lower mag
+    tissue_area_threshold: 0.2
+    # Adaptive autofocus (optional)
+    adaptive_initial_step_um: 10.0      # Larger initial step for low mag
+    adaptive_min_step_um: 2.0
+    adaptive_max_steps: 25
+    adaptive_focus_threshold: 0.95
+
+  # Example: Medium magnification objective (20x-40x)
+  # - Moderate depth of field -> moderate steps and range
+  - objective: LOCI_OBJECTIVE_002
+    n_steps: 40
+    search_range_um: 50.0
+    n_tiles: 2                          # More frequent refocusing
+    interp_strength: 100
+    interp_kind: quadratic
+    score_metric: laplacian_variance
+    texture_threshold: 0.010            # Moderate threshold
+    tissue_area_threshold: 0.2
+    adaptive_initial_step_um: 5.0       # Moderate initial step
+    adaptive_min_step_um: 0.4
+    adaptive_max_steps: 25
+    adaptive_focus_threshold: 0.95
+
+  # Example: High magnification objective (60x-100x)
+  # - Small depth of field -> more steps, smaller range
+  - objective: LOCI_OBJECTIVE_003
+    n_steps: 15
+    search_range_um: 12.0               # Smaller search range
+    n_tiles: 7                          # Variable - depends on sample flatness
+    interp_strength: 100
+    interp_kind: quadratic
+    score_metric: laplacian_variance
+    texture_threshold: 0.015            # Higher threshold for high mag
+    tissue_area_threshold: 0.2
+    adaptive_initial_step_um: 2.0       # Small initial step for high mag
+    adaptive_min_step_um: 0.2
+    adaptive_max_steps: 25
+    adaptive_focus_threshold: 0.95
+
+# ========== TUNING GUIDELINES ==========
+#
+# 1. START WITH DEFAULTS:
+#    - Use values from examples above as starting points
+#    - Test on representative samples before large acquisitions
+#
+# 2. OPTIMIZE FOR SPEED vs ACCURACY:
+#    - For faster autofocus: Reduce n_steps, increase n_tiles
+#    - For better accuracy: Increase n_steps, decrease n_tiles
+#
+# 3. HANDLE DIFFICULT SAMPLES:
+#    - Warped slides: Decrease n_tiles (refocus more often)
+#    - Low contrast tissue: Lower texture_threshold, try 'robust_sharpness' metric
+#    - Noisy backgrounds: Use 'robust_sharpness' or 'hybrid_sharpness'
+#    - Sparse tissue: Lower tissue_area_threshold
+#
+# 4. MAGNIFICATION-SPECIFIC TUNING:
+#    - Low mag (4x-10x): Larger search_range_um (50-100), fewer n_steps (7-15)
+#    - Medium mag (20x-40x): Moderate search_range_um (25-50), moderate n_steps (15-40)
+#    - High mag (60x-100x): Smaller search_range_um (10-25), more n_steps (15-50)
+#
+# 5. ADAPTIVE AUTOFOCUS:
+#    - Enable for large tiled acquisitions to speed up refocusing
+#    - Requires good initial focus on first tile
+#    - May fail if sample has abrupt height changes
+#
+# 6. TESTING PROCEDURE:
+#    - Start with conservative (slower) settings
+#    - Acquire test region with known challenging areas
+#    - Review focus quality across all tiles
+#    - Incrementally adjust parameters to optimize speed/quality tradeoff
+#    - Document settings that work well for each sample type

@@ -1,256 +1,290 @@
-# ========== MICROSCOPE CONFIGURATION SCHEMA TEMPLATE ==========
-# This template defines the structure for microscope configuration files
-# Replace placeholder values with actual hardware specifications
+# ========== MICROSCOPE CONFIGURATION TEMPLATE ==========
+# This template defines the structure for microscope hardware configuration files.
+# Replace placeholder values with actual hardware specifications.
+#
+# IMPORTANT: This file contains ONLY hardware configuration and physical properties.
+# - Imaging settings (exposure, gain, white balance): imageprocessing_<microscope>.yml
+# - Autofocus parameters: autofocus_<microscope>.yml
+#
+# All hardware device IDs (objectives, detectors, stages) must match entries in
+# the resources_LOCI.yml file located in the resources/ folder.
 
-# ========== REUSABLE DEFINITIONS ==========
-# Define anchors for values used multiple times
-
-# Camera-specific settings (for microscopes with multiple cameras)
-# For cameras with RGB control:
-#   - 'all': Single exposure value for R,G,B channels (simplified mode)
-#   - 'r,g,b': Individual channel exposures (advanced mode)
-#   - ConfigManager should check for 'all' first, fallback to r,g,b
-#   - Gains are always applied per-channel for white balance
-camera_settings:
-  CAMERA_ID_001:                # Replace with actual camera ID from resources
-    modality_exposures: &cam001_mod_exposures
-      # For single exposure cameras
-      setting1: 100
-      setting2: 200
-    modality_gains: &cam001_mod_gains
-      # Single gain value or RGB gains
-      gain: 1.0
-      
-  CAMERA_ID_002:                # Example: RGB camera with full control
-    modality_exposures: &cam002_mod_exposures
-      setting1:
-        all: 100                # Single exposure mode
-        r: 90                   # OR individual RGB mode
-        g: 100
-        b: 110
-      setting2:
-        all: 200
-        r: 180
-        g: 200
-        b: 220
-    modality_gains: &cam002_mod_gains
-      setting1: {r: 1.0, g: 1.0, b: 1.0}
-      setting2: {r: 1.1, g: 1.0, b: 1.05}
-
-# ========== MICROSCOPE CONFIGURATION ==========
-
+# ========== MICROSCOPE IDENTIFICATION ==========
 microscope:
-  name: 'MICROSCOPE_NAME'       # Unique identifier
-  type: 'MicroscopeType'        # e.g., 'Multimodal', 'UprightBrightfield'
-  detector_in_use: null         # Runtime state
-  objective_in_use: null        # Runtime state
-  modality: null                # Runtime state
+  name: 'MICROSCOPE_NAME'       # Unique identifier for this microscope (e.g., 'PPM', 'CAMM')
+  type: 'MicroscopeType'        # e.g., 'Multimodal', 'UprightBrightfield', 'InvertedFluorescence'
+  detector_in_use: null         # Runtime state - leave as null
+  objective_in_use: null        # Runtime state - leave as null
+  modality: null                # Runtime state - leave as null
 
 # ========== MODALITY-SPECIFIC SETTINGS ==========
-# Properties inherent to each imaging modality
+# Define each imaging modality available on this microscope.
+# Include only properties inherent to the modality itself, not imaging parameters.
 
 modalities:
-  modality_name_1:              # e.g., brightfield, fluorescence, ppm
-    type: 'modality_type'       # e.g., 'brightfield', 'fluorescence', 'polarized', 'multiphoton'
-    
-    # Hardware control specific to this modality
-    illumination:               # For transmitted light modalities
-      device: 'DeviceName'
-      control_type: 'voltage'   # or 'current', 'digital'
-      
-    # OR for laser-based modalities
-    laser:
-      device: 'LaserDevice'
-      wavelength_nm: 488
-      wavelength_range_nm: [400, 700]
-      
-    # For modalities with rotation control (e.g., PPM)
-    rotation_stage:             # NOT part of XYZ stage
-      device: 'RotationDevice'
-      type: 'polarizer'         # or 'waveplate', 'filter_wheel'
-    rotation_angles:            # For PPM
-      - name: 'position_name'
-        value: 0                # degrees or device units
-        tick: 0                 # device-specific units
-      
-    # Background correction method for this modality
+  # Example: Brightfield transmitted light microscopy
+  brightfield:
+    type: 'brightfield'
+
+    # Illumination control
+    lamp:
+      device: 'LED-Device-Name'     # Micro-Manager device name
+      control_type: 'voltage'       # Options: 'voltage', 'current', 'digital'
+
+    # Background correction settings
+    background_correction:
+      enabled: true                 # Enable/disable background correction
+      method: 'divide'              # Options: 'divide', 'subtract', 'none'
+      base_folder: "D:/path/to/backgrounds"
+      # Path pattern: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
+
+  # Example: Polarized light microscopy (PPM)
+  ppm:
+    type: 'polarized'
+
+    # Rotation stage for polarizer control (separate from XYZ stage)
+    rotation_stage:
+      device: 'LOCI_STAGE_PI_001'   # Must match resources_LOCI.yml
+      type: 'polarizer'             # Options: 'polarizer', 'waveplate', 'filter_wheel'
+
+    # Polarizer rotation angles
+    rotation_angles:
+      - name: 'negative'
+        tick: -7                    # Device-specific units (e.g., 1 tick = 1 degree)
+      - name: 'crossed'
+        tick: 0
+      - name: 'positive'
+        tick: 7
+      - name: 'uncrossed'
+        tick: 90
+
     background_correction:
       enabled: true
-      method: 'divide'          # Options: 'divide', 'subtract', 'none'
+      method: 'divide'
       base_folder: "D:/path/to/backgrounds"
-      # Path pattern: {base}/{microscope}/{modality}/{magnification}x/{detector}/
-      
-    # For modalities with variable magnification (e.g., SHG with zoom)
+      # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
+
+  # Example: Second Harmonic Generation (SHG) multiphoton imaging
+  shg:
+    type: 'multiphoton'
+
+    # Laser control
+    laser:
+      device: 'Chameleon'
+      wavelength_nm: 800
+      wavelength_range_nm: [690, 1040]
+
+    # Variable magnification through scanning zoom
     magnification_control:
-      type: 'zoom'              # or 'fixed'
-      device: 'ZoomDevice'      # If applicable
-      range: [1.0, 10.0]        # Min/max zoom factor
+      type: 'zoom'
+      range: [0.5, 10.0]            # Min/max zoom factors
 
-# ========== DETECTOR CAPABILITIES ==========
-# Hardware capabilities of each detector
+    background_correction:
+      enabled: false                # Typically disabled for multiphoton
 
-detectors:
-  DETECTOR_ID_001:              # Must match ID in resources file
-    compatible_modalities: ['modality1', 'modality2']
-    channel_control: 'single'   # Options: 'single', 'gain_only', 'full_rgb'
-    short_name: 'det1'          # Used in profile naming
-    
-  DETECTOR_ID_002:
-    compatible_modalities: ['modality1', 'modality3']
-    channel_control: 'full_rgb'
-    short_name: 'det2'
+  # Example: Fluorescence imaging
+  fluorescence:
+    type: 'fluorescence'
 
-# ========== OBJECTIVE-SPECIFIC SETTINGS ==========
-# Properties inherent to objective lenses
-# Autofocus parameters are integrated directly here
+    # Light source
+    lamp:
+      device: 'Mercury-Lamp'
+      control_type: 'digital'
 
-objectives:
-  OBJECTIVE_ID_001:             # Must match ID in resources file
-    # Autofocus parameters specific to this objective
-    autofocus:
-      n_steps: 7                # Number of focus steps
-      search_range_um: 100      # Total Z range to search
-      n_tiles: 3                # Number of tiles to sample
-    
-    # Fixed pixel size for camera-based detection
-    pixel_size_xy_um:
-      DETECTOR_ID_001: 1.105
-      DETECTOR_ID_002: 0.876
-      
-  OBJECTIVE_ID_002:
-    autofocus:
-      n_steps: 11
-      search_range_um: 25
-      n_tiles: 5
-      
-    pixel_size_xy_um:
-      DETECTOR_ID_001: 0.553
-      DETECTOR_ID_002: 0.438
-      
-    # For scanning modalities with variable pixel size
-    scan_parameters:            # Alternative/addition to fixed pixel_size_xy_um
-      base_fov_um: 500          # Field of view at zoom = 1.0
-      # Pixel size = base_fov_um / (scan_resolution * zoom_factor)
+    # Filter control
+    filter_wheel:
+      device: 'FilterWheel-Device'
+      filters:
+        - name: 'DAPI'
+          position: 1
+          excitation_nm: 350
+          emission_nm: 470
+        - name: 'FITC'
+          position: 2
+          excitation_nm: 488
+          emission_nm: 525
 
-# ========== ACQUISITION PROFILES ==========
-# Named combinations of modality + objective + detector + settings
-# IMPORTANT: When multiple detectors exist for an objective, ALL profiles should specify the detector
+    background_correction:
+      enabled: true
+      method: 'subtract'
+      base_folder: "D:/path/to/backgrounds"
 
-acquisition_profiles:
-  # Profile naming convention:
-  # - Single detector: {modality}_{magnification}x
-  # - Multiple detectors: {modality}_{magnification}x_{detector_short_name}
-  # Be consistent - if ANY objective has multiple detector options, use explicit naming for ALL
-  
-  profile_name_1:               # e.g., bf_10x_jai, ppm_20x_mp6
-    modality: 'modality_name'
-    objective: 'OBJECTIVE_ID'
-    detector: 'DETECTOR_ID'
-    
-    # Optional: stage positions for this combination
-    stage_positions: 
-      z_um: -9200
-      f_um: -3200               # If stage has separate focus axis
-    
-    # Optional: hardware positions
-    objective_turret_position: 'Position-1'
-    filter_position: 'Filter-1'
-    
-    # Acquisition parameters specific to this combination
-    acquisition_settings:
-      # For camera-based detection
-      exposure_ms: 50           # Single value or reference to anchor
-      gain: 1.0
-      binning: 1
-      
-      # For RGB cameras with separate control
-      exposures_ms: *cam001_mod_exposures
-      gains_rgb: *cam001_mod_gains
-      
-      # For scanning/PMT detection
-      pmt_gain: 0.75
-      pixel_dwell_time_us: 4.0
-      averaging: 2
-      scan_mode: 'bidirectional'
-      
-      # For variable magnification modalities
-      zoom_factor: 1.0          # Used to calculate actual pixel size
-      scan_resolution_px: [512, 512]
-      
-      # Modality-specific settings
-      lamp_voltage: 4.0         # For brightfield
-      laser_power_percent: 30   # For laser-based
+# ========== AVAILABLE HARDWARE ==========
+# Lists all hardware components available on this microscope.
+# All combinations of modality/objective/detector are valid unless
+# specifically restricted by compatible_modalities in detectors section.
+
+hardware:
+  # Objective lenses
+  objectives:
+    - id: 'LOCI_OBJECTIVE_001'      # Must match resources_LOCI.yml entry
+      # Pixel size for camera-based detection (fixed)
+      pixel_size_xy_um:
+        LOCI_DETECTOR_001: 1.105    # Detector ID: pixel size in micrometers
+        LOCI_DETECTOR_002: 0.876
+
+    - id: 'LOCI_OBJECTIVE_002'
+      pixel_size_xy_um:
+        LOCI_DETECTOR_001: 0.553
+        LOCI_DETECTOR_002: 0.438
+      # For scanning modalities with variable pixel size
+      scan_parameters:
+        base_fov_um: 500            # Field of view at zoom = 1.0
+        # Actual pixel size = base_fov_um / (scan_resolution * zoom_factor)
+
+    - id: 'LOCI_OBJECTIVE_003'
+      pixel_size_xy_um:
+        LOCI_DETECTOR_001: 0.277
+        LOCI_DETECTOR_002: 0.219
+
+  # Detectors (cameras, PMTs, etc.)
+  detectors:
+    - 'LOCI_DETECTOR_001'           # Camera for brightfield/fluorescence
+    - 'LOCI_DETECTOR_002'           # Alternative camera (e.g., RGB prism)
+    - 'LOCI_PMT_001'                # PMT for multiphoton imaging
 
 # ========== STAGE CONFIGURATION ==========
-# Only references stage for sample positioning
-# Device mappings (x_device, y_device, etc.) are defined in resources file
+# XYZ stage for sample positioning only.
+# Device mappings (x_device, y_device, z_device) are defined in resources_LOCI.yml.
+# Rotation stages are defined in modality sections, NOT here.
 
 stage:
-  stage_id: 'STAGE_ID_001'      # References stage in resources file
-  
-  # Movement limits
+  stage_id: 'LOCI_STAGE_001'        # Must match resources_LOCI.yml entry
+
+  # Movement limits in micrometers
   limits:
     x_um:
-      low: -20000
-      high: 20000
+      low: -36000                   # Minimum X position
+      high: 34000                   # Maximum X position
     y_um:
-      low: -15000
-      high: 15000
+      low: -39000
+      high: 34000
     z_um:
-      low: -5000
-      high: 5000
-    f_um:                       # If stage has separate focus axis
-      low: -10000
+      low: -5601                    # Stage raised (sample close to objective)
+      high: -1600                   # Stage lowered (sample far from objective)
+    f_um:                           # Optional: separate focus axis if stage has one
+      low: -18000
       high: 0
+
+  # ========== STAGE INSERT CONFIGURATION (Optional) ==========
+  # For microscopes with interchangeable slide holders.
+  # Defines the viewable aperture (light transmission window) for each insert type.
+  # Only the aperture area is shown in the Stage Map visualization.
+  #
+  # CALIBRATION PROCEDURE (using 4 reference points):
+  #   Center the objective on each edge and record stage positions:
+  #   1. aperture_left_x_um:   Left edge of aperture (stage X when edge is centered in FOV)
+  #   2. aperture_right_x_um:  Right edge of aperture
+  #   3. slide_top_y_um:       Top edge of slide glass
+  #   4. slide_bottom_y_um:    Bottom edge of slide glass
+  #
+  # The system calculates aperture dimensions from these measurements.
+
+  inserts:
+    # Safety margin around slides for "legal zone" computation (micrometers)
+    slide_margin_um: 2000
+
+    # Default insert configuration to use
+    default: single_h
+
+    # Insert configurations
+    configurations:
+      single_h:
+        name: "Single Slide (Horizontal)"
+        description: "Standard single slide holder with horizontal orientation"
+
+        # Calibration reference points (measured in micrometers)
+        aperture_left_x_um: 33404       # Stage X when left aperture edge is centered
+        aperture_right_x_um: -35085     # Stage X when right aperture edge is centered
+        aperture_top_y_um: 33007        # Stage Y when top aperture edge is centered
+        aperture_bottom_y_um: -38294    # Stage Y when bottom aperture edge is centered
+        slide_top_y_um: 12220           # Stage Y when top of slide glass is centered
+        slide_bottom_y_um: -11654       # Stage Y when bottom of slide glass is centered
+
+        # Estimated aperture height (less critical for accuracy)
+        aperture_height_mm: 60.0        # Vertical opening size in millimeters
+
+        # Standard slide dimensions
+        slide_width_mm: 75              # 3 inches (horizontal orientation)
+        slide_height_mm: 25             # 1 inch
+
+      single_v:
+        name: "Single Slide (Vertical)"
+        description: "Standard single slide holder with vertical orientation"
+
+        aperture_left_x_um: 0
+        aperture_right_x_um: 60000
+        slide_top_y_um: 0
+        slide_bottom_y_um: 75000        # Slide is 75mm tall when vertical
+
+        aperture_height_mm: 55.0
+        slide_width_mm: 25              # Rotated dimensions
+        slide_height_mm: 75
+
+      quad_v:
+        name: "Four Slides (Vertical)"
+        description: "Four slides arranged vertically"
+
+        aperture_left_x_um: 0
+        aperture_right_x_um: 120000
+        slide_top_y_um: 0
+        slide_bottom_y_um: 75000
+
+        aperture_height_mm: 55.0
+        slide_width_mm: 25
+        slide_height_mm: 75
+
+        # Multiple slide configuration
+        slide_spacing_mm: 30.0          # Center-to-center distance between slides
+        num_slides: 4
 
 # ========== GENERAL SETTINGS ==========
 
-# Slide dimensions
+# Standard microscope slide dimensions
 slide_size_um:
-  x: 40000
-  y: 20000
+  x: 40000      # 40mm = 40,000 micrometers
+  y: 20000      # 20mm
 
-# Additional hardware devices
-objective_slider:               # If applicable
-  device: 'TurretDevice'
-  label_device: 'LabelReader'
+# Optional: Objective turret/slider control
+objective_slider:
+  device: 'Turret:O:35'             # Micro-Manager device name
+  label_device: 'Label'             # Device that reports current position
 
-# ========== SCHEMA NOTES ==========
+# ========== CONFIGURATION NOTES ==========
 #
-# 1. CONSISTENCY: When multiple detectors exist, ALL profiles should explicitly specify detector
-#    - Use format: {modality}_{magnification}x_{detector_short_name}
-#    - Be systematic - include ALL combinations or document why some are excluded
+# 1. SEPARATION OF CONCERNS:
+#    - This file: Hardware configuration and physical properties only
+#    - imageprocessing_<microscope>.yml: Exposure, gain, white balance settings
+#    - autofocus_<microscope>.yml: Autofocus parameters per objective
 #
-# 2. PIXEL SIZE CALCULATION:
-#    - Fixed detectors: pixel_size specified per objective/detector combination
-#    - Scanning detectors: pixel_size = base_fov_um / (scan_resolution * zoom_factor)
-#    - PMT detectors: pixel size determined by scan settings
+# 2. HARDWARE REFERENCES:
+#    - All device IDs must match entries in resources_LOCI.yml
+#    - Objective IDs: LOCI_OBJECTIVE_<manufacturer>_<magnification>_<variant>_<number>
+#    - Detector IDs: LOCI_DETECTOR_<manufacturer>_<number>
+#    - Stage IDs: LOCI_STAGE_<manufacturer>_<number>
 #
-# 3. BACKGROUND CORRECTION:
-#    - Each modality defines its own correction method and settings
-#    - Methods: 'divide', 'subtract', 'none'
-#    - Path pattern: {base}/{microscope}/{modality}/{mag}x/{detector}/
-#    - Additional patterns per modality (e.g., {angle_name}_background.tif for PPM)
+# 3. PIXEL SIZE:
+#    - For fixed detectors: Specify pixel_size_xy_um per objective/detector pair
+#    - For scanning modalities: Use scan_parameters with base_fov_um
+#    - Pixel size = base_fov_um / (scan_resolution * zoom_factor)
 #
-# 4. RUNTIME vs CONFIG:
-#    - Config: Hardware capabilities and fixed settings
-#    - Runtime: Current state (detector_in_use, objective_in_use, etc.)
+# 4. BACKGROUND CORRECTION:
+#    - Each modality defines its own correction method
+#    - Methods: 'divide' (flatfield), 'subtract' (dark subtraction), 'none'
+#    - Path patterns vary by modality (see examples above)
 #
-# 5. EXPOSURE MODES (for RGB cameras):
-#    - Single mode: Use 'all' field for one exposure value, white balance via gains
-#    - RGB mode: Use 'r', 'g', 'b' fields for individual control
-#    - ConfigManager checks for 'all' first, falls back to r,g,b
+# 5. STAGE CONFIGURATION:
+#    - XYZ stages: Sample positioning only (defined here)
+#    - Rotation stages: Part of modality definition (e.g., polarizer rotation)
+#    - Stage limits should match or exceed aperture calibration bounds
 #
-# 6. AUTOFOCUS:
-#    - Parameters integrated directly into objectives section
-#    - Each objective has its own optimized settings
+# 6. MODALITY TYPES:
+#    - 'brightfield': Transmitted light with lamp control
+#    - 'polarized': Requires rotation_stage and rotation_angles
+#    - 'fluorescence': Requires filter_wheel or excitation control
+#    - 'multiphoton': Laser-based with optional magnification_control
 #
-# 7. STAGE SEPARATION:
-#    - XYZ stages: For sample positioning only
-#    - Rotation stages: Referenced in modality settings (e.g., PPM polarizer)
-#    - Stage device mappings belong in resources file, not config
-#
-# 8. REFERENCES:
-#    - All hardware IDs must match entries in resources file
-#    - Use YAML anchors to avoid duplication
-#    - Camera settings can be referenced throughout profiles
+# 7. STAGE INSERTS (Optional):
+#    - Only needed for microscopes with interchangeable slide holders
+#    - Calibration defines viewable aperture for Stage Map visualization
+#    - Multiple configurations allow switching between insert types
