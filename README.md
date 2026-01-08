@@ -13,11 +13,15 @@ This repository contains configuration templates and examples for setting up QPS
 
 ### Configuration Templates
 
-- **`config_template.yml`** - Comprehensive microscope configuration template with examples for all modality types
-- **`autofocus_template.yml`** - Autofocus parameter template with detailed documentation
-- **`imageprocessing_template.yml`** - Image processing settings template (exposure, gain, white balance)
+Located in the `templates/` folder:
+
+- **`templates/config_template.yml`** - Comprehensive microscope configuration template with examples for all modality types
+- **`templates/autofocus_template.yml`** - Autofocus parameter template with detailed documentation
+- **`templates/imageprocessing_template.yml`** - Image processing settings template (exposure, gain, white balance)
 
 ### Example Configurations
+
+Located in the root directory:
 
 - **`config_PPM.yml`** - PPM (Polarized light) microscope example configuration
 - **`config_CAMM.yml`** - CAMM (Multi-modal) microscope example configuration
@@ -43,7 +47,7 @@ This repository contains configuration templates and examples for setting up QPS
 2. **Copy and customize a template:**
    ```bash
    # Copy the main configuration template
-   cp config_template.yml config_my_microscope.yml
+   cp templates/config_template.yml config_my_microscope.yml
 
    # Edit with your hardware settings
    nano config_my_microscope.yml  # or use your preferred editor
@@ -51,13 +55,13 @@ This repository contains configuration templates and examples for setting up QPS
 
 3. **Configure autofocus (optional):**
    ```bash
-   cp autofocus_template.yml autofocus_my_microscope.yml
+   cp templates/autofocus_template.yml autofocus_my_microscope.yml
    # Edit autofocus parameters for your objectives
    ```
 
 4. **Configure image processing (optional):**
    ```bash
-   cp imageprocessing_template.yml imageprocessing_my_microscope.yml
+   cp templates/imageprocessing_template.yml imageprocessing_my_microscope.yml
    # Edit exposure and gain settings for your camera
    ```
 

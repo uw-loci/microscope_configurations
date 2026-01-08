@@ -12,10 +12,9 @@
 !*template*.yml
 !*template*.yaml
 
-# Specifically include template files by name
-!config_template.yml
-!autofocus_template.yml
-!imageprocessing_template.yml
+# Include templates folder and all contents
+!templates/
+!templates/**
 
 # ========== INCLUDE SHARED RESOURCES ==========
 # Always include the resources folder and its contents
