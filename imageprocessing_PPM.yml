@@ -3,6 +3,48 @@
 # Includes: exposure times, gains, white balance, background correction
 # Future additions: denoising settings, color correction, etc.
 
+# ========== CALIBRATION TARGETS ==========
+# Target intensities for background collection and white balance calibration
+# These values ensure consistency between the two calibration workflows
+calibration_targets:
+  # Default target intensities per angle (used when background_exposures not yet populated)
+  # Based on optical properties of polarized light:
+  # - Crossed (0 deg): Very dim due to blocked light -> 125
+  # - Birefringence (+/-7 deg): Moderate intensity -> 160
+  # - Uncrossed (90 deg): Maximum brightness -> 245
+  target_intensities:
+    uncrossed: 245.0
+    positive: 160.0
+    negative: 160.0
+    crossed: 125.0
+    default: 180.0
+
+  # Background collection results (populated when backgrounds are acquired)
+  # When present, achieved_intensity values take priority over target_intensities
+  # This section is auto-populated by background collection workflow
+  # background_exposures:
+  #   last_calibrated: "2026-01-15T10:30:00"
+  #   modality: "ppm"
+  #   objective: "LOCI_OBJECTIVE_OLYMPUS_20X_POL_001"
+  #   detector: "LOCI_DETECTOR_JAI_001"
+  #   angles:
+  #     uncrossed:
+  #       angle_degrees: 90.0
+  #       exposure_ms: 0.8
+  #       achieved_intensity: 244.2
+  #     positive:
+  #       angle_degrees: 7.0
+  #       exposure_ms: 45.0
+  #       achieved_intensity: 159.8
+  #     negative:
+  #       angle_degrees: -7.0
+  #       exposure_ms: 42.0
+  #       achieved_intensity: 160.1
+  #     crossed:
+  #       angle_degrees: 0.0
+  #       exposure_ms: 800.0
+  #       achieved_intensity: 124.5
+
 # ========== BACKGROUND CORRECTION ==========
 background_correction:
   ppm:
@@ -38,7 +80,22 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI - using camera's internal WB
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          # Defocus offset for WB calibration (um) - relative to focused Z position
+          # Set per-objective since working distance varies significantly
+          # OMIT or set null to require manual defocus (safer default)
+          defocus_offset_um: 100
+          # Target intensity for calibration (8-bit equivalent, 0-255)
+          target_intensity: 180
+          # Acceptable deviation from target
+          tolerance: 5
+          # Maximum iterations for convergence
+          max_iterations: 15
+          # Maximum exposure ratio before using gain compensation
+          max_exposure_ratio: 2.0
+          # Whether to include black level calibration
+          calibrate_black_level: true
         exposures_ms:
           negative:
             all: 80
@@ -83,7 +140,14 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          defocus_offset_um: 75  # Smaller for 20x due to shorter working distance
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
         exposures_ms:
           uncrossed:
             all: 15
@@ -128,7 +192,14 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          defocus_offset_um: 50  # Even smaller for 40x due to very short working distance
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
         exposures_ms:
           negative:
             all: 1500
@@ -172,7 +243,14 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          defocus_offset_um: 100
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
         exposures_ms:
           single: 50
         gains:
@@ -192,7 +270,14 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          defocus_offset_um: 75
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
         exposures_ms:
           single: 80
         gains:
@@ -212,7 +297,14 @@ imaging_profiles:
 
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable for JAI
+          enabled: false  # Disable software WB - using hardware WB via calibration
+        white_balance_calibration:
+          defocus_offset_um: 50
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
         exposures_ms:
           single: 120
         gains:
