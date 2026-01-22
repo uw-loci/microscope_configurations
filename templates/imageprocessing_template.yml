@@ -70,10 +70,20 @@ imaging_profiles:
           g: 1.0
           b: 1.1
 
-      # RGB camera with full per-channel exposure control
+      # RGB camera with full per-channel exposure control (e.g., JAI)
       LOCI_DETECTOR_003:
         white_balance:
           enabled: false                # Disable if using per-channel exposures
+        # Per-objective calibration settings for automated white balance
+        white_balance_calibration:
+          defocus_offset_um: 100        # Defocus offset for WB calibration (um)
+                                        # Set per-objective since working distance varies
+                                        # OMIT or set null to require manual defocus
+          target_intensity: 180         # Target intensity for calibration (0-255)
+          tolerance: 5                  # Acceptable deviation from target
+          max_iterations: 15            # Max calibration iterations
+          max_exposure_ratio: 2.0       # Exposure ratio before using gain compensation
+          calibrate_black_level: true   # Whether to include black level calibration
         exposures_ms:
           single:
             all: 50                     # Option 1: Single exposure for all channels
@@ -116,10 +126,19 @@ imaging_profiles:
           g: 1.0
           b: 1.1
 
-      # RGB camera with per-angle, per-channel control
+      # RGB camera with per-angle, per-channel control (e.g., JAI)
       LOCI_DETECTOR_JAI_001:
         white_balance:
           enabled: false                # Using per-channel exposures instead
+        # Per-objective calibration settings for automated white balance
+        white_balance_calibration:
+          defocus_offset_um: 100        # Defocus offset for WB calibration (um)
+                                        # Set per-objective since working distance varies
+          target_intensity: 180         # Target intensity for calibration (0-255)
+          tolerance: 5                  # Acceptable deviation from target
+          max_iterations: 15            # Max calibration iterations
+          max_exposure_ratio: 2.0       # Exposure ratio before using gain compensation
+          calibrate_black_level: true   # Whether to include black level calibration
         exposures_ms:
           # Each angle can have 'all' mode or individual r,g,b
           negative:
@@ -164,6 +183,44 @@ imaging_profiles:
           g: 1.0
           b: 1.1
 
+      # JAI detector with per-channel control (different defocus for 20x)
+      LOCI_DETECTOR_JAI_001:
+        white_balance:
+          enabled: false
+        white_balance_calibration:
+          defocus_offset_um: 75         # Smaller for 20x due to shorter working distance
+          target_intensity: 180
+          tolerance: 5
+          max_iterations: 15
+          max_exposure_ratio: 2.0
+          calibrate_black_level: true
+        exposures_ms:
+          negative:
+            all: 800
+            r: 750
+            g: 800
+            b: 850
+          crossed:
+            all: 1200
+            r: 1150
+            g: 1200
+            b: 1250
+          positive:
+            all: 800
+            r: 750
+            g: 800
+            b: 850
+          uncrossed:
+            all: 15
+            r: 12
+            g: 15
+            b: 18
+        gains:
+          negative: {r: 1.0, g: 1.0, b: 1.0}
+          crossed: {r: 1.1, g: 1.0, b: 1.05}
+          positive: {r: 1.0, g: 1.0, b: 1.0}
+          uncrossed: {r: 1.2, g: 1.0, b: 1.1}
+
   # ===== FLUORESCENCE PROFILES =====
   fluorescence:
     LOCI_OBJECTIVE_001:
@@ -196,6 +253,48 @@ imaging_profiles:
           scan_resolution_px: [512, 512]  # [width, height] in pixels
           # Actual FOV = base_fov_um / zoom_factor (from config file)
           # Pixel size = FOV / resolution
+
+# ========== WHITE BALANCE CALIBRATION RESULTS (Auto-populated) ==========
+# This section is automatically populated by the white balance calibration workflow.
+# It serves as an audit trail of calibration results. DO NOT edit manually.
+# The actual values used for acquisition are in imaging_profiles above.
+
+# white_balance_calibration:
+#   jai_simple:                           # Simple WB calibration results
+#     calibrated: "2026-01-22T10:30:00"   # Timestamp of last calibration
+#     converged: true
+#     target: 180
+#     exposures_ms:
+#       r: 45.0
+#       g: 50.0
+#       b: 55.0
+#     gains:
+#       r: 1.0
+#       g: 1.0
+#       b: 1.0
+#     final_means:
+#       r: 180.0
+#       g: 180.0
+#       b: 180.0
+#   jai_ppm:                              # PPM per-angle calibration results
+#     calibrated: "2026-01-22T10:30:00"
+#     angles:
+#       negative:
+#         converged: true
+#         exposures_ms: {r: 750.0, g: 800.0, b: 850.0}
+#         gains: {r: 1.0, g: 1.0, b: 1.0}
+#       crossed:
+#         converged: true
+#         exposures_ms: {r: 1150.0, g: 1200.0, b: 1250.0}
+#         gains: {r: 1.1, g: 1.0, b: 1.05}
+#       positive:
+#         converged: true
+#         exposures_ms: {r: 750.0, g: 800.0, b: 850.0}
+#         gains: {r: 1.0, g: 1.0, b: 1.0}
+#       uncrossed:
+#         converged: true
+#         exposures_ms: {r: 12.0, g: 15.0, b: 18.0}
+#         gains: {r: 1.2, g: 1.0, b: 1.1}
 
 # ========== FUTURE SETTINGS (Placeholder) ==========
 # These sections are reserved for future image processing features.
@@ -256,6 +355,11 @@ imaging_profiles:
 #    - Set enabled: true to apply software white balance via per-channel gains
 #    - Set enabled: false if using camera's internal white balance or per-channel exposures
 #    - For monochrome cameras, always use enabled: false
+#    - white_balance_calibration section (per detector profile):
+#      - Used by automated WB calibration workflow in QuPath
+#      - defocus_offset_um: How far to defocus for calibration (objective-specific)
+#      - Calibration results are written back to exposures_ms and gains sections
+#      - Each objective needs its own calibration (different working distances/optics)
 #
 # 4. BACKGROUND CORRECTION:
 #    - 'divide': Flatfield correction (typical for brightfield, PPM)
