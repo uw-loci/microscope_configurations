@@ -185,28 +185,28 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           negative:
-            all: 246.55
-            r: 160.07
-            g: 246.55
-            b: 500.0
+            all: 246.52
+            r: 160.04
+            g: 246.52
+            b: 499.38
           crossed:
-            all: 948.23
-            r: 958.43
-            g: 948.23
-            b: 1462.08
+            all: 944.03
+            r: 966.67
+            g: 944.03
+            b: 1458.15
           positive:
-            all: 191.27
-            r: 150.08
-            g: 191.27
-            b: 497.56
+            all: 191.01
+            r: 149.98
+            g: 191.01
+            b: 497.42
           uncrossed:
-            all: 9.66
+            all: 9.67
             r: 6.33
-            g: 9.66
-            b: 26.1
+            g: 9.67
+            b: 26.11
         gains:
           negative:
-            unified_gain: 6.665
+            unified_gain: 6.657
             r: 1.0
             g: 1.0
             b: 1.0
@@ -300,26 +300,26 @@ imaging_profiles:
           single: 1.0
 white_balance_calibration:
   jai_ppm:
-    calibrated: '2026-02-02T08:52:26.092377'
+    calibrated: '2026-02-02T09:14:23.656695'
     angles:
       positive:
         converged: true
         unified_gain: 8.0
         exposures_ms:
-          r: 150.08
-          g: 191.27
-          b: 497.56
+          r: 149.98
+          g: 191.01
+          b: 497.42
         gains:
           r: 1.0
           g: 1.0
           b: 1.0
       negative:
         converged: true
-        unified_gain: 6.665
+        unified_gain: 6.657
         exposures_ms:
-          r: 160.07
-          g: 246.55
-          b: 500.0
+          r: 160.04
+          g: 246.52
+          b: 499.38
         gains:
           r: 1.0
           g: 1.0
@@ -328,9 +328,9 @@ white_balance_calibration:
         converged: true
         unified_gain: 5.0
         exposures_ms:
-          r: 958.43
-          g: 948.23
-          b: 1462.08
+          r: 966.67
+          g: 944.03
+          b: 1458.15
         gains:
           r: 1.0
           g: 1.0
@@ -340,8 +340,8 @@ white_balance_calibration:
         unified_gain: 5.0
         exposures_ms:
           r: 6.33
-          g: 9.66
-          b: 26.1
+          g: 9.67
+          b: 26.11
         gains:
           r: 1.0
           g: 1.0
