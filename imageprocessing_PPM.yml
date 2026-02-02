@@ -1,69 +1,43 @@
-# ========== PPM IMAGE PROCESSING CONFIGURATION ==========
-# Software-related settings for image acquisition and processing
-# Includes: exposure times, gains, white balance, background correction
-# Future additions: denoising settings, color correction, etc.
-
-# ========== CALIBRATION TARGETS ==========
-# Target intensities for background collection and white balance calibration
-# These values ensure consistency between the two calibration workflows
 calibration_targets:
-  # Default target intensities per angle (used when background_exposures not yet populated)
-  # Based on optical properties of polarized light:
-  # - Crossed (0 deg): Very dim due to blocked light -> 125
-  # - Birefringence (+/-7 deg): Moderate intensity -> 160
-  # - Uncrossed (90 deg): Maximum brightness -> 245
   target_intensities:
     uncrossed: 245.0
     positive: 160.0
     negative: 160.0
     crossed: 125.0
     default: 180.0
-
-  # Background collection results (populated when backgrounds are acquired)
-  # When present, achieved_intensity values take priority over target_intensities
-  # This section is auto-populated by background collection workflow
-  # background_exposures:
-  #   last_calibrated: "2026-01-15T10:30:00"
-  #   modality: "ppm"
-  #   objective: "LOCI_OBJECTIVE_OLYMPUS_20X_POL_001"
-  #   detector: "LOCI_DETECTOR_JAI_001"
-  #   angles:
-  #     uncrossed:
-  #       angle_degrees: 90.0
-  #       exposure_ms: 0.8
-  #       achieved_intensity: 244.2
-  #     positive:
-  #       angle_degrees: 7.0
-  #       exposure_ms: 45.0
-  #       achieved_intensity: 159.8
-  #     negative:
-  #       angle_degrees: -7.0
-  #       exposure_ms: 42.0
-  #       achieved_intensity: 160.1
-  #     crossed:
-  #       angle_degrees: 0.0
-  #       exposure_ms: 800.0
-  #       achieved_intensity: 124.5
-
-# ========== BACKGROUND CORRECTION ==========
+  background_exposures:
+    last_calibrated: '2026-01-27T13:30:24.531670'
+    modality: ppm
+    objective: null
+    detector: null
+    angles:
+      negative:
+        angle_degrees: -7.0
+        exposure_ms: 218.93
+        achieved_intensity: 159.0
+      crossed:
+        angle_degrees: 0.0
+        exposure_ms: 333.82
+        achieved_intensity: 123.0
+      positive:
+        angle_degrees: 7.0
+        exposure_ms: 197.22
+        achieved_intensity: 159.0
+      uncrossed:
+        angle_degrees: 90.0
+        exposure_ms: 6.01
+        achieved_intensity: 244.0
 background_correction:
   ppm:
     enabled: true
-    method: 'divide'
-    base_folder: "D:/2025QPSC/data/background_tiles/"  # background will be + 'polarized' + angle
+    method: divide
+    base_folder: D:/2025QPSC/data/background_tiles/
   brightfield:
     enabled: true
-    method: 'divide'
-    base_folder: "D:/2025QPSC/data/background_tiles"  # background will be + 'brightfield'
-
-# ========== IMAGING PROFILES ==========
-# Settings for each modality/objective/detector combination
-# Organized by modality -> objective -> detector
-
+    method: divide
+    base_folder: D:/2025QPSC/data/background_tiles
 imaging_profiles:
-  # ===== PPM PROFILES =====
   ppm:
-    # ----- 10x Objective -----
     LOCI_OBJECTIVE_OLYMPUS_10X_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -77,53 +51,54 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
-          # Defocus offset for WB calibration (um) - relative to focused Z position
-          # Set per-objective since working distance varies significantly
-          # OMIT or set null to require manual defocus (safer default)
           defocus_offset_um: 100
-          # Target intensity for calibration (8-bit equivalent, 0-255)
           target_intensity: 180
-          # Acceptable deviation from target
           tolerance: 5
-          # Maximum iterations for convergence
           max_iterations: 15
-          # Maximum exposure ratio before using gain compensation
           max_exposure_ratio: 2.0
-          # Whether to include black level calibration
           calibrate_black_level: true
         exposures_ms:
           negative:
-            all: 80
-            r: 100
-            g: 100
-            b: 100
+            all: 218.93
+            r: 167.76
+            g: 218.93
+            b: 318.04
           crossed:
-            all: 150
-            r: 150
-            g: 150
-            b: 150
+            all: 333.82
+            r: 322.91
+            g: 333.82
+            b: 515.67
           positive:
-            all: 60
-            r: 50
-            g: 50
-            b: 50
+            all: 197.22
+            r: 189.87
+            g: 197.22
+            b: 366.14
           uncrossed:
-            all: 1.2
-            r: 1.2
-            g: 1.2
-            b: 1.2
+            all: 6.01
+            r: 4.86
+            g: 6.01
+            b: 9.22
         gains:
-          negative: {r: 1.0, g: 1.0, b: 1.0}
-          crossed: {r: 1.1, g: 1.0, b: 1.05}
-          positive: {r: 1.0, g: 1.0, b: 1.0}
-          uncrossed: {r: 1.2, g: 1.0, b: 1.1}
-
-    # ----- 20x Objective -----
+          negative:
+            r: 1.0
+            g: 1.0
+            b: 1.416
+          crossed:
+            r: 1.0
+            g: 1.0
+            b: 1.0
+          positive:
+            r: 1.0
+            g: 1.0
+            b: 1.526
+          uncrossed:
+            r: 1.0
+            g: 1.0
+            b: 1.809
     LOCI_OBJECTIVE_OLYMPUS_20X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -137,12 +112,11 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
-          defocus_offset_um: 75  # Smaller for 20x due to shorter working distance
+          defocus_offset_um: 75
           target_intensity: 180
           tolerance: 5
           max_iterations: 15
@@ -150,32 +124,42 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           uncrossed:
-            all: 15
-            r: 12
-            g: 15
-            b: 18
+            all: 1.58
+            r: 1.31
+            g: 1.58
+            b: 2.31
           negative:
-            all: 800
-            r: 750
-            g: 800
-            b: 850
+            all: 62.32
+            r: 47.85
+            g: 62.32
+            b: 84.59
           crossed:
-            all: 1200
-            r: 1150
-            g: 1200
-            b: 1250
+            all: 127.99
+            r: 109.72
+            g: 127.99
+            b: 213.33
           positive:
-            all: 800
-            r: 750
-            g: 800
-            b: 850
+            all: 57.13
+            r: 53.63
+            g: 57.13
+            b: 97.21
         gains:
-          negative: {r: 1.0, g: 1.0, b: 1.0}
-          crossed: {r: 1.1, g: 1.0, b: 1.05}
-          positive: {r: 1.0, g: 1.0, b: 1.0}
-          uncrossed: {r: 1.2, g: 1.0, b: 1.1}
-
-    # ----- 40x Objective -----
+          negative:
+            r: 1.0
+            g: 1.0
+            b: 1.601
+          crossed:
+            r: 1.0
+            g: 1.0
+            b: 1.0
+          positive:
+            r: 1.0
+            g: 1.0
+            b: 1.768
+          uncrossed:
+            r: 1.0
+            g: 1.0
+            b: 1.916
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -189,12 +173,11 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
-          defocus_offset_um: 50  # Even smaller for 40x due to very short working distance
+          defocus_offset_um: 50
           target_intensity: 180
           tolerance: 5
           max_iterations: 15
@@ -202,34 +185,47 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           negative:
-            all: 1500
-            r: 1450
-            g: 1500
-            b: 1550
+            all: 246.55
+            r: 160.07
+            g: 246.55
+            b: 500.0
           crossed:
-            all: 2000
-            r: 1950
-            g: 2000
-            b: 2050
+            all: 948.23
+            r: 958.43
+            g: 948.23
+            b: 1462.08
           positive:
-            all: 1500
-            r: 1450
-            g: 1500
-            b: 1550
+            all: 191.27
+            r: 150.08
+            g: 191.27
+            b: 497.56
           uncrossed:
-            all: 25
-            r: 22
-            g: 25
-            b: 28
+            all: 9.66
+            r: 6.33
+            g: 9.66
+            b: 26.1
         gains:
-          negative: {r: 1.0, g: 1.0, b: 1.0}
-          crossed: {r: 1.1, g: 1.0, b: 1.05}
-          positive: {r: 1.0, g: 1.0, b: 1.0}
-          uncrossed: {r: 1.2, g: 1.0, b: 1.1}
-
-  # ===== BRIGHTFIELD PROFILES =====
+          negative:
+            unified_gain: 6.665
+            r: 1.0
+            g: 1.0
+            b: 1.0
+          crossed:
+            unified_gain: 5.0
+            r: 1.0
+            g: 1.0
+            b: 1.0
+          positive:
+            unified_gain: 8.0
+            r: 1.0
+            g: 1.0
+            b: 1.0
+          uncrossed:
+            unified_gain: 5.0
+            r: 1.0
+            g: 1.0
+            b: 1.0
   brightfield:
-    # ----- 10x Objective -----
     LOCI_OBJECTIVE_OLYMPUS_10X_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -240,10 +236,9 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
           defocus_offset_um: 100
           target_intensity: 180
@@ -255,8 +250,6 @@ imaging_profiles:
           single: 50
         gains:
           single: 1.0
-
-    # ----- 20x Objective -----
     LOCI_OBJECTIVE_OLYMPUS_20X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -267,10 +260,9 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
           defocus_offset_um: 75
           target_intensity: 180
@@ -282,8 +274,6 @@ imaging_profiles:
           single: 80
         gains:
           single: 1.0
-
-    # ----- 40x Objective -----
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -294,10 +284,9 @@ imaging_profiles:
           r: 1.2
           g: 1.0
           b: 1.1
-
       LOCI_DETECTOR_JAI_001:
         white_balance:
-          enabled: false  # Disable software WB - using hardware WB via calibration
+          enabled: false
         white_balance_calibration:
           defocus_offset_um: 50
           target_intensity: 180
@@ -309,15 +298,67 @@ imaging_profiles:
           single: 120
         gains:
           single: 1.0
-
-# ========== FUTURE SETTINGS ==========
-# Placeholder sections for future image processing features
-
-# denoising:
-#   enabled: false
-#   method: 'gaussian'
-#   strength: 1.0
-
-# color_correction:
-#   enabled: false
-#   profile: null
+white_balance_calibration:
+  jai_ppm:
+    calibrated: '2026-02-02T08:52:26.092377'
+    angles:
+      positive:
+        converged: true
+        unified_gain: 8.0
+        exposures_ms:
+          r: 150.08
+          g: 191.27
+          b: 497.56
+        gains:
+          r: 1.0
+          g: 1.0
+          b: 1.0
+      negative:
+        converged: true
+        unified_gain: 6.665
+        exposures_ms:
+          r: 160.07
+          g: 246.55
+          b: 500.0
+        gains:
+          r: 1.0
+          g: 1.0
+          b: 1.0
+      crossed:
+        converged: true
+        unified_gain: 5.0
+        exposures_ms:
+          r: 958.43
+          g: 948.23
+          b: 1462.08
+        gains:
+          r: 1.0
+          g: 1.0
+          b: 1.0
+      uncrossed:
+        converged: true
+        unified_gain: 5.0
+        exposures_ms:
+          r: 6.33
+          g: 9.66
+          b: 26.1
+        gains:
+          r: 1.0
+          g: 1.0
+          b: 1.0
+  jai_simple:
+    calibrated: '2026-01-27T11:39:52.118569'
+    converged: true
+    target: 180.0
+    exposures_ms:
+      r: 1.13
+      g: 1.37
+      b: 2.03
+    gains:
+      r: 1.0
+      g: 1.0
+      b: 1.95
+    final_means:
+      r: 178.7
+      g: 179.1
+      b: 179.1
