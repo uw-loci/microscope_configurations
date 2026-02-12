@@ -39,6 +39,12 @@ ppm_birefringence_tests/
 .ipynb_checkpoints/
 *.ipynb
 
+# Data and output files
+*.log
+*.txt
+*.npz
+*.csv
+
 # Temporary and backup files
 *.bak
 *.tmp
@@ -49,6 +55,10 @@ Thumbs.db
 # Saved state files
 saved_transforms.json
 *.json
+
+# Calibration output directories (generated at runtime on microscope PC)
+white_balance_calibration/
+ppm_reference_slide/
 
 # Archive directories
 archive/
