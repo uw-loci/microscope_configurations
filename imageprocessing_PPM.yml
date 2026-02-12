@@ -185,46 +185,46 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           negative:
-            all: 246.52
-            r: 160.04
-            g: 246.52
-            b: 499.38
+            all: 25.02
+            r: 16.29
+            g: 25.02
+            b: 85.53
           crossed:
-            all: 944.03
-            r: 966.67
-            g: 944.03
-            b: 1458.15
+            all: 93.7
+            r: 85.01
+            g: 93.7
+            b: 201.75
           positive:
-            all: 191.01
-            r: 149.98
-            g: 191.01
-            b: 497.42
+            all: 24.39
+            r: 18.27
+            g: 24.39
+            b: 120.31
           uncrossed:
-            all: 9.67
-            r: 6.33
-            g: 9.67
-            b: 26.11
+            all: 0.69
+            r: 0.45
+            g: 0.69
+            b: 3.45
         gains:
           negative:
-            unified_gain: 6.657
-            r: 1.0
-            g: 1.0
-            b: 1.0
+            unified_gain: 5.0
+            analog_red: 1.03
+            analog_blue: 1.058
+            wb_method: manual_ppm
           crossed:
             unified_gain: 5.0
-            r: 1.0
-            g: 1.0
-            b: 1.0
+            analog_red: 1.0
+            analog_blue: 1.072
+            wb_method: manual_ppm
           positive:
-            unified_gain: 8.0
-            r: 1.0
-            g: 1.0
-            b: 1.0
+            unified_gain: 5.0
+            analog_red: 1.038
+            analog_blue: 1.038
+            wb_method: manual_ppm
           uncrossed:
             unified_gain: 5.0
-            r: 1.0
-            g: 1.0
-            b: 1.0
+            analog_red: 1.043
+            analog_blue: 1.052
+            wb_method: manual_ppm
   brightfield:
     LOCI_OBJECTIVE_OLYMPUS_10X_001:
       LOCI_DETECTOR_TELEDYNE_001:
@@ -300,52 +300,52 @@ imaging_profiles:
           single: 1.0
 white_balance_calibration:
   jai_ppm:
-    calibrated: '2026-02-02T09:14:23.656695'
+    calibrated: '2026-02-10T22:47:40.049079'
     angles:
       positive:
         converged: true
-        unified_gain: 8.0
+        unified_gain: 5.0
         exposures_ms:
-          r: 149.98
-          g: 191.01
-          b: 497.42
+          r: 18.27
+          g: 24.39
+          b: 120.31
         gains:
-          r: 1.0
-          g: 1.0
-          b: 1.0
+          unified_gain: 5.0
+          analog_red: 1.038
+          analog_blue: 1.038
       negative:
         converged: true
-        unified_gain: 6.657
+        unified_gain: 5.0
         exposures_ms:
-          r: 160.04
-          g: 246.52
-          b: 499.38
+          r: 16.29
+          g: 25.02
+          b: 85.53
         gains:
-          r: 1.0
-          g: 1.0
-          b: 1.0
+          unified_gain: 5.0
+          analog_red: 1.03
+          analog_blue: 1.058
       crossed:
         converged: true
         unified_gain: 5.0
         exposures_ms:
-          r: 966.67
-          g: 944.03
-          b: 1458.15
+          r: 85.01
+          g: 93.7
+          b: 201.75
         gains:
-          r: 1.0
-          g: 1.0
-          b: 1.0
+          unified_gain: 5.0
+          analog_red: 1.0
+          analog_blue: 1.072
       uncrossed:
         converged: true
         unified_gain: 5.0
         exposures_ms:
-          r: 6.33
-          g: 9.67
-          b: 26.11
+          r: 0.45
+          g: 0.69
+          b: 3.45
         gains:
-          r: 1.0
-          g: 1.0
-          b: 1.0
+          unified_gain: 5.0
+          analog_red: 1.043
+          analog_blue: 1.052
   jai_simple:
     calibrated: '2026-01-27T11:39:52.118569'
     converged: true
