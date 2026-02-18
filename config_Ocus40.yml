@@ -15,10 +15,16 @@ macro:
   pixel_size_um: 81.0           # Fixed for this scanner
   requires_cropping: true       # Remove slide holder from view
   slide_bounds:                 # bounds for cropping macro image to get the slide image only
-    x_min_px: 41               # slide glass starts ~41px from left (holder ledge on non-label side)
-    x_max_px: 979              # slide glass ends ~979px (938px wide slide region)
-    y_min_px: 26               # slide glass top edge
-    y_max_px: 338              # slide glass bottom edge (312px tall slide region)
+    x_min_px: 0
+    x_max_px: 938
+    y_min_px: 19
+    y_max_px: 331
+  # Stage Map overlay positioning: how the cropped macro aligns with the slide rectangle.
+  # x_offset_um / y_offset_um shift the overlay relative to the slide rectangle (positive = right/down).
+  # If omitted, the macro is fit to the slide rectangle width with no offset.
+  stagemap_overlay:
+    x_offset_um: 3320          # macro content starts ~3.3mm right of the slide rect left edge
+    y_offset_um: 0
   description: 'Ocus40 whole slide scanner with slide holder visible in macro image'
 
 # User-configurable scanner settings (if any)
