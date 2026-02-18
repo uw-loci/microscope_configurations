@@ -24,7 +24,7 @@ macro:
   # If omitted, the macro is fit to the slide rectangle width with no offset.
   stagemap_overlay:
     x_offset_um: 2186          # horizontal offset of macro vs slide rect (positive = right)
-    y_offset_um: -3151         # vertical offset of macro vs slide rect (positive = down)
+    y_offset_um: 32            # vertical offset of macro vs slide rect (positive = down)
   description: 'Ocus40 whole slide scanner with slide holder visible in macro image'
 
 # User-configurable scanner settings (if any)
