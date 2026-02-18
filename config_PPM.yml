@@ -107,13 +107,13 @@ stage:
         # Measure these 4 positions with objective centered on each edge:
         aperture_left_x_um: 34873      # Stage X when left aperture edge is centered
         aperture_right_x_um: -35085 # Stage X when right aperture edge is centered
-        aperture_top_y_um: 33007      # Stage Y when  aperture edge closest to microscope is centered
-        aperture_bottom_y_um: -38294 # Stage Y when aperture edge farther from microscope is centered
+        aperture_top_y_um: 23007      # Stage Y when  aperture edge closest to microscope is centered
+        aperture_bottom_y_um: -48114 # Stage Y when aperture edge farther from microscope is centered
         slide_top_y_um: -3207          # Stage Y when top of slide glass is centered
         slide_bottom_y_um: -21841   # Stage Y when bottom of slide glass is centered
 
         # Estimated aperture height (vertical) - less critical for accuracy
-        aperture_height_mm: 60.0   # ~6cm vertical opening
+        aperture_height_mm: 60.0   # ~6cm Y distance opening
 
         # Slide dimensions (standard 1" x 3" slide)
         slide_width_mm: 75         # 3 inches
