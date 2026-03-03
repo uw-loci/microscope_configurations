@@ -36,7 +36,7 @@ autofocus_settings:
   n_tiles: 2
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: laplacian_variance
+  score_metric: robust_sharpness
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   adaptive_initial_step_um: 5.0
