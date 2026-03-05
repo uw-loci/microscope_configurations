@@ -33,13 +33,12 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
   search_range_um: 50.0
-  n_tiles: 2
+  n_tiles: 4
   interp_strength: 100
   interp_kind: quadratic
   score_metric: robust_sharpness
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  rgb_brightness_threshold: 245.0  # PPM tissue at 90deg (uncrossed) is naturally bright (~235 mean)
   adaptive_initial_step_um: 5.0
   adaptive_min_step_um: 0.4
   adaptive_max_steps: 25
