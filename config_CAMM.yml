@@ -43,9 +43,11 @@ hardware:
     - id: 'LOCI_4x_001'
       pixel_size_xy_um:
         LOCI_CAMERA_001: 1.105  # Fixed for camera-based detection
+      pixel_size_z_um: null  # Set when Z-stacks are calibrated (um per Z step)
     - id: 'LOCI_20x_001'
       pixel_size_xy_um:
         LOCI_CAMERA_001: 0.222  # Fixed for camera-based detection
+      pixel_size_z_um: null
       # For scanning modalities with variable pixel size
       scan_parameters:
         base_fov_um: 500  # Field of view at zoom = 1.0
