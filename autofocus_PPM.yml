@@ -20,7 +20,7 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
   n_steps: 35
   search_range_um: 50.0
-  n_tiles: 5
+  n_tiles: 4
   interp_strength: 100
   interp_kind: quadratic
   score_metric: laplacian_variance
@@ -33,7 +33,7 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
   search_range_um: 50.0
-  n_tiles: 4
+  n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
   score_metric: robust_sharpness
