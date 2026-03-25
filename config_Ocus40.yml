@@ -25,6 +25,8 @@ macro:
   stagemap_overlay:
     x_offset_um: 0          # horizontal offset of macro vs slide rect (positive = right)
     y_offset_um: 0         # vertical offset of macro vs slide rect (positive = down)
+  flip_x: true
+  flip_y: true
   description: 'Ocus40 whole slide scanner with slide holder visible in macro image'
 
 # User-configurable scanner settings (if any)
