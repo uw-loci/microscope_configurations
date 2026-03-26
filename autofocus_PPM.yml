@@ -1,24 +1,23 @@
 # ========== AUTOFOCUS CONFIGURATION ==========
 # Autofocus parameters per objective
-# These settings control the autofocus behavior during image acquisition
+# These settings control autofocus behavior during image acquisition
 #
-# STANDARD AUTOFOCUS parameters (used for initial focus on first tissue position):
-#   n_steps: Number of Z positions to sample during autofocus (higher = more accurate but slower)
-#   search_range_um: Total Z range to search in micrometers (centered on current position)
-#   interp_strength: Interpolation density factor for focus curve fitting (typical: 50-200)
+# STANDARD AUTOFOCUS (initial focus on first tissue position):
+#   n_steps: Number of Z positions to sample (higher = more accurate but slower)
+#   search_range_um: Total Z range to search in micrometers
+#   interp_strength: Interpolation density factor (typical: 50-200)
 #   interp_kind: Interpolation method - 'linear', 'quadratic', or 'cubic'
 #
-# SWEEP DRIFT CHECK parameters (used for subsequent focus corrections during acquisition):
-#   sweep_range_um: Total Z range for sweep (default 10 = +/-5um from current position)
-#   sweep_n_steps: Number of Z positions to sample during sweep (default 6)
+# SWEEP DRIFT CHECK (in-acquisition focus correction):
+#   sweep_range_um: Total Z range for drift check (default 10 = +/-5um)
+#   sweep_n_steps: Number of Z positions to sample (default 6)
 #
-# SHARED parameters:
-#   n_tiles: Spatial frequency - autofocus runs every N tiles during large acquisitions (lower = more frequent)
-#   score_metric: Focus metric used by BOTH standard AF and sweep drift check
-#                 'normalized_variance' (recommended for 20x+), 'laplacian_variance',
-#                 'sobel', 'brenner_gradient', 'p98_p2' (histogram spread)
-#   texture_threshold: Minimum texture variance for tissue detection (typical: 0.005-0.030)
-#   tissue_area_threshold: Minimum fraction of image that must contain tissue (typical: 0.05-0.30)
+# SHARED:
+#   n_tiles: Autofocus runs every N tiles (lower = more frequent)
+#   score_metric: 'normalized_variance' (recommended), 'laplacian_variance',
+#                 'sobel', 'brenner_gradient', or 'p98_p2'
+#   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
+#   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
 
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
@@ -35,13 +34,13 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
   search_range_um: 50.0
-  n_tiles: 1
+  n_tiles: 5
   interp_strength: 100
   interp_kind: quadratic
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 10.0
+  sweep_range_um: 6.0
   sweep_n_steps: 6
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   n_steps: 15
