@@ -35,10 +35,10 @@
       "m10": 0.0,
       "m01": 0.0,
       "m11": 81.0,
-      "m02": -41030.995296,
-      "m12": -21918.283344000003
+      "m02": -40648.067168,
+      "m12": -21969.522335999998
     },
-    "createdDate": "Mar 12, 2026, 5:14:34 PM",
+    "createdDate": "Mar 25, 2026, 4:29:22 PM",
     "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
     "greenBoxParams": {
       "greenThreshold": 0.4,
