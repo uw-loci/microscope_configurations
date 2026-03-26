@@ -12,12 +12,16 @@
 #   sweep_range_um: Total Z range for drift check (default 10 = +/-5um)
 #   sweep_n_steps: Number of Z positions to sample (default 6)
 #
-# SHARED:
-#   n_tiles: Autofocus runs every N tiles (lower = more frequent)
-#   score_metric: 'normalized_variance' (recommended), 'laplacian_variance',
-#                 'sobel', 'brenner_gradient', or 'p98_p2'
-#   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
-#   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+# SHARED parameters:
+#   n_tiles: Spatial frequency - autofocus runs every N tiles during large acquisitions (lower = more frequent)
+#   score_metric: Focus metric used by BOTH standard AF and sweep drift check
+#                 'normalized_variance' (recommended for 20x+), 'laplacian_variance',
+#                 'sobel', 'brenner_gradient', 'p98_p2' (histogram spread)
+#   texture_threshold: Minimum texture variance for tissue detection (typical: 0.005-0.030)
+#   tissue_area_threshold: Minimum fraction of image that must contain tissue (typical: 0.05-0.30)
+#   rgb_brightness_threshold: Maximum average RGB brightness for tissue (default 240.0).
+#                             Images brighter than this are considered blank/background and AF is skipped.
+#                             Lower values are more aggressive at rejecting tiles. Set per-objective if needed.
 
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
@@ -29,6 +33,7 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
+  rgb_brightness_threshold: 240.0
   sweep_range_um: 10.0
   sweep_n_steps: 6
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
@@ -40,7 +45,7 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 6.0
+  sweep_range_um: 10.0
   sweep_n_steps: 6
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   n_steps: 15
@@ -51,5 +56,6 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
+  rgb_brightness_threshold: 240.0
   sweep_range_um: 6.0
   sweep_n_steps: 6
