@@ -6,27 +6,27 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-03-25T15:11:54.294486'
+    last_calibrated: '2026-03-27T14:19:38.470958'
     modality: ppm
     objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 14.39
-        achieved_intensity: 160.0
+        exposure_ms: 9.37
+        achieved_intensity: 151.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 11.33
-        achieved_intensity: 159.0
+        exposure_ms: 15.85
+        achieved_intensity: 149.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 27.67
-        achieved_intensity: 124.0
+        exposure_ms: 25.68
+        achieved_intensity: 126.0
       uncrossed:
         angle_degrees: 90.0
-        exposure_ms: 0.72
-        achieved_intensity: 245.0
+        exposure_ms: 0.7
+        achieved_intensity: 235.0
 background_correction:
   ppm:
     enabled: true
@@ -124,35 +124,35 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           uncrossed:
-            all: 0.69
+            all: 0.7
             r: 0.46
-            g: 0.69
-            b: 0.91
+            g: 0.7
+            b: 0.92
           negative:
-            all: 17.35
-            r: 10.48
-            g: 17.35
-            b: 17.5
+            all: 15.85
+            r: 9.93
+            g: 15.85
+            b: 15.85
           crossed:
-            all: 26.02
-            r: 23.08
-            g: 26.02
-            b: 26.02
+            all: 25.68
+            r: 23.07
+            g: 25.68
+            b: 25.68
           positive:
-            all: 9.76
-            r: 7.65
-            g: 9.76
-            b: 13.87
+            all: 9.37
+            r: 7.25
+            g: 9.37
+            b: 13.47
         gains:
           negative:
             unified_gain: 2.0
             analog_red: 1.0
-            analog_blue: 3.249
+            analog_blue: 3.201
             wb_method: manual_ppm
           crossed:
             unified_gain: 3.0
-            analog_red: 0.99
-            analog_blue: 3.05
+            analog_red: 1.0
+            analog_blue: 3.011
             wb_method: manual_ppm
           positive:
             unified_gain: 2.0
@@ -163,14 +163,14 @@ imaging_profiles:
             unified_gain: 1.0
             analog_red: 1.0
             analog_blue: 4.0
-            wb_method: manual_simple
+            wb_method: manual_ppm
         simple_wb:
-          last_calibrated: '2026-03-25T15:11:54.385157'
+          last_calibrated: '2026-03-27T13:01:04.208941'
           base_angle: uncrossed
           base_exposures_ms:
             r: 0.46
-            g: 0.69
-            b: 0.91
+            g: 0.7
+            b: 0.92
           base_gains:
             unified_gain: 1.0
             analog_red: 1.0
@@ -178,29 +178,29 @@ imaging_profiles:
             wb_method: manual_simple
           angles:
             positive:
-              scale: 20.861
+              scale: 15.493
               unified_gain: 2.0
-              r: 9.6
-              g: 14.39
-              b: 18.98
+              r: 7.13
+              g: 10.84
+              b: 14.25
             negative:
-              scale: 16.418
+              scale: 22.456
               unified_gain: 2.0
-              r: 7.55
-              g: 11.33
-              b: 14.94
+              r: 10.33
+              g: 15.72
+              b: 20.66
             crossed:
-              scale: 40.099
+              scale: 36.355
               unified_gain: 3.0
-              r: 18.45
-              g: 27.67
-              b: 36.49
+              r: 16.72
+              g: 25.45
+              b: 33.45
             uncrossed:
               scale: 1.043
               unified_gain: 1.0
               r: 0.48
-              g: 0.72
-              b: 0.95
+              g: 0.73
+              b: 0.96
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
