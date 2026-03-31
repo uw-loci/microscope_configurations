@@ -33,7 +33,7 @@ autofocus_settings:
   sweep_n_steps: 10
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
-  search_range_um: 50.0
+  search_range_um: 30.0
   n_tiles: 5
   interp_strength: 100
   interp_kind: quadratic
