@@ -165,43 +165,6 @@ imaging_profiles:
             analog_blue: 4.0
             wb_method: manual_ppm
         wb_last_modified: '2026-03-31T12:32:17.295248'
-        simple_wb:
-          last_calibrated: '2026-03-31T12:36:28.184911'
-          base_angle: uncrossed
-          base_exposures_ms:
-            r: 0.47
-            g: 0.71
-            b: 0.93
-          base_gains:
-            unified_gain: 1.0
-            analog_red: 1.0
-            analog_blue: 4.0
-            wb_method: manual_ppm
-          angles:
-            positive:
-              scale: 15.493
-              unified_gain: 2.0
-              r: 7.28
-              g: 11.0
-              b: 14.41
-            negative:
-              scale: 22.456
-              unified_gain: 2.0
-              r: 10.55
-              g: 15.94
-              b: 20.88
-            crossed:
-              scale: 35.87
-              unified_gain: 3.0
-              r: 16.86
-              g: 25.47
-              b: 33.36
-            uncrossed:
-              scale: 1.047
-              unified_gain: 1.0
-              r: 0.49
-              g: 0.74
-              b: 0.97
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
@@ -267,43 +230,6 @@ imaging_profiles:
             analog_red: 1.0
             analog_blue: 2.858
             wb_method: manual_ppm
-        simple_wb:
-          last_calibrated: '2026-02-28T12:34:24.775801'
-          base_angle: uncrossed
-          base_exposures_ms:
-            r: 0.33
-            g: 0.49
-            b: 0.49
-          base_gains:
-            unified_gain: 1.0
-            analog_red: 1.0
-            analog_blue: 2.854
-            wb_method: manual_simple
-          angles:
-            negative:
-              scale: 46.691
-              unified_gain: 1.0
-              r: 15.41
-              g: 22.88
-              b: 22.88
-            crossed:
-              scale: 65.871
-              unified_gain: 3.0
-              r: 21.74
-              g: 32.28
-              b: 32.28
-            positive:
-              scale: 30.647
-              unified_gain: 2.0
-              r: 10.11
-              g: 15.02
-              b: 15.02
-            uncrossed:
-              scale: 1.446
-              unified_gain: 1.0
-              r: 0.48
-              g: 0.71
-              b: 0.71
   brightfield:
     LOCI_OBJECTIVE_OLYMPUS_10X_001:
       LOCI_DETECTOR_TELEDYNE_001:
