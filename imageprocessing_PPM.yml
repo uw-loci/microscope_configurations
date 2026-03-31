@@ -122,85 +122,21 @@ imaging_profiles:
           max_iterations: 15
           max_exposure_ratio: 2.0
           calibrate_black_level: true
+        # Exposures and gains are written by WB calibration.
+        # Simple WB: uncrossed has per-channel R/G/B; small angles have unified (r=g=b).
+        # Re-run Simple WB to populate with correct unified-exposure values.
         exposures_ms:
           uncrossed:
             all: 0.71
             r: 0.48
             g: 0.71
             b: 0.93
-          negative:
-            all: 27.95
-            r: 17.01
-            g: 27.95
-            b: 28.18
-          crossed:
-            all: 62.85
-            r: 55.58
-            g: 62.85
-            b: 63.54
-          positive:
-            all: 15.77
-            r: 12.42
-            g: 15.77
-            b: 23.42
         gains:
-          negative:
-            unified_gain: 1.0
-            analog_red: 1.0
-            analog_blue: 3.053
-            wb_method: manual_simple
-          crossed:
-            unified_gain: 1.089
-            analog_red: 1.0
-            analog_blue: 3.17
-            wb_method: manual_simple
-          positive:
-            unified_gain: 1.0
-            analog_red: 1.0
-            analog_blue: 4.0
-            wb_method: manual_simple
           uncrossed:
             unified_gain: 1.0
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_simple
-        simple_wb:
-          last_calibrated: '2026-03-30T19:22:35.805546'
-          base_angle: uncrossed
-          base_exposures_ms:
-            r: 0.48
-            g: 0.71
-            b: 0.93
-          base_gains:
-            unified_gain: 1.0
-            analog_red: 1.0
-            analog_blue: 4.0
-            wb_method: manual_simple
-          angles:
-            positive:
-              scale: 31.063
-              unified_gain: 1.0
-              r: 14.91
-              g: 22.06
-              b: 28.89
-            negative:
-              scale: 43.593
-              unified_gain: 1.0
-              r: 20.92
-              g: 30.95
-              b: 40.54
-            crossed:
-              scale: 89.083
-              unified_gain: 1.089
-              r: 42.76
-              g: 63.25
-              b: 82.85
-            uncrossed:
-              scale: 1.061
-              unified_gain: 1.0
-              r: 0.51
-              g: 0.75
-              b: 0.99
         wb_last_modified: '2026-03-30T19:21:39.059911'
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
