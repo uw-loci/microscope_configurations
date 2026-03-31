@@ -62,6 +62,22 @@
 #   - Higher values: Require fuller tissue coverage
 #   - Use 0.05-0.10 for sparse samples, 0.20-0.30 for dense tissue
 #
+# ========== WSI TISSUE SCORING (Existing Image Workflow) ==========
+# When acquiring from an existing image, tiles can be pre-scored from the WSI
+# to select the best tile for initial autofocus (avoiding blank/white regions).
+#
+# wsi_tissue_threshold: Min fraction of tissue pixels to accept a tile for AF (0.0-1.0)
+#   - Default 0.15 (15% of the tile must contain tissue)
+#   - Lower for sparse samples, higher for dense tissue
+#
+# wsi_tissue_white_threshold: Pixel mean RGB above this is classified as white/blank
+#   - Default 230 (near-white)
+#   - Lower to be more aggressive at excluding light tissue
+#
+# wsi_tissue_dark_threshold: Pixel mean RGB below this is classified as background/artifact
+#   - Default 20 (near-black)
+#   - Raise to exclude dark artifacts or pen marks
+#
 # ========== ADAPTIVE AUTOFOCUS PARAMETERS (Optional) ==========
 # These parameters enable adaptive autofocus for faster focusing on subsequent tiles.
 #
