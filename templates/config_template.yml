@@ -65,19 +65,45 @@ modalities:
       # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
 
   # Example: Second Harmonic Generation (SHG) multiphoton imaging
+  # The Setup Wizard collects these fields when you choose type 'multiphoton'.
+  # Fields marked [manual] are not collected by the wizard -- edit YAML directly.
   shg:
     type: 'multiphoton'
 
-    # Laser control
+    # Laser control (required)
     laser:
-      device: 'Chameleon'
-      wavelength_nm: 800
-      wavelength_range_nm: [690, 1040]
+      device: 'Chameleon'           # Micro-Manager device name
+      wavelength_nm: 800            # Default operating wavelength
+      wavelength_range_nm: [690, 1040]  # Tunable range
 
-    # Variable magnification through scanning zoom
-    magnification_control:
-      type: 'zoom'
+    # Pockels cell for laser power modulation (required)
+    pockels_cell:
+      device: 'PockelsCell-Dev1ao1' # Analog output device
+      max_voltage: 1.0              # Safety limit
+      # type: 'analog_voltage'      # [manual] Control type
+      # property: 'Voltage'         # [manual] MM property name
+
+    # PMT detector (required)
+    pmt:
+      device: 'DCC100'              # PMT controller device
+      connector: 1                  # Controller connector number
+      max_gain_percent: 100.0       # Safety limit for high-voltage
+
+    # Scan magnifier / zoom (optional)
+    zoom:
+      device: 'OSc-Magnifier'       # Leave blank if not available
       range: [0.5, 10.0]            # Min/max zoom factors
+      default: 1.0                  # Default zoom
+
+    # Laser safety shutter (optional)
+    shutter:
+      device: 'UniblitzShutter'
+
+    # Digital IO shutter [manual] -- for NI DAQ digital shutter control
+    # digital_shutter:
+    #   device: 'Shutters-DigitalIODev1'
+    #   open_state: 3
+    #   closed_state: 0
 
     background_correction:
       enabled: false                # Typically disabled for multiphoton
