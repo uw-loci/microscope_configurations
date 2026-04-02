@@ -1,0 +1,204 @@
+# ========== CAMM MICROSCOPE CONFIGURATION (TEMPLATE) ==========
+# Dual-modality system: Brightfield (QCamera) + SHG/Multiphoton (OSc-LSM)
+#
+# This template shows how QPSC hardware abstractions map to a multi-camera,
+# multi-modality microscope. Each detector has its own flip state because
+# the brightfield and laser scanning optical paths may be mirrored
+# differently relative to the physical stage.
+#
+# Component mapping:
+#   Camera:       QCamera (brightfield) / OSc-LSM (SHG) -- per-detector flip
+#   Stage:        ASI Tiger XYZ + condenser F-stage + objective turret
+#   Illumination: LED (brightfield) / Pockels cell (laser)
+#   Detector:     PMT via DCC-100 (SHG only)
+#   RotationStage: None (no polarization on CAMM)
+
+microscope:
+  name: 'CAMM'
+  type: 'Multimodal'
+  detector_in_use: null    # Set at runtime
+  objective_in_use: null   # Set at runtime
+  modality: null           # Set at runtime
+
+# ========== MODALITY-SPECIFIC SETTINGS ==========
+modalities:
+  brightfield:
+    type: 'brightfield'
+    illumination:
+      device: 'LED-Dev1ao0'
+      type: 'analog_voltage'
+      property: 'Voltage'
+      max_voltage: 5.0
+    background_correction:
+      enabled: true
+      method: 'divide'
+    # When switching TO brightfield:
+    #   1. Disable PMT (safety!)
+    #   2. Set Core/Camera -> QCamera
+    #   3. Set Core/Shutter -> WhiteLED
+    #   4. Turn on LED
+    #   5. Set digital shutter state 0
+
+  shg:
+    type: 'multiphoton'
+    laser:
+      device: 'Chameleon'
+      wavelength_nm: 800
+      wavelength_range_nm: [690, 1040]
+    pockels_cell:
+      device: 'PockelsCell-Dev1ao1'
+      type: 'analog_voltage'
+      property: 'Voltage'
+      max_voltage: 1.0
+    pmt:
+      device: 'DCC100'
+      connector: 1
+      max_gain_percent: 100.0
+    zoom:
+      device: 'OSc-Magnifier'
+      range: [0.5, 10.0]
+      default: 1.0
+    shutter:
+      device: 'UniblitzShutter'
+    digital_shutter:
+      device: 'Shutters-DigitalIODev1'
+      open_state: 3
+      closed_state: 0
+    background_correction:
+      enabled: false
+    # When switching TO shg:
+    #   1. Turn off LED
+    #   2. Set Core/Camera -> OSc-LSM
+    #   3. Set Core/Shutter -> UniblitzShutter
+    #   4. Set digital shutter open (state 3)
+    #   5. Configure OSc-LSM resolution + pixel rate
+    #   6. Set Pockels cell power
+    #   7. Enable PMT + clear overload + set gain
+
+# ========== DETECTOR CONFIGURATION ==========
+# CRITICAL: flip_x / flip_y are PER-DETECTOR because the brightfield
+# camera and laser scanning detector use different optical paths.
+# The QCamera image may be mirrored relative to the OSc-LSM image.
+id_detector:
+  LOCI_DETECTOR_QCAM_001:
+    name: 'QImaging QCamera'
+    device: 'QCamera'           # MM device name
+    width_px: 1392
+    height_px: 1040
+    sensor_pixel_width_um: 6.5
+    sensor_pixel_height_um: 6.5
+    flip_x: true                # Brightfield camera is flipped on X
+    flip_y: true                # Brightfield camera is flipped on Y
+    compatible_modalities:
+      - 'brightfield'
+
+  LOCI_PMT_001:
+    name: 'SHG PMT Detector'
+    device: 'OSc-LSM'           # MM "camera" device for scan engine
+    width_px: 512               # Default scan resolution
+    height_px: 512
+    base_pixel_size_um: 0.509   # Pixel size at 256 resolution
+    flip_x: false               # LSM is NOT flipped (different path)
+    flip_y: false
+    compatible_modalities:
+      - 'shg'
+
+# ========== OBJECTIVE CONFIGURATION ==========
+hardware:
+  objectives:
+    - id: 'LOCI_OBJECTIVE_NIKON_4X_001'
+      turret_label: 'Position-2'
+      pixel_size_xy_um:
+        LOCI_DETECTOR_QCAM_001: 1.105
+      pixel_size_z_um: null
+
+    - id: 'LOCI_OBJECTIVE_NIKON_20X_001'
+      turret_label: 'Position-1'
+      pixel_size_xy_um:
+        LOCI_DETECTOR_QCAM_001: 0.222
+        LOCI_PMT_001: 0.509      # At 256 resolution; scales with resolution
+      pixel_size_z_um: null
+
+  detectors:
+    - 'LOCI_DETECTOR_QCAM_001'
+    - 'LOCI_PMT_001'
+
+# ========== ACQUISITION PROFILES ==========
+# Each profile combines a modality + objective + detector + settings.
+# The --scan-type flag from Java maps to a profile name.
+acquisition_profiles:
+  bf_4x:
+    modality: 'brightfield'
+    objective: 'LOCI_OBJECTIVE_NIKON_4X_001'
+    detector: 'LOCI_DETECTOR_QCAM_001'
+
+  bf_20x:
+    modality: 'brightfield'
+    objective: 'LOCI_OBJECTIVE_NIKON_20X_001'
+    detector: 'LOCI_DETECTOR_QCAM_001'
+
+  shg_20x:
+    modality: 'shg'
+    objective: 'LOCI_OBJECTIVE_NIKON_20X_001'
+    detector: 'LOCI_PMT_001'
+    lsm_resolution: 512
+    lsm_pixel_rate_hz: 250000.0
+    pockels_power: 0.4          # 0.0 - 1.0 (fraction of max voltage)
+    pmt_gain: 0.40              # 0.0 - 1.0 (fraction of max HV)
+    averaging: 2
+
+  shg_20x_highres:
+    modality: 'shg'
+    objective: 'LOCI_OBJECTIVE_NIKON_20X_001'
+    detector: 'LOCI_PMT_001'
+    lsm_resolution: 1024
+    lsm_pixel_rate_hz: 125000.0   # Slower scan for better SNR
+    pockels_power: 0.4
+    pmt_gain: 0.40
+    averaging: 4
+
+# ========== STAGE CONFIGURATION ==========
+stage:
+  stage_id: 'LOCI_STAGE_ASI_001'
+  z_stage: 'ZStage:Z:32'       # Primary Z (focus)
+  f_stage: 'ZStage:F:32'       # Secondary Z (condenser/collector)
+  limits:
+    x_um:
+      low: -5000
+      high: 40000
+    y_um:
+      low: -4200
+      high: 25000
+    z_um:
+      low: -8500
+      high: 17000
+    f_um:
+      low: -19000
+      high: 0
+
+# Objective turret device
+obj_slider: ['Turret:O:35', 'Label']
+
+# ========== MODE-SPECIFIC STAGE POSITIONS ==========
+# When switching between modalities, the Z and F stages must move to
+# different positions because the focal planes differ.
+mode_positions:
+  bf_4x:
+    z: 3570
+    f: -1000
+    led_voltage: 4.0
+  bf_20x:
+    z: -6980
+    f: -15800
+    led_voltage: 5.0
+  shg_20x:
+    z: -6640
+    f: -18500
+    led_voltage: 0.0    # LED off for laser scanning
+
+# ========== XY OFFSETS BETWEEN MODALITIES ==========
+# The brightfield and SHG optical paths are offset in XY.
+# When switching from one to the other, these offsets are applied.
+modality_xy_offsets:
+  bf_20x: [-600, 10]           # XY offset when switching to 20x BF
+  shg_20x: [-580, -280]        # XY offset when switching to SHG
