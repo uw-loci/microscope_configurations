@@ -11,6 +11,16 @@ id_stage:
             z: 'ZStage:Z:32'
             f: 'ZStage:F:32'  # Separate focus axis
             
+    OWS3_STAGE_NIKON_TI2_001:
+        name: 'Nikon Ti2-E XY + Z'
+        vendor: 'Nikon'
+        serial: null
+        type: 'xyz'
+        devices:
+            xy: 'XYStage'
+            z: 'ZDrive'
+            f: null
+
     LOCI_STAGE_PRIOR_001:
         name: 'Prior XYZ Stage'
         vendor: 'Prior'
@@ -29,17 +39,20 @@ id_stage:
         model: 'KBD101'
         serial: '??'
         type: 'rotational motor'
+        rotation_type: 'thor'
         device: 'KBD101_Thor_Rotation'
         units: 'ticks'  # 1 tick = 2 degrees
         resolution: 0.001  # degrees per tick
-        
+
     LOCI_STAGE_PI_001:
         name: 'PI Z Stage Axis 4'
         vendor: 'PI'
         model: 'U651 stage C-867 controller PI_GCS_2:MM2'
         serial: '??'
         type: 'rotational motor'
+        rotation_type: 'piz'
         device: 'PIZStage'
+        piz_offset: 50280.0
         units: 'ticks'  # 1 tick = 2 degrees
         resolution: 0.001  # degrees per tick
         
@@ -47,6 +60,7 @@ id_detector:
     LOCI_DETECTOR_QCAM_001:
         name: 'QCAM'
         manufacturer: 'QCAM'
+        camera_type: 'generic'
         width_px: 1392
         height_px: 1040
         sensor_pixel_width_um: 6.5
@@ -58,6 +72,7 @@ id_detector:
     LOCI_PMT_001:
         name: null
         manufacturer: null
+        camera_type: 'laser_scanning'
         width_px: 512
         height_px: 512
         sensor_pixel_width_um: 'NA'
@@ -69,6 +84,7 @@ id_detector:
     LOCI_DETECTOR_TELEDYNE_001:
         name: 'MicroPublisher 6'
         manufacturer: 'Teledyne'
+        camera_type: 'generic'
         width_px: 2688
         height_px: 2200
         sensor_pixel_width_um: 4.54
@@ -81,6 +97,7 @@ id_detector:
     LOCI_DETECTOR_JAI_001:
         name: 'AP-3200T-USB'
         manufacturer: 'JAI'
+        camera_type: 'jai'
         width_px: 2064
         height_px: 1544
         sensor_pixel_width_um: 5.5
@@ -89,6 +106,35 @@ id_detector:
         flip_x: false
         flip_y: false
         description: 'JAI 3-CCD prism detector'
+
+    OWS3_DETECTOR_HAMAMATSU_001:
+        name: 'Hamamatsu ORCA'
+        manufacturer: 'Hamamatsu'
+        camera_type: 'generic'
+        device: 'HamamatsuHam_DCAM'
+        width_px: 2048
+        height_px: 2048
+        sensor_pixel_width_um: 6.5
+        sensor_pixel_height_um: 6.5
+        requires_debayering: false
+        flip_x: false
+        flip_y: false
+        description: 'Hamamatsu ORCA sCMOS camera'
+
+    OWS3_PMT_BOTTOM_001:
+        name: 'Bottom Epi PMT (SHG/2P)'
+        manufacturer: 'Becker & Hickl'
+        camera_type: 'laser_scanning'
+        device: 'OSc-LSM'
+        width_px: 512
+        height_px: 512
+        base_pixel_size_um: 0.509
+        sensor_pixel_width_um: 'NA'
+        sensor_pixel_height_um: 'NA'
+        requires_debayering: false
+        flip_x: false
+        flip_y: false
+        description: 'Non-descanned bottom epi PMT via DCU module, channel 1'
 
 id_objective_lens:
     LOCI_OBJECTIVE_NIKON_20X_001:
@@ -153,3 +199,50 @@ id_objective_lens:
         description: 'https://www.edmundoptics.com/p/olympus-uplfln-40x-objective/29229/'
         manufacturer_id: 'Olympus'
         on_scope: 'PPM'
+
+    # --- OWS3 (Nikon Ti2-E) objectives ---
+
+    OWS3_OBJECTIVE_NIKON_10X_001:
+        name: '10x Nikon 0.5NA air'
+        magnification: 10.0
+        na: 0.5
+        wd_um: null
+        description: 'Nikon CFI Plan Apochromat 10x'
+        manufacturer_id: null
+        on_scope: 'OWS3'
+
+    OWS3_OBJECTIVE_NIKON_20X_001:
+        name: '20x Nikon 0.75NA air'
+        magnification: 20.0
+        na: 0.75
+        wd_um: null
+        description: 'Nikon CFI Plan Apochromat 20x'
+        manufacturer_id: null
+        on_scope: 'OWS3'
+
+    OWS3_OBJECTIVE_NIKON_40X_WATER_001:
+        name: '40x Nikon 1.15NA LWD water'
+        magnification: 40.0
+        na: 1.15
+        wd_um: null
+        description: 'Nikon CFI Apochromat LWD Lambda S 40xC WI'
+        manufacturer_id: null
+        on_scope: 'OWS3'
+
+    OWS3_OBJECTIVE_NIKON_40X_OIL_001:
+        name: '40x Nikon 1.30NA oil'
+        magnification: 40.0
+        na: 1.30
+        wd_um: null
+        description: 'Nikon CFI Plan Fluor 40x Oil'
+        manufacturer_id: null
+        on_scope: 'OWS3'
+
+    OWS3_OBJECTIVE_NIKON_60X_OIL_001:
+        name: '60x Nikon 1.40NA oil'
+        magnification: 60.0
+        na: 1.40
+        wd_um: null
+        description: 'Nikon CFI Plan Apochromat Lambda 60x Oil'
+        manufacturer_id: null
+        on_scope: 'OWS3'

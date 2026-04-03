@@ -82,6 +82,7 @@ modalities:
 id_detector:
   LOCI_DETECTOR_QCAM_001:
     name: 'QImaging QCamera'
+    camera_type: 'generic'
     device: 'QCamera'           # MM device name
     width_px: 1392
     height_px: 1040
@@ -94,6 +95,7 @@ id_detector:
 
   LOCI_PMT_001:
     name: 'SHG PMT Detector'
+    camera_type: 'laser_scanning'
     device: 'OSc-LSM'           # MM "camera" device for scan engine
     width_px: 512               # Default scan resolution
     height_px: 512
@@ -157,6 +159,15 @@ acquisition_profiles:
     pmt_gain: 0.40
     averaging: 4
 
+# ========== PMT SAFETY ==========
+# CRITICAL: These devices are closed/disabled BEFORE any light path or
+# illumination change to prevent PMT damage from bright light.
+pmt_safety:
+  detector_shutter:
+    device: 'Shutters-DigitalIODev1'
+    closed_state: '0'
+  # UniblitzShutter is closed via Core/Shutter mechanism, not direct set
+
 # ========== STAGE CONFIGURATION ==========
 stage:
   stage_id: 'LOCI_STAGE_ASI_001'
@@ -195,6 +206,30 @@ mode_positions:
     z: -6640
     f: -18500
     led_voltage: 0.0    # LED off for laser scanning
+
+# ========== OBJECTIVE SWAP SEQUENCES ==========
+# Different objectives may need different Z/turret staging orders to avoid
+# collisions. Each sequence group lists which objectives use it and the
+# ordered steps to execute. Steps reference stage device keys (z_stage,
+# f_stage) and mode_positions value keys (z, f, turret_label).
+objective_swap_sequences:
+  low_mag:
+    objectives: ['LOCI_OBJECTIVE_NIKON_4X_001']
+    sequence:
+      - {action: set_focus_device, device_key: z_stage}
+      - {action: move_position, device_key: z_stage, value_key: z}
+      - {action: set_turret}
+      - {action: set_focus_device, device_key: f_stage}
+      - {action: wait}
+  high_mag:
+    objectives: ['LOCI_OBJECTIVE_NIKON_20X_001']
+    sequence:
+      - {action: set_turret}
+      - {action: set_focus_device, device_key: z_stage}
+      - {action: move_position, device_key: z_stage, value_key: z}
+      - {action: set_focus_device, device_key: f_stage}
+      - {action: move_position, device_key: f_stage, value_key: f}
+      - {action: wait}
 
 # ========== XY OFFSETS BETWEEN MODALITIES ==========
 # The brightfield and SHG optical paths are offset in XY.

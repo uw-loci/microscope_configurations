@@ -27,9 +27,18 @@ modalities:
     type: 'brightfield'
 
     # Illumination control
-    lamp:
-      device: 'LED-Device-Name'     # Micro-Manager device name
-      control_type: 'voltage'       # Options: 'voltage', 'current', 'digital'
+    # type: 'device_property' for MM devices with State + Intensity (e.g. Nikon DiaLamp)
+    # type: 'analog_voltage' for NI DAQ analog outputs (e.g. LED via voltage)
+    illumination:
+      device: 'DiaLamp'             # Micro-Manager device name
+      type: 'device_property'       # Options: 'device_property', 'analog_voltage'
+      state_property: 'State'       # Only for device_property type
+      intensity_property: 'Intensity'
+      max_intensity: 2100.0         # Maximum intensity value for this device
+      label: 'DiaLamp'             # Human-readable name for logging
+      # For analog_voltage type, use these instead:
+      # type: 'analog_voltage'
+      # max_voltage: 5.0
 
     # Background correction settings
     background_correction:
@@ -79,14 +88,18 @@ modalities:
     # Pockels cell for laser power modulation (required)
     pockels_cell:
       device: 'PockelsCell-Dev1ao1' # Analog output device
+      type: 'analog_voltage'        # Control type
+      property: 'Voltage'           # MM property name
       max_voltage: 1.0              # Safety limit
-      # type: 'analog_voltage'      # [manual] Control type
-      # property: 'Voltage'         # [manual] MM property name
+      label: 'Pockels Cell'
 
     # PMT detector (required)
+    # type: 'dcc' for Becker & Hickl DCC-100 (single module on/off + per-connector gain)
+    # type: 'dcu' for Becker & Hickl DCU (per-channel enable/gain/cooling)
     pmt:
       device: 'DCC100'              # PMT controller device
-      connector: 1                  # Controller connector number
+      type: 'dcc'                   # Options: 'dcc', 'dcu'
+      connector: 1                  # Controller connector/channel number
       max_gain_percent: 100.0       # Safety limit for high-voltage
 
     # Scan magnifier / zoom (optional)
@@ -168,6 +181,63 @@ hardware:
     - 'LOCI_DETECTOR_001'           # Camera for brightfield/fluorescence
     - 'LOCI_DETECTOR_002'           # Alternative camera (e.g., RGB prism)
     - 'LOCI_PMT_001'                # PMT for multiphoton imaging
+
+# ========== DETECTOR CONFIGURATION (id_detector) ==========
+# Define each detector with its camera_type so the hardware abstraction
+# layer creates the correct Camera subclass automatically.
+# camera_type options: 'generic', 'jai', 'laser_scanning'
+id_detector:
+  LOCI_DETECTOR_001:
+    name: 'Primary Camera'
+    camera_type: 'generic'          # Standard area camera (CCD/sCMOS)
+    device: 'Camera-Device-Name'    # MM device name
+    width_px: 2048
+    height_px: 2048
+    flip_x: false                   # Optical flip (NOT stage inversion)
+    flip_y: false
+    compatible_modalities:
+      - 'brightfield'
+      - 'fluorescence'
+
+  # LOCI_PMT_001:
+  #   name: 'Scanning PMT'
+  #   camera_type: 'laser_scanning'  # Galvo scan engine (e.g. OpenScan OSc-LSM)
+  #   device: 'OSc-LSM'
+  #   width_px: 512
+  #   height_px: 512
+  #   base_pixel_size_um: 0.509     # Pixel size at base resolution (e.g. 256)
+  #   flip_x: false
+  #   flip_y: false
+  #   compatible_modalities:
+  #     - 'shg'
+  #     - '2p'
+
+# ========== ACQUISITION PROFILES ==========
+# Each profile maps a --scan-type name to hardware configuration.
+# mm_setup_presets are applied in order to set light path, filters, etc.
+# acquisition_profiles:
+#   bf_20x:
+#     modality: 'brightfield'
+#     objective: 'LOCI_OBJECTIVE_001'
+#     detector: 'LOCI_DETECTOR_001'
+#     illumination_intensity: 1200
+#     mm_setup_presets:
+#       - group: 'Light Path'
+#         preset: '2-R100 (BF Camera)'
+#       - group: 'Lens Turret'
+#         preset: 'Nikon 20x 0.75NA air'
+
+# ========== PMT SAFETY (required for systems with PMTs) ==========
+# Devices disabled/closed BEFORE any light path or illumination change.
+# All states are explicit strings, never booleans.
+# pmt_safety:
+#   detector_shutter:
+#     device: 'Arduino-Switch'
+#     preset_group: 'Detector Shutters'    # MM ConfigGroup for atomic set
+#     closed_preset: 'Closed and Off'
+#   laser_shutter:
+#     device: 'LaserShutter'
+#     closed_state: '0'
 
 # ========== STAGE CONFIGURATION ==========
 # XYZ stage for sample positioning only.

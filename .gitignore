@@ -7,10 +7,14 @@
 *.yml
 *.yaml
 
-# ========== INCLUDE TEMPLATES ==========
+# ========== INCLUDE TEMPLATES AND EXAMPLE CONFIGS ==========
 # Re-include template files (these are tracked in the repository)
 !*template*.yml
 !*template*.yaml
+
+# Include example microscope configs (for reference / new system setup)
+!config_OWS3.yml
+!autofocus_OWS3.yml
 
 # Include templates folder and all contents
 !templates/

@@ -1,0 +1,79 @@
+# Autofocus configuration for OWS3 (Nikon Ti2-E)
+#
+# IMPORTANT: Each objective has 'calibrated: false' by default.
+# Acquisition will REFUSE to run autofocus until you set 'calibrated: true'
+# after verifying the parameters are safe for your hardware.
+#
+# CRITICAL: An incorrect search_range_um can crash the objective into the sample!
+# Start with conservative values and increase gradually.
+#
+# To calibrate:
+#   1. Adjust search_range_um and n_steps for each objective
+#   2. Run the Autofocus Benchmark utility from the QP Scope menu
+#   3. Set 'calibrated: true' for each objective you have verified
+
+autofocus_settings:
+  - objective: 'OWS3_OBJECTIVE_NIKON_10X_001'
+    calibrated: false
+    n_steps: 21
+    search_range_um: 50.0
+    n_tiles: 5
+    interp_strength: 100
+    interp_kind: 'quadratic'
+    score_metric: 'sobel'
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 10.0
+    sweep_n_steps: 5
+
+  - objective: 'OWS3_OBJECTIVE_NIKON_20X_001'
+    calibrated: false
+    n_steps: 21
+    search_range_um: 30.0
+    n_tiles: 5
+    interp_strength: 100
+    interp_kind: 'quadratic'
+    score_metric: 'sobel'
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 10.0
+    sweep_n_steps: 5
+
+  - objective: 'OWS3_OBJECTIVE_NIKON_40X_WATER_001'
+    calibrated: false
+    n_steps: 21
+    search_range_um: 20.0
+    n_tiles: 9
+    interp_strength: 100
+    interp_kind: 'quadratic'
+    score_metric: 'sobel'
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 5.0
+    sweep_n_steps: 5
+
+  - objective: 'OWS3_OBJECTIVE_NIKON_40X_OIL_001'
+    calibrated: false
+    n_steps: 21
+    search_range_um: 20.0
+    n_tiles: 9
+    interp_strength: 100
+    interp_kind: 'quadratic'
+    score_metric: 'sobel'
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 5.0
+    sweep_n_steps: 5
+
+  - objective: 'OWS3_OBJECTIVE_NIKON_60X_OIL_001'
+    calibrated: false
+    n_steps: 21
+    search_range_um: 15.0
+    n_tiles: 9
+    interp_strength: 100
+    interp_kind: 'quadratic'
+    score_metric: 'sobel'
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 3.0
+    sweep_n_steps: 5
