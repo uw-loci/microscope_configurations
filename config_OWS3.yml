@@ -24,7 +24,7 @@ modalities:
       base_folder: ''
 hardware:
   objectives:
-  - id: 0.75NA_AIR_10x
+  - id: 0.5NA_AIR_10x
     pixel_size_xy_um:
       HAMAMATSU_DCAM_01: 0.6502
   - id: 0.75NA_AIR_20x
