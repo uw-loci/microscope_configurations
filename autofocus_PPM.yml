@@ -18,11 +18,6 @@
 #                 'sobel', 'brenner_gradient', or 'p98_p2'
 #   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
 #   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
-#
-# WSI TISSUE SCORING (existing image workflow only):
-#   wsi_tissue_threshold: Min tissue fraction in WSI tile to use for AF (0.0-1.0, default 0.15)
-#   wsi_tissue_white_threshold: Pixel mean RGB above this = white/blank (default 230)
-#   wsi_tissue_dark_threshold: Pixel mean RGB below this = background/artifact (default 20)
 
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
@@ -36,9 +31,6 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 10
-  wsi_tissue_threshold: 0.15
-  wsi_tissue_white_threshold: 230
-  wsi_tissue_dark_threshold: 20
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
   search_range_um: 30.0
@@ -50,9 +42,6 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
   sweep_n_steps: 10
-  wsi_tissue_threshold: 0.15
-  wsi_tissue_white_threshold: 230
-  wsi_tissue_dark_threshold: 20
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   n_steps: 15
   search_range_um: 12.0
@@ -64,6 +53,3 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
   sweep_n_steps: 6
-  wsi_tissue_threshold: 0.15
-  wsi_tissue_white_threshold: 230
-  wsi_tissue_dark_threshold: 20
