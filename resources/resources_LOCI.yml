@@ -85,6 +85,7 @@ id_detector:
         name: 'MicroPublisher 6'
         manufacturer: 'Teledyne'
         camera_type: 'generic'
+        device: 'QCamera'
         width_px: 2688
         height_px: 2200
         sensor_pixel_width_um: 4.54
@@ -98,6 +99,7 @@ id_detector:
         name: 'AP-3200T-USB'
         manufacturer: 'JAI'
         camera_type: 'jai'
+        device: 'JAICamera'
         width_px: 2064
         height_px: 1544
         sensor_pixel_width_um: 5.5
