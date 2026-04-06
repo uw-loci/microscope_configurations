@@ -4,7 +4,7 @@
 # Autofocus settings are in autofocus_PPM.yml
 
 ppm_optics : 1 # change to "NA" if you want BF
-ppm_pizstage_offset : -1804
+ppm_pizstage_offset : 177082.5 
 
 microscope:
   name: 'PPM'
