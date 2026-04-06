@@ -41,8 +41,8 @@ id_stage:
         type: 'rotational motor'
         rotation_type: 'thor'
         device: 'KBD101_Thor_Rotation'
-        units: 'ticks'  # 1 tick = 2 degrees
-        resolution: 0.001  # degrees per tick
+        units_per_deg: 2.0            # Hardware units per optical degree
+        thor_offset: 276              # Calibration offset for angle conversion
 
     LOCI_STAGE_PI_001:
         name: 'PI Z Stage Axis 4'
@@ -52,9 +52,10 @@ id_stage:
         type: 'rotational motor'
         rotation_type: 'piz'
         device: 'PIZStage'
-        piz_offset: 50280.0
-        units: 'ticks'  # 1 tick = 2 degrees
-        resolution: 0.001  # degrees per tick
+        # NOTE: piz_offset is a per-microscope calibration value.
+        # It belongs in config_<microscope>.yml as ppm_pizstage_offset,
+        # NOT here in the shared resources file.
+        units_per_deg: 1000.0         # Hardware units per optical degree
         
 id_detector:
     LOCI_DETECTOR_QCAM_001:
