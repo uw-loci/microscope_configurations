@@ -123,6 +123,7 @@ id_detector:
         flip_x: false
         flip_y: false
         description: 'Hamamatsu ORCA sCMOS camera'
+        background_target_intensity: 51200
 
     OWS3_PMT_BOTTOM_001:
         name: 'Bottom Epi PMT (SHG/2P)'

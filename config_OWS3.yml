@@ -63,6 +63,7 @@ id_detector:
     height_px: 2048
     flip_x: false
     flip_y: false
+    background_target_intensity: 51200
 stage:
   stage_id: LOCI_STAGE_OWS3
   z_stage: ZDrive
