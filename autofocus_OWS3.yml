@@ -31,7 +31,7 @@ autofocus_settings:
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 20.0
-  sweep_n_steps: 15
+  sweep_n_steps: 5
 - objective: 0.75NA_AIR_20x
   calibrated: true
   n_steps: 35
