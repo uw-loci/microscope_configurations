@@ -89,7 +89,7 @@ acquisition_profiles:
       preset: 2-R100 (BF Camera)
     - group: Epi Shutter
       preset: Closed
-    illumination_intensity: 500
+    illumination_intensity: 70
   Brightfield_20x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
