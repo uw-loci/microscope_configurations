@@ -77,7 +77,11 @@ slide_size_um:
   x: 40000
   y: 20000
 acquisition_profiles:
-  bf_20x:
+  # Keys match the scan_type prefix sent by the Java extension,
+  # which is "<Modality>_<Objective>" (e.g. "Brightfield_10x").
+  # apply_mode_setup strips the trailing "_<counter>" suffix before
+  # looking up the profile.
+  Brightfield_10x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
     mm_setup_presets:
@@ -86,7 +90,73 @@ acquisition_profiles:
     - group: Epi Shutter
       preset: Closed
     illumination_intensity: 500
-  fl_20x:
+  Brightfield_20x:
+    modality: Brightfield
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (BF Camera)
+    - group: Epi Shutter
+      preset: Closed
+    illumination_intensity: 500
+  Brightfield_40x:
+    modality: Brightfield
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (BF Camera)
+    - group: Epi Shutter
+      preset: Closed
+    illumination_intensity: 500
+  Brightfield_60x:
+    modality: Brightfield
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (BF Camera)
+    - group: Epi Shutter
+      preset: Closed
+    illumination_intensity: 500
+  Fluorescence_10x:
+    modality: Fluorescence
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (Epi Camera)
+    - group: Epi Shutter
+      preset: Open
+    - group: 'Epi Channel: Laser/LED (LAPP)'
+      preset: Epi LED (DLEDI)
+    - group: Filter Turret
+      preset: Single photon LED-DA FI TR Cy5-B
+    illumination_intensity: 1.0
+  Fluorescence_20x:
+    modality: Fluorescence
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (Epi Camera)
+    - group: Epi Shutter
+      preset: Open
+    - group: 'Epi Channel: Laser/LED (LAPP)'
+      preset: Epi LED (DLEDI)
+    - group: Filter Turret
+      preset: Single photon LED-DA FI TR Cy5-B
+    illumination_intensity: 1.0
+  Fluorescence_40x:
+    modality: Fluorescence
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (Epi Camera)
+    - group: Epi Shutter
+      preset: Open
+    - group: 'Epi Channel: Laser/LED (LAPP)'
+      preset: Epi LED (DLEDI)
+    - group: Filter Turret
+      preset: Single photon LED-DA FI TR Cy5-B
+    illumination_intensity: 1.0
+  Fluorescence_60x:
     modality: Fluorescence
     detector: HAMAMATSU_DCAM_01
     mm_setup_presets:
