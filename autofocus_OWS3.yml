@@ -18,6 +18,10 @@
 #                 'sobel', 'brenner_gradient', or 'p98_p2'
 #   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
 #   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+#
+# GAP DETECTION (safety nets beyond the spatial grid):
+#   gap_index_multiplier: Force AF after this many x n_tiles without AF (default 3)
+#   gap_spatial_multiplier: Force AF when distance > this x af_min_distance (default 2.0)
 
 autofocus_settings:
 - objective: 0.5NA_AIR_10x
@@ -32,6 +36,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 20.0
   sweep_n_steps: 5
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: 0.75NA_AIR_20x
   calibrated: true
   n_steps: 35
@@ -44,6 +50,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 5
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: 1.15NA_WATER_LWD_40x
   calibrated: true
   n_steps: 35
@@ -56,6 +64,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 5
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: 1.3NA_OIL_40x
   calibrated: true
   n_steps: 35
@@ -68,6 +78,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 5
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: 1.4NA_OIL_60x
   calibrated: true
   n_steps: 35
@@ -80,3 +92,5 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 5
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0

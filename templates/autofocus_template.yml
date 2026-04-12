@@ -78,6 +78,23 @@
 #   - Default 20 (near-black)
 #   - Raise to exclude dark artifacts or pen marks
 #
+# ========== GAP DETECTION SAFETY NETS (Optional) ==========
+# These multipliers control when autofocus is forced as a safety net,
+# beyond the spatial grid positions selected by n_tiles.
+#
+# gap_index_multiplier: Force AF after this many x n_tiles without any AF
+#   - Default: 3 (e.g., with n_tiles=5, force AF after 15 tiles)
+#   - Lower values: more frequent safety AF (slower, but safer for warped slides)
+#   - Higher values: trust the spatial grid more (faster, less safety margin)
+#   - Set to 0 to disable (rely only on spatial grid + spatial gap)
+#   - WARNING: setting to 1 recreates the old "vertical pillar" pattern
+#
+# gap_spatial_multiplier: Force AF when nearest AF is farther than this x af_min_distance
+#   - Default: 2.0 (catches disconnected tissue fragments)
+#   - Lower values (1.0-1.5): more aggressive, may fire on normal row transitions
+#   - Higher values (3.0+): only fires for truly large gaps
+#   - This is the safety net for tissue fragments separated by blank space
+#
 # ========== ADAPTIVE AUTOFOCUS PARAMETERS (Optional) ==========
 # These parameters enable adaptive autofocus for faster focusing on subsequent tiles.
 #

@@ -18,6 +18,10 @@
 #                 'sobel', 'brenner_gradient', or 'p98_p2'
 #   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
 #   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+#
+# GAP DETECTION (safety nets beyond the spatial grid):
+#   gap_index_multiplier: Force AF after this many x n_tiles without AF (default 3)
+#   gap_spatial_multiplier: Force AF when distance > this x af_min_distance (default 2.0)
 
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
@@ -31,6 +35,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 10
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   n_steps: 40
   search_range_um: 30.0
@@ -42,6 +48,8 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
   sweep_n_steps: 10
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   n_steps: 15
   search_range_um: 12.0
@@ -53,3 +61,5 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
   sweep_n_steps: 6
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
