@@ -21,6 +21,7 @@
 
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
+  calibrated: true
   n_steps: 35
   search_range_um: 50.0
   n_tiles: 4
@@ -32,17 +33,19 @@ autofocus_settings:
   sweep_range_um: 10.0
   sweep_n_steps: 10
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
+  calibrated: true
   n_steps: 40
   search_range_um: 30.0
-  n_tiles: 5
+  n_tiles: 4
   interp_strength: 100
   interp_kind: quadratic
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 6.0
-  sweep_n_steps: 10
+  sweep_range_um: 5.0
+  sweep_n_steps: 8
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
+  calibrated: true
   n_steps: 15
   search_range_um: 12.0
   n_tiles: 7
