@@ -40,6 +40,11 @@ modalities:
       - id: DAPI
         display_name: DAPI (385 nm)
         exposure_ms: 100
+        # intensity_property marks which entry in device_properties is the
+        # primary "brightness knob" for this channel, so the per-acquisition
+        # dialog can expose it as a spinner without knowing anything about
+        # the specific hardware behind it.
+        intensity_property: { device: DLED, property: Intensity-385nm }
         mm_setup_presets:
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
@@ -50,6 +55,7 @@ modalities:
       - id: FITC
         display_name: FITC (475 nm)
         exposure_ms: 80
+        intensity_property: { device: DLED, property: Intensity-475nm }
         mm_setup_presets:
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
@@ -60,6 +66,7 @@ modalities:
       - id: TRITC
         display_name: TRITC (550 nm)
         exposure_ms: 120
+        intensity_property: { device: DLED, property: Intensity-550nm }
         mm_setup_presets:
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
@@ -70,6 +77,7 @@ modalities:
       - id: Cy5
         display_name: Cy5 (621 nm)
         exposure_ms: 200
+        intensity_property: { device: DLED, property: Intensity-621nm }
         mm_setup_presets:
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
@@ -104,6 +112,9 @@ modalities:
       - id: BF
         display_name: Brightfield
         exposure_ms: 10
+        # intensity_property targets the transmitted lamp instead of a DLED
+        # wavelength -- the BF channel picker spinner exposes lamp intensity.
+        intensity_property: { device: DiaLamp, property: Intensity }
         # Light Path "2-R100 (BF Camera)" preset already sets DiaLamp State=1
         # and routes the image to the BF camera port via the LAPP branch.
         mm_setup_presets:
@@ -121,6 +132,7 @@ modalities:
       - id: DAPI
         display_name: DAPI (385 nm)
         exposure_ms: 100
+        intensity_property: { device: DLED, property: Intensity-385nm }
         mm_setup_presets:
           - { group: Light Path, preset: 2-R100 (Epi Camera) }
           - { group: Epi Shutter, preset: Open }
@@ -134,6 +146,7 @@ modalities:
       - id: FITC
         display_name: FITC (475 nm)
         exposure_ms: 80
+        intensity_property: { device: DLED, property: Intensity-475nm }
         mm_setup_presets:
           - { group: Light Path, preset: 2-R100 (Epi Camera) }
           - { group: Epi Shutter, preset: Open }
@@ -147,6 +160,7 @@ modalities:
       - id: TRITC
         display_name: TRITC (550 nm)
         exposure_ms: 120
+        intensity_property: { device: DLED, property: Intensity-550nm }
         mm_setup_presets:
           - { group: Light Path, preset: 2-R100 (Epi Camera) }
           - { group: Epi Shutter, preset: Open }
@@ -160,6 +174,7 @@ modalities:
       - id: Cy5
         display_name: Cy5 (621 nm)
         exposure_ms: 200
+        intensity_property: { device: DLED, property: Intensity-621nm }
         mm_setup_presets:
           - { group: Light Path, preset: 2-R100 (Epi Camera) }
           - { group: Epi Shutter, preset: Open }
