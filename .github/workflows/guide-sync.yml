@@ -21,6 +21,16 @@ on:
   pull_request:
     branches: [main]
 
+# Opt JavaScript actions (actions/checkout etc.) into the Node 24 runtime
+# early. GitHub is deprecating Node 20 on the Actions runners: it becomes
+# the non-default runtime on 2026-06-02 and is removed entirely on
+# 2026-09-16. Setting this env var at workflow scope makes
+# actions/checkout@v4 run on Node 24 today so we don't get surprised by a
+# hard failure later, and silences the deprecation warning on every run.
+# Reference: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   guide-sync:
     name: Template <-> guide sync
