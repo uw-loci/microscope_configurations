@@ -23,6 +23,10 @@
 !templates/
 !templates/**
 
+# Include GitHub Actions workflows (.yml files under .github/)
+!.github/
+!.github/**
+
 # ========== INCLUDE SHARED RESOURCES ==========
 # Always include the resources folder and its contents
 !resources/

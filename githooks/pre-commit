@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
-# Pre-commit hook: enforce LLM_CONFIG_GUIDE.md staleness checks.
+# Pre-commit hook: optional fast-fail for LLM_CONFIG_GUIDE.md staleness.
 #
-# Rules:
+# The AUTHORITATIVE check is the GitHub Actions workflow at
+# .github/workflows/guide-sync.yml, which runs server-side on every
+# push and PR and blocks merging if templates and the guide are out of
+# sync. This local hook duplicates the logic so developers get the
+# same feedback at commit time instead of waiting for CI. It is
+# opt-in per clone.
+#
+# Rules (matching the CI workflow):
 #   1. If anything under templates/ is modified, LLM_CONFIG_GUIDE.md
-#      must also be touched in the same commit. Templates and the guide
-#      drift apart easily otherwise -- the guide is the primary way new
-#      scopes learn the schema.
+#      must also be touched in the same commit. FAILS the commit.
 #   2. If config_OWS3.yml, config_PPM.yml, or autofocus_*.yml (real
-#      configs, not templates) is modified, print a reminder that the
-#      guide's worked examples may need a sync pass. Warning only, does
-#      not fail the commit.
+#      configs, not templates) is modified, print a reminder. Warning
+#      only, does not fail the commit.
 #
-# Install with:
+# Install (opt-in, per clone):
 #   git config core.hooksPath githooks
 #
-# Bypass one commit with:
+# Bypass one commit (CI will still catch it):
 #   git commit --no-verify
-# (Don't make this a habit.)
 
 set -euo pipefail
 

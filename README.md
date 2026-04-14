@@ -274,30 +274,45 @@ imaging_settings:
 - **Templates are for reference** - Copy and customize them for your specific hardware
 - **LOCI resources** - The `resources/` folder contains shared hardware definitions used across multiple microscopes
 
-## Pre-commit hook: LLM_CONFIG_GUIDE.md sync check
+## LLM_CONFIG_GUIDE.md sync check
 
-This repo ships an opt-in pre-commit hook at `githooks/pre-commit` that
-enforces keeping `LLM_CONFIG_GUIDE.md` in sync with the config templates.
-It blocks a commit that touches `templates/*.yml` without also updating
-`LLM_CONFIG_GUIDE.md`, and warns (without blocking) when real scope
-configs (`config_OWS3.yml`, `autofocus_PPM.yml`, etc.) are changed
-without a matching guide update.
+`LLM_CONFIG_GUIDE.md` is the primary reference an LLM (or a human
+bootstrapping a new microscope) follows when producing a QPSC config
+from scratch. When templates change and the guide doesn't, new scopes
+get authored against stale examples and land with subtle schema
+mismatches that only show up mid-acquisition.
 
-Install it once per clone:
+This repo enforces "template changes must update the guide" in two
+layers:
+
+### 1. GitHub Actions workflow (authoritative)
+
+`.github/workflows/guide-sync.yml` runs on every push to `main` and on
+every pull request targeting `main`. It:
+
+- **Fails** the check if any file under `templates/` was modified
+  without `LLM_CONFIG_GUIDE.md` being touched in the same diff -- this
+  blocks merging.
+- **Warns** (without failing) when real scope configs
+  (`config_OWS3.yml`, `autofocus_PPM.yml`, etc.) are modified without a
+  matching guide update.
+
+No setup required -- this runs on GitHub for every contributor
+automatically.
+
+### 2. Local pre-commit hook (optional fast-fail)
+
+`githooks/pre-commit` runs the same checks before each local commit so
+developers get feedback without waiting for CI. It's opt-in per clone:
 
 ```bash
 git config core.hooksPath githooks
 ```
 
-After that, any `git commit` in this repo runs the check automatically.
-To bypass a single commit when you're sure the guide doesn't need an
-update (rare), use `git commit --no-verify`.
-
-Why this matters: `LLM_CONFIG_GUIDE.md` is the primary reference an LLM
-(or a human bootstrapping a new microscope) follows when producing a
-QPSC config from scratch. When templates change and the guide doesn't,
-new scopes get authored against stale examples and land with subtle
-schema mismatches that only show up mid-acquisition.
+The CI workflow is the line that actually blocks merges; the local hook
+just catches the mistake a few seconds earlier. To bypass the local
+hook for a single commit (rare), use `git commit --no-verify`. Bypassing
+CI is not possible without admin override.
 
 ## Configuration Guide
 

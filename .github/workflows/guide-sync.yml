@@ -1,0 +1,114 @@
+name: LLM_CONFIG_GUIDE sync check
+
+# Enforce on the server side that every push or PR touching the config
+# templates also updates LLM_CONFIG_GUIDE.md. This is the authoritative
+# gate; the local githooks/pre-commit is an optional fast-fail for
+# developers who opted into it via `git config core.hooksPath githooks`,
+# but drift creeps in whenever someone forgets to install the hook --
+# CI is the only line that catches 100% of changes.
+#
+# Rules:
+#   1. If anything under templates/ changed, LLM_CONFIG_GUIDE.md must
+#      also be in the same diff. Otherwise the check FAILS and the
+#      push/PR is blocked from merging.
+#   2. If a real scope config (config_OWS3.yml, autofocus_PPM.yml, etc.)
+#      changed without LLM_CONFIG_GUIDE.md being touched, emit a warning
+#      annotation but let the check pass.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  guide-sync:
+    name: Template <-> guide sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          # Need enough history to diff against the base ref on push and
+          # against the PR base on pull_request. fetch-depth: 0 is the
+          # simple correct answer for this repo's size.
+          fetch-depth: 0
+
+      - name: Compute changed files
+        id: diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            # push event: compare against the commit before this push.
+            # For the very first push to a branch, github.event.before is
+            # all zeros, which breaks git diff -- fall back to HEAD~1.
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+            if [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base="$(git rev-parse HEAD~1 2>/dev/null || echo "")"
+            fi
+          fi
+          if [ -z "$base" ]; then
+            echo "No base commit to diff against -- skipping check."
+            echo "files=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Diffing $base..$head"
+          files=$(git diff --name-only "$base" "$head" | tr '\n' ' ')
+          echo "Changed files: $files"
+          # Write to a file so downstream steps can parse without quoting pain.
+          git diff --name-only "$base" "$head" > changed_files.txt
+
+      - name: Enforce template <-> guide sync
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f changed_files.txt ]; then
+            echo "No changed_files.txt (first push / no base) -- nothing to check."
+            exit 0
+          fi
+
+          template_touched=0
+          guide_touched=0
+          real_config_touched=0
+          modified_templates=""
+          modified_real=""
+
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              templates/*.yml|templates/*.yaml)
+                template_touched=1
+                modified_templates="$modified_templates  $f%0A"
+                ;;
+              LLM_CONFIG_GUIDE.md)
+                guide_touched=1
+                ;;
+              config_OWS3.yml|config_PPM.yml|config_CAMM.yml|autofocus_OWS3.yml|autofocus_PPM.yml|autofocus_CAMM.yml)
+                real_config_touched=1
+                modified_real="$modified_real  $f%0A"
+                ;;
+            esac
+          done < changed_files.txt
+
+          exit_code=0
+
+          if [ "$template_touched" = "1" ] && [ "$guide_touched" = "0" ]; then
+            echo "::error title=LLM_CONFIG_GUIDE.md out of sync::Template files were modified without updating LLM_CONFIG_GUIDE.md.%0A%0AModified templates:%0A${modified_templates}%0ALLM_CONFIG_GUIDE.md is the primary reference for new scopes and LLMs authoring config files from scratch. When templates change, the guide must be updated to match so downstream users don't follow stale examples.%0A%0AFix: update LLM_CONFIG_GUIDE.md in the same PR/commit."
+            exit_code=1
+          fi
+
+          if [ "$real_config_touched" = "1" ] && [ "$guide_touched" = "0" ]; then
+            echo "::warning title=Real scope config changed::Real scope configs were modified without a LLM_CONFIG_GUIDE.md update.%0A%0AModified:%0A${modified_real}%0AThe guide's worked examples reference config_OWS3.yml. If the change adds a new schema pattern (not just a hardware value tweak), consider updating the guide too. This is a reminder, not a gate."
+          fi
+
+          if [ "$template_touched" = "1" ] && [ "$guide_touched" = "1" ]; then
+            echo "::notice title=Sync OK::Templates and LLM_CONFIG_GUIDE.md both updated."
+          fi
+
+          exit "$exit_code"
