@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# Pre-commit hook: enforce LLM_CONFIG_GUIDE.md staleness checks.
+#
+# Rules:
+#   1. If anything under templates/ is modified, LLM_CONFIG_GUIDE.md
+#      must also be touched in the same commit. Templates and the guide
+#      drift apart easily otherwise -- the guide is the primary way new
+#      scopes learn the schema.
+#   2. If config_OWS3.yml, config_PPM.yml, or autofocus_*.yml (real
+#      configs, not templates) is modified, print a reminder that the
+#      guide's worked examples may need a sync pass. Warning only, does
+#      not fail the commit.
+#
+# Install with:
+#   git config core.hooksPath githooks
+#
+# Bypass one commit with:
+#   git commit --no-verify
+# (Don't make this a habit.)
+
+set -euo pipefail
+
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+# Files staged for this commit (added/modified/renamed, not deleted).
+staged() {
+    git diff --cached --name-only --diff-filter=AMR
+}
+
+STAGED=$(staged)
+
+template_touched=0
+guide_touched=0
+real_config_touched=0
+
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    case "$f" in
+        templates/*.yml|templates/*.yaml)
+            template_touched=1
+            ;;
+        LLM_CONFIG_GUIDE.md)
+            guide_touched=1
+            ;;
+        config_OWS3.yml|config_PPM.yml|config_CAMM.yml|autofocus_OWS3.yml|autofocus_PPM.yml|autofocus_CAMM.yml)
+            real_config_touched=1
+            ;;
+    esac
+done <<< "$STAGED"
+
+exit_code=0
+
+if [ "$template_touched" = "1" ] && [ "$guide_touched" = "0" ]; then
+    echo -e "${RED}[pre-commit] Template files were modified without updating LLM_CONFIG_GUIDE.md${NC}"
+    echo ""
+    echo "Modified templates:"
+    staged | grep -E '^templates/.*\.ya?ml$' | sed 's/^/  /'
+    echo ""
+    echo "LLM_CONFIG_GUIDE.md is the primary reference for new scopes and"
+    echo "LLMs authoring config files from scratch. When templates change,"
+    echo "the guide must be updated to match so downstream users don't"
+    echo "follow stale examples."
+    echo ""
+    echo "Fix:"
+    echo "  1. Update LLM_CONFIG_GUIDE.md to reflect the template changes"
+    echo "  2. git add LLM_CONFIG_GUIDE.md"
+    echo "  3. Re-run the commit"
+    echo ""
+    echo "Bypass (not recommended):"
+    echo "  git commit --no-verify"
+    echo ""
+    exit_code=1
+fi
+
+if [ "$real_config_touched" = "1" ] && [ "$guide_touched" = "0" ]; then
+    echo -e "${YELLOW}[pre-commit] Warning: real scope configs changed without a LLM_CONFIG_GUIDE.md update${NC}"
+    echo ""
+    echo "Modified real configs:"
+    staged | grep -E '^(config|autofocus)_(OWS3|PPM|CAMM)\.yml$' | sed 's/^/  /'
+    echo ""
+    echo "The guide's worked examples reference config_OWS3.yml. If the"
+    echo "change you just staged adds a new schema pattern (not just a"
+    echo "hardware value tweak), consider updating the guide too."
+    echo ""
+    echo "Not failing the commit -- this is a reminder, not a gate."
+    echo ""
+fi
+
+if [ "$exit_code" = "0" ] && [ "$template_touched" = "1" ] && [ "$guide_touched" = "1" ]; then
+    echo -e "${GREEN}[pre-commit] Template + LLM_CONFIG_GUIDE.md both staged. OK.${NC}"
+fi
+
+exit "$exit_code"

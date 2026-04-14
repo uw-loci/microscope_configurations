@@ -1,24 +1,23 @@
-# ========== AUTOFOCUS CONFIGURATION ==========
-# Autofocus parameters per objective
-# These settings control autofocus behavior during image acquisition
+# ========== PPM AUTOFOCUS CONFIGURATION (schema v2) ==========
 #
-# STANDARD AUTOFOCUS (initial focus on first tissue position):
-#   n_steps: Number of Z positions to sample (higher = more accurate but slower)
-#   search_range_um: Total Z range to search in micrometers
-#   interp_strength: Interpolation density factor (typical: 50-200)
-#   interp_kind: Interpolation method - 'linear', 'quadratic', or 'cubic'
+# Modality-aware autofocus for the PPM polarized-light scope. PPM has
+# two supported modalities (ppm and brightfield); both use dense_texture
+# because the polarizer is always engaged and the imaged fields are
+# expected to contain texture-rich tissue.
 #
-# SWEEP DRIFT CHECK (in-acquisition focus correction):
-#   sweep_range_um: Total Z range for drift check (default 10 = +/-5um)
-#   sweep_n_steps: Number of Z positions to sample (default 6)
+# Schema layout:
 #
-# SHARED:
-#   n_tiles: Autofocus runs every N tiles (lower = more frequent)
-#   score_metric: 'normalized_variance' (recommended), 'laplacian_variance',
-#                 'sobel', 'brenner_gradient', or 'p98_p2'
-#   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
-#   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+#   autofocus_settings  -- per-objective hardware params (search range,
+#                          steps, sweep)
+#   strategies          -- named validity+score recipes
+#   modalities          -- which strategy each modality uses
+#
+# Authoring guide: LLM_CONFIG_GUIDE.md (section 2)
+# Design doc:      claude-reports/2026-04-13_modality-aware-autofocus-design.md
 
+schema_version: 2
+
+# ========== PER-OBJECTIVE HARDWARE PARAMETERS ==========
 autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
   calibrated: true
@@ -30,8 +29,13 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
+  # Halved drift-check cost to match OWS3: 3 points over 10 um is plenty
+  # for a 10x DoF and removes ~4 s per drift check from per-tile overhead.
   sweep_range_um: 10.0
-  sweep_n_steps: 10
+  sweep_n_steps: 3
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   calibrated: true
   n_steps: 40
@@ -42,8 +46,12 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
+  # 3 steps is enough for the 20x narrower DoF at 6 um range
   sweep_range_um: 6.0
-  sweep_n_steps: 6
+  sweep_n_steps: 3
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   calibrated: true
   n_steps: 15
@@ -54,5 +62,50 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
+  # Keep 4 sample points for the tightest DoF
   sweep_range_um: 6.0
-  sweep_n_steps: 6
+  sweep_n_steps: 4
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+
+# ========== STRATEGY LIBRARY (v2) ==========
+strategies:
+  dense_texture:
+    description: >
+      H&E, IHC, PPM, confluent IF. Requires both sufficient gradient
+      texture AND a significant tissue-area fraction.
+    score_metric: laplacian_variance
+    validity_check: texture_and_area
+    validity_params:
+      texture_threshold: 0.010
+      tissue_area_threshold: 0.200
+      rgb_brightness_threshold: 240.0
+      tissue_mask_range: [0.10, 0.90]
+      median_floor: 15.0
+    on_failure: defer
+
+  manual_only:
+    description: >
+      Skip auto entirely. Always prompts the user.
+    score_metric: none
+    validity_check: always_false
+    validity_params: {}
+    on_failure: manual
+
+# ========== PER-MODALITY STRATEGY BINDINGS (v2) ==========
+# PPM only has ppm and brightfield in config_PPM.yml. Both use
+# dense_texture, but PPM loosens the tissue mask range because polarized
+# images have wider intensity distributions than standard brightfield.
+modalities:
+  ppm:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        tissue_mask_range: [0.05, 0.95]
+        texture_threshold: 0.005
+
+  brightfield:
+    strategy: dense_texture
+
+  bf:
+    strategy: dense_texture

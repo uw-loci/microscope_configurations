@@ -1,0 +1,137 @@
+# ========== MOCK MICROSCOPE CONFIGURATION ==========
+#
+# Reference config that runs the full QPSC stack against the
+# Micro-Manager Demo device adapter. No physical hardware required.
+# Intended for CI-adjacent end-to-end testing, schema validation, and
+# Java/Python parser coverage on machines that don't have real scopes.
+#
+# Setup:
+#   1. Install Micro-Manager and select the Demo adapter in Configurator
+#   2. Save the generated .cfg somewhere Pycromanager can find it
+#   3. Launch microscope_command_server against that .cfg
+#   4. Point QPSC at this file as the microscope config
+#
+# Channels reference DemoCamera + DLamp + DDichroic device properties
+# that ship with the MM Demo profile. Adjust property names if your
+# Demo build uses different defaults.
+#
+# NOTE: This config is schema-validated by the Java/Python parsers but
+# has not been hardware-verified against a live Demo adapter. Expect
+# minor fixups on first real run. File bugs when you hit them.
+
+microscope:
+  name: MOCK
+  type: Multimodal
+  detector_in_use: null
+  objective_in_use: null
+  modality: null
+
+modalities:
+  Brightfield:
+    type: brightfield
+    illumination:
+      device: DLamp
+      type: device_property
+      state_property: State
+      intensity_property: Intensity
+      max_intensity: 100.0
+      label: Demo lamp
+    background_correction:
+      enabled: false
+      method: divide
+      base_folder: ''
+
+  Fluorescence:
+    type: widefield
+    illumination:
+      device: DLamp
+      type: device_property
+      state_property: State
+      intensity_property: Intensity
+      max_intensity: 100.0
+      label: Demo lamp
+    background_correction:
+      enabled: false
+      method: divide
+      base_folder: ''
+    # Two-channel library against the Demo adapter's DDichroic + DShutter.
+    # Since the Demo camera doesn't render different images per channel,
+    # the primary purpose of this library is to exercise the parser, the
+    # acquisition loop, the per-channel preset cache, and the stitcher +
+    # merger. Visual output is identical across channels.
+    channels:
+      - id: DAPI
+        display_name: DAPI (mock)
+        exposure_ms: 50
+        intensity_property: { device: DLamp, property: Intensity }
+        mm_setup_presets:
+          - { group: Channel, preset: DAPI }
+        device_properties:
+          - { device: DLamp, property: Intensity, value: 25 }
+      - id: FITC
+        display_name: FITC (mock)
+        exposure_ms: 50
+        intensity_property: { device: DLamp, property: Intensity }
+        mm_setup_presets:
+          - { group: Channel, preset: FITC }
+        device_properties:
+          - { device: DLamp, property: Intensity, value: 25 }
+
+hardware:
+  objectives:
+    - id: MOCK_OBJECTIVE_10X
+      pixel_size_xy_um:
+        MOCK_CAMERA_01: 0.65
+    - id: MOCK_OBJECTIVE_20X
+      pixel_size_xy_um:
+        MOCK_CAMERA_01: 0.325
+  detectors:
+    - MOCK_CAMERA_01
+
+id_detector:
+  MOCK_CAMERA_01:
+    name: Demo Camera
+    camera_type: generic
+    device: DCam
+    width_px: 512
+    height_px: 512
+    flip_x: false
+    flip_y: false
+
+stage:
+  stage_id: MOCK_STAGE
+  z_stage: DStage
+  limits:
+    x_um:
+      low: -10000.0
+      high: 10000.0
+    y_um:
+      low: -10000.0
+      high: 10000.0
+    z_um:
+      low: -500.0
+      high: 500.0
+
+slide_size_um:
+  x: 40000
+  y: 20000
+
+acquisition_profiles:
+  Brightfield_10x:
+    modality: Brightfield
+    detector: MOCK_CAMERA_01
+    illumination_intensity: 25
+  Brightfield_20x:
+    modality: Brightfield
+    detector: MOCK_CAMERA_01
+    illumination_intensity: 25
+  Fluorescence_10x:
+    modality: Fluorescence
+    detector: MOCK_CAMERA_01
+    illumination_intensity: 25
+    channels: [DAPI, FITC]
+  Fluorescence_20x:
+    modality: Fluorescence
+    detector: MOCK_CAMERA_01
+    illumination_intensity: 25
+    channels: [DAPI, FITC]

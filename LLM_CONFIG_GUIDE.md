@@ -108,34 +108,50 @@ modalities:
   BF_IF:
     # Combined brightfield + immunofluorescence on a single-camera scope.
     # The brightfield channel uses the same camera as the IF channels.
-    type: widefield
+    # type: bf_if (NOT widefield) gives the UI a distinct entry and lets
+    # future BF-specific defaults (background correction, image type)
+    # attach without touching the pure-IF code path.
+    type: bf_if
     illumination:
-      device: DiaLamp
+      device: LappMainBranch1
       type: device_property
       state_property: State
-      intensity_property: Intensity
-      max_intensity: 2100.0
-      label: BF / IF combo
+      intensity_property: State
+      max_intensity: 1.0
+      label: Epi LED
     channels:
       - id: BF
         display_name: Brightfield
-        exposure_ms: 5
-        # Same mechanism, different device: the BF channel's brightness
-        # knob points at the transmitted lamp.
+        exposure_ms: 10
+        # The BF channel's brightness knob points at the transmitted lamp
+        # instead of a DLED wavelength. The acquisition dialog spinner
+        # exposes whichever property is named here.
         intensity_property: { device: DiaLamp, property: Intensity }
+        # The "BF Camera" Light Path preset routes the image to the BF
+        # port AND toggles DiaLamp State=1 on this example scope. The
+        # Epi Shutter preset defensively closes the epi path so no LED
+        # light leaks into the BF exposure.
         mm_setup_presets:
-          - { group: Light Path, preset: 3-R100 (BF Camera) }
+          - { group: Light Path, preset: 2-R100 (BF Camera) }
+          - { group: Epi Shutter, preset: Closed }
         device_properties:
-          - { device: DiaLamp, property: State, value: 1 }
           - { device: DiaLamp, property: Intensity, value: 500 }
+          # Defensive: zero every epi LED during BF integration so a
+          # stuck LED state can't contaminate the brightfield image.
+          - { device: DLED, property: Intensity-385nm, value: 0 }
+          - { device: DLED, property: Intensity-475nm, value: 0 }
+          - { device: DLED, property: Intensity-550nm, value: 0 }
+          - { device: DLED, property: Intensity-621nm, value: 0 }
       - id: FITC
         display_name: FITC (475 nm)
         exposure_ms: 80
         intensity_property: { device: DLED, property: Intensity-475nm }
         mm_setup_presets:
           - { group: Light Path, preset: 2-R100 (Epi Camera) }
+          - { group: Epi Shutter, preset: Open }
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
+          # Transmitted lamp fully off during epi acquisition
           - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-475nm, value: 30 }
 ```

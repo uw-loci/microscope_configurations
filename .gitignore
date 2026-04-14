@@ -15,6 +15,9 @@
 # Include example microscope configs (for reference / new system setup)
 !config_OWS3.yml
 !autofocus_OWS3.yml
+# Mock configs for CI-adjacent testing against the MM Demo adapter
+!config_mock.yml
+!autofocus_mock.yml
 
 # Include templates folder and all contents
 !templates/

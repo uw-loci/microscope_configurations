@@ -1,199 +1,262 @@
-# ========== AUTOFOCUS CONFIGURATION TEMPLATE ==========
-# Autofocus parameters optimized for each objective lens.
-# These settings control the autofocus behavior during image acquisition.
+# ========== AUTOFOCUS CONFIGURATION TEMPLATE (schema v2) ==========
 #
-# File naming convention: autofocus_<microscope_name>.yml
-# (e.g., autofocus_PPM.yml, autofocus_CAMM.yml)
+# This template produces a modality-aware autofocus config for a new
+# microscope. Rename to autofocus_<microscope>.yml (e.g. autofocus_PPM.yml)
+# and update objective IDs to match config_<microscope>.yml.
 #
-# All objective IDs must match entries in the corresponding microscope config file
-# (config_<microscope>.yml) and resources_LOCI.yml.
-
+# Schema layout has three sections:
+#
+#   autofocus_settings  -- per-objective HARDWARE params (search range,
+#                          steps, sweep). These describe what the stage and
+#                          objective can safely do; sample physics lives in
+#                          strategies/modalities below.
+#
+#   strategies          -- LIBRARY of named recipes for "is this image
+#                          focusable?" + "what's the focus score?". Each
+#                          entry binds a validity check, a score metric,
+#                          and a failure mode (defer / proceed / manual).
+#
+#   modalities          -- BINDINGS that say which strategy each modality
+#                          should use, with optional per-modality overrides
+#                          of validity_params. Modality keys match the
+#                          ModalityRegistry prefix list (longest-prefix
+#                          wins, case-insensitive).
+#
+# Schema v1 (the bare per-objective rows with texture_threshold and
+# tissue_area_threshold inline) is still parseable as a fallback. Loaders
+# that see schema_version: 2 prefer the strategy library + modality
+# bindings; loaders that don't see it fall back to the v1 inline fields.
+#
+# Design doc:
+#   claude-reports/2026-04-13_modality-aware-autofocus-design.md
+#
+# Authoring guide:
+#   LLM_CONFIG_GUIDE.md (section 2)
+#
 # ========== PARAMETER DESCRIPTIONS ==========
 #
-# n_steps: Number of Z positions to sample during autofocus search
-#   - Higher values: More accurate focus but slower
-#   - Typical range: 7-50 steps
-#   - Lower magnification (larger DOF): fewer steps needed (7-15)
-#   - Higher magnification (smaller DOF): more steps needed (15-50)
+# STANDARD AUTOFOCUS (initial focus on first tissue position):
+#   n_steps: Number of Z positions to sample (higher = more accurate but slower)
+#     - Low mag (4x-10x): 7-15 steps
+#     - Mid mag (20x-40x): 15-40 steps
+#     - High mag (60x+): 15-50 steps
+#   search_range_um: Total Z range to search in micrometers
+#     - Low mag: 50-100 um (larger DoF)
+#     - Mid mag: 25-50 um
+#     - High mag: 10-25 um (smaller DoF)
+#   interp_strength: Interpolation density factor (typical: 50-200)
+#   interp_kind: Interpolation method - 'linear', 'quadratic', or 'cubic'
 #
-# search_range_um: Total Z range to search in micrometers (centered on current position)
-#   - Typical range: 10-100 micrometers
-#   - Lower magnification: larger range (50-100um)
-#   - Higher magnification: smaller range (10-25um)
+# SWEEP DRIFT CHECK (in-acquisition focus correction):
+#   sweep_range_um: Total Z range for drift check (default 10 = +/-5 um)
+#     - Wider for low mag (12-20 um), narrower for high mag (6-10 um)
+#   sweep_n_steps: Number of Z positions to sample for drift
+#     - 3 steps is enough for most objectives; use 4+ on tight-DoF (60x+)
 #
-# n_tiles: Spatial frequency - autofocus runs every N tiles during large acquisitions
-#   - Higher values: Faster acquisition but less frequent refocusing
-#   - Lower values: More frequent refocusing but slower
-#   - Typical range: 1-10 tiles
-#   - For flat samples: use higher values (5-10)
-#   - For warped samples: use lower values (1-3)
+# SHARED:
+#   n_tiles: Autofocus runs every N tiles (lower = more frequent)
+#     - Flat samples: 5-10
+#     - Warped samples: 1-3
+#   score_metric: Used only by v1 fallback loader; in v2 this is set
+#                 per-strategy in the strategies block.
 #
-# interp_strength: Interpolation density factor for focus curve fitting
-#   - Controls smoothness of fitted focus curve
-#   - Typical range: 50-200
-#   - Higher values: smoother curve, may miss sharp peaks
-#   - Lower values: more responsive to data, may be noisy
-#   - Recommended: 100 for most applications
-#
-# interp_kind: Interpolation method for focus curve fitting
-#   - Options: 'linear', 'quadratic', 'cubic'
-#   - 'linear': Fastest, simplest, good for well-behaved samples
-#   - 'quadratic': Balanced, recommended for most applications
-#   - 'cubic': Smoothest, best for noisy data
-#
-# score_metric: Focus sharpness metric algorithm
-#   - 'laplacian_variance': Fast (~5ms), robust, recommended default
-#   - 'sobel': Fast (~5ms), edge-based, good for sharp features
-#   - 'brenner_gradient': Fastest (~3ms), simple gradient-based
-#   - 'robust_sharpness': Particle-resistant (~20ms), best for noisy backgrounds
-#   - 'hybrid_sharpness': Balanced (~8ms), combines multiple metrics
-#
-# texture_threshold: Minimum texture variance for tissue detection
-#   - Determines minimum image complexity to be considered "tissue" vs "background"
-#   - Typical range: 0.005-0.030
-#   - Lower values: Accept smoother, less textured tissue
-#   - Higher values: Require more texture/detail to accept as tissue
-#   - Start with 0.010 and adjust based on sample characteristics
-#
-# tissue_area_threshold: Minimum fraction of image that must contain tissue
-#   - Fraction of image area that must exceed texture_threshold (0.0-1.0)
-#   - Typical range: 0.05-0.30
-#   - Lower values: Accept sparse tissue coverage
-#   - Higher values: Require fuller tissue coverage
-#   - Use 0.05-0.10 for sparse samples, 0.20-0.30 for dense tissue
-#
-# ========== WSI TISSUE SCORING (Existing Image Workflow) ==========
-# When acquiring from an existing image, tiles can be pre-scored from the WSI
-# to select the best tile for initial autofocus (avoiding blank/white regions).
-#
-# wsi_tissue_threshold: Min fraction of tissue pixels to accept a tile for AF (0.0-1.0)
-#   - Default 0.15 (15% of the tile must contain tissue)
-#   - Lower for sparse samples, higher for dense tissue
-#
-# wsi_tissue_white_threshold: Pixel mean RGB above this is classified as white/blank
-#   - Default 230 (near-white)
-#   - Lower to be more aggressive at excluding light tissue
-#
-# wsi_tissue_dark_threshold: Pixel mean RGB below this is classified as background/artifact
-#   - Default 20 (near-black)
-#   - Raise to exclude dark artifacts or pen marks
-#
-# ========== GAP DETECTION SAFETY NETS (Optional) ==========
-# These multipliers control when autofocus is forced as a safety net,
-# beyond the spatial grid positions selected by n_tiles.
-#
-# gap_index_multiplier: Force AF after this many x n_tiles without any AF
-#   - Default: 3 (e.g., with n_tiles=5, force AF after 15 tiles)
-#   - Lower values: more frequent safety AF (slower, but safer for warped slides)
-#   - Higher values: trust the spatial grid more (faster, less safety margin)
-#   - Set to 0 to disable (rely only on spatial grid + spatial gap)
-#   - WARNING: setting to 1 recreates the old "vertical pillar" pattern
-#
-# gap_spatial_multiplier: Force AF when nearest AF is farther than this x af_min_distance
-#   - Default: 2.0 (catches disconnected tissue fragments)
-#   - Lower values (1.0-1.5): more aggressive, may fire on normal row transitions
-#   - Higher values (3.0+): only fires for truly large gaps
-#   - This is the safety net for tissue fragments separated by blank space
-#
-# ========== ADAPTIVE AUTOFOCUS PARAMETERS (Optional) ==========
-# These parameters enable adaptive autofocus for faster focusing on subsequent tiles.
-#
-# adaptive_initial_step_um: Initial step size for coarse search (micrometers)
-#   - Larger for low magnification (5-10um), smaller for high magnification (0.5-2um)
-#
-# adaptive_min_step_um: Minimum step size for fine search (micrometers)
-#   - Should be smaller than depth of field
-#   - Low mag: 1-2um, High mag: 0.2-0.5um
-#
-# adaptive_max_steps: Maximum number of steps for adaptive search
-#   - Typical range: 15-30 steps
-#   - Prevents excessive searching if focus is lost
-#
-# adaptive_focus_threshold: Confidence threshold for accepting focus (0.0-1.0)
-#   - Typical range: 0.90-0.98
-#   - Higher values: More stringent, slower but more accurate
-#   - Lower values: More permissive, faster but may accept suboptimal focus
+# GAP DETECTION (safety nets beyond the spatial grid):
+#   gap_index_multiplier: Force AF after this many x n_tiles without AF (default 3)
+#     - Set to 0 to disable; WARNING: 1 recreates the "vertical pillar" pattern
+#   gap_spatial_multiplier: Force AF when distance > this x af_min_distance (default 2.0)
 
-# ========== AUTOFOCUS SETTINGS ==========
+schema_version: 2
+
+# ========== PER-OBJECTIVE HARDWARE PARAMETERS ==========
+# One row per objective. Objective IDs must match config_<SCOPE>.yml
+# and the corresponding entries in resources_LOCI.yml.
 autofocus_settings:
-  # Example: Low magnification objective (4x-10x)
-  # - Larger depth of field -> fewer steps, larger range
-  - objective: LOCI_OBJECTIVE_001       # Must match config file
-    n_steps: 35
-    search_range_um: 50.0
-    n_tiles: 5                          # Less frequent refocusing
+  # Example: Low magnification objective (4x-10x) -- large DoF, fewer steps
+  - objective: LOCI_OBJECTIVE_001
+    calibrated: true
+    n_steps: 9
+    search_range_um: 15.0
+    n_tiles: 5
     interp_strength: 100
     interp_kind: quadratic
-    score_metric: laplacian_variance
-    texture_threshold: 0.005            # Lower threshold for lower mag
+    score_metric: normalized_variance
+    texture_threshold: 0.005
     tissue_area_threshold: 0.2
-    # Adaptive autofocus (optional)
-    adaptive_initial_step_um: 10.0      # Larger initial step for low mag
-    adaptive_min_step_um: 2.0
-    adaptive_max_steps: 25
-    adaptive_focus_threshold: 0.95
+    sweep_range_um: 12.0
+    sweep_n_steps: 3
+    gap_index_multiplier: 3
+    gap_spatial_multiplier: 2.0
 
   # Example: Medium magnification objective (20x-40x)
-  # - Moderate depth of field -> moderate steps and range
   - objective: LOCI_OBJECTIVE_002
-    n_steps: 40
+    calibrated: true
+    n_steps: 35
     search_range_um: 50.0
-    n_tiles: 2                          # More frequent refocusing
+    n_tiles: 5
     interp_strength: 100
     interp_kind: quadratic
     score_metric: laplacian_variance
-    texture_threshold: 0.010            # Moderate threshold
+    texture_threshold: 0.010
     tissue_area_threshold: 0.2
-    adaptive_initial_step_um: 5.0       # Moderate initial step
-    adaptive_min_step_um: 0.4
-    adaptive_max_steps: 25
-    adaptive_focus_threshold: 0.95
+    sweep_range_um: 10.0
+    sweep_n_steps: 3
+    gap_index_multiplier: 3
+    gap_spatial_multiplier: 2.0
 
-  # Example: High magnification objective (60x-100x)
-  # - Small depth of field -> more steps, smaller range
+  # Example: High magnification objective (60x-100x) -- tight DoF, extra sweep point
   - objective: LOCI_OBJECTIVE_003
-    n_steps: 15
-    search_range_um: 12.0               # Smaller search range
-    n_tiles: 7                          # Variable - depends on sample flatness
+    calibrated: true
+    n_steps: 35
+    search_range_um: 50.0
+    n_tiles: 5
     interp_strength: 100
     interp_kind: quadratic
     score_metric: laplacian_variance
-    texture_threshold: 0.015            # Higher threshold for high mag
+    texture_threshold: 0.015
     tissue_area_threshold: 0.2
-    adaptive_initial_step_um: 2.0       # Small initial step for high mag
-    adaptive_min_step_um: 0.2
-    adaptive_max_steps: 25
-    adaptive_focus_threshold: 0.95
+    sweep_range_um: 10.0
+    sweep_n_steps: 4
+    gap_index_multiplier: 3
+    gap_spatial_multiplier: 2.0
+
+# ========== STRATEGY LIBRARY (v2) ==========
+# Each strategy is a self-contained recipe. validity_check + score_metric
+# are tags consumed by microscope_control/autofocus/strategies.py, which
+# maps them to concrete Python implementations. In most cases you can
+# copy this block unchanged across scopes and only adjust the per-modality
+# bindings below. Tune validity_params only if your scope's noise floor
+# or background level differs from the defaults.
+#
+# on_failure values:
+#   defer   -- skip this tile and try the next one (current dense behavior)
+#   proceed -- run AF anyway (sparse samples often focus fine even when
+#              the gate is borderline)
+#   manual  -- pop the manual focus dialog immediately
+strategies:
+  dense_texture:
+    description: >
+      H&E, IHC, PPM, confluent IF. Requires both sufficient gradient
+      texture AND a significant tissue-area fraction.
+    score_metric: laplacian_variance
+    validity_check: texture_and_area
+    validity_params:
+      texture_threshold: 0.010
+      tissue_area_threshold: 0.200
+      rgb_brightness_threshold: 240.0
+      tissue_mask_range: [0.10, 0.90]
+      median_floor: 15.0
+    on_failure: defer
+
+  sparse_signal:
+    description: >
+      Scattered fluorescent objects (beads, pollen, single cells on a
+      dark background). No area gate. Validity = count of bright local
+      maxima above an adaptive (median + k*MAD) background. Brightness
+      check uses dynamic range, NOT a median floor, so the dim-image
+      exposure-doubling loop does not fire on samples whose backgrounds
+      are intentionally near zero.
+    score_metric: laplacian_variance
+    validity_check: bright_spot_count
+    validity_params:
+      spot_sigma_above_bg: 5.0
+      spot_min_separation_px: 8
+      min_spots: 3
+      min_peak_intensity: 20.0
+      bright_pixel_floor: 50.0
+    on_failure: proceed
+
+  dark_field:
+    description: >
+      Background-dominated signal where neither a mid-gray mask nor a
+      bright-spot count fits (e.g. SHG, dark-field contrast). Whole-FOV
+      gradient magnitude. Validity = total gradient energy above a floor.
+    score_metric: brenner_gradient
+    validity_check: total_gradient_energy
+    validity_params:
+      min_gradient_energy: 0.002
+    on_failure: proceed
+
+  manual_only:
+    description: >
+      Skip auto entirely. Always prompts the user. Used for training
+      runs, edge-case samples, or when the user does not trust auto for
+      this modality.
+    score_metric: none
+    validity_check: always_false
+    validity_params: {}
+    on_failure: manual
+
+# ========== PER-MODALITY STRATEGY BINDINGS (v2) ==========
+# Modality keys are matched against ModalityRegistry's longest-prefix-
+# wins lookup (case-insensitive). overrides.validity_params merges into
+# the named strategy's defaults. To bind a modality to a custom strategy
+# at acquisition time, use the --af-strategy CLI flag (set via the
+# acquisition dialog autofocus dropdown).
+#
+# Add one binding per modality prefix your scope actually uses.
+# Unlisted modalities fall back to dense_texture via the v1 compat path.
+modalities:
+  bf:
+    strategy: dense_texture
+
+  brightfield:
+    strategy: dense_texture
+
+  ppm:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        # Polarized images have wider intensity ranges
+        tissue_mask_range: [0.05, 0.95]
+        texture_threshold: 0.005
+
+  fl:
+    strategy: sparse_signal
+
+  fluorescence:
+    strategy: sparse_signal
+
+  bf_if:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        # IF-heavy slides have sparser tissue than pure H&E
+        tissue_area_threshold: 0.10
+
+  lsm:
+    strategy: dark_field
+
+  shg:
+    strategy: dark_field
+
+  '2p':
+    strategy: dark_field
+
+  confocal:
+    strategy: dark_field
 
 # ========== TUNING GUIDELINES ==========
 #
 # 1. START WITH DEFAULTS:
-#    - Use values from examples above as starting points
-#    - Test on representative samples before large acquisitions
+#    - Copy this template verbatim, then adjust per-objective rows to
+#      match your stage and objective lineup. Leave strategies/modalities
+#      alone until you see a real failure.
 #
 # 2. OPTIMIZE FOR SPEED vs ACCURACY:
-#    - For faster autofocus: Reduce n_steps, increase n_tiles
-#    - For better accuracy: Increase n_steps, decrease n_tiles
+#    - Faster: reduce n_steps, increase n_tiles, drop sweep_n_steps to 3
+#    - Accurate: increase n_steps, decrease n_tiles
 #
 # 3. HANDLE DIFFICULT SAMPLES:
-#    - Warped slides: Decrease n_tiles (refocus more often)
-#    - Low contrast tissue: Lower texture_threshold, try 'robust_sharpness' metric
-#    - Noisy backgrounds: Use 'robust_sharpness' or 'hybrid_sharpness'
-#    - Sparse tissue: Lower tissue_area_threshold
+#    - Sparse fluorescence (beads, pollen): bind fluorescence -> sparse_signal
+#    - Warped slides: decrease n_tiles (refocus more often)
+#    - Noisy backgrounds: try dark_field strategy or tune spot thresholds
 #
-# 4. MAGNIFICATION-SPECIFIC TUNING:
-#    - Low mag (4x-10x): Larger search_range_um (50-100), fewer n_steps (7-15)
-#    - Medium mag (20x-40x): Moderate search_range_um (25-50), moderate n_steps (15-40)
-#    - High mag (60x-100x): Smaller search_range_um (10-25), more n_steps (15-50)
+# 4. VALIDATE BINDINGS:
+#    - After a run, check tile_measurements.json: each tile has
+#      af_strategy: <name>. If it says dense_texture when you expected
+#      sparse_signal, your binding prefix is wrong or too short.
 #
-# 5. ADAPTIVE AUTOFOCUS:
-#    - Enable for large tiled acquisitions to speed up refocusing
-#    - Requires good initial focus on first tile
-#    - May fail if sample has abrupt height changes
-#
-# 6. TESTING PROCEDURE:
-#    - Start with conservative (slower) settings
-#    - Acquire test region with known challenging areas
-#    - Review focus quality across all tiles
-#    - Incrementally adjust parameters to optimize speed/quality tradeoff
-#    - Document settings that work well for each sample type
+# 5. --af-strategy OVERRIDE:
+#    - The acquisition dialog dropdown sends --af-strategy at runtime,
+#      which overrides the binding for that acquisition only. Useful for
+#      testing new strategies without editing YAML.

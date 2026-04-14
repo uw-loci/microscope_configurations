@@ -1,0 +1,92 @@
+# ========== MOCK AUTOFOCUS CONFIGURATION (schema v2) ==========
+#
+# Paired autofocus config for config_mock.yml. Uses manual_only for
+# every modality because the Demo adapter's synthetic images don't
+# produce a meaningful focus curve -- sweeping and scoring it would
+# either always pass or always fail, neither of which is useful for
+# test coverage. manual_only trips the manual dialog path, which CI
+# tests can auto-dismiss.
+#
+# For local interactive testing, change any modality binding to
+# dense_texture or sparse_signal to exercise the real strategy code.
+
+schema_version: 2
+
+autofocus_settings:
+  - objective: MOCK_OBJECTIVE_10X
+    calibrated: true
+    n_steps: 5
+    search_range_um: 10.0
+    n_tiles: 5
+    interp_strength: 100
+    interp_kind: quadratic
+    score_metric: laplacian_variance
+    texture_threshold: 0.005
+    tissue_area_threshold: 0.2
+    sweep_range_um: 6.0
+    sweep_n_steps: 3
+    gap_index_multiplier: 3
+    gap_spatial_multiplier: 2.0
+
+  - objective: MOCK_OBJECTIVE_20X
+    calibrated: true
+    n_steps: 5
+    search_range_um: 10.0
+    n_tiles: 5
+    interp_strength: 100
+    interp_kind: quadratic
+    score_metric: laplacian_variance
+    texture_threshold: 0.010
+    tissue_area_threshold: 0.2
+    sweep_range_um: 6.0
+    sweep_n_steps: 3
+    gap_index_multiplier: 3
+    gap_spatial_multiplier: 2.0
+
+# ========== STRATEGY LIBRARY (v2) ==========
+strategies:
+  dense_texture:
+    description: >
+      Dense-tissue gate. Copied from the standard library so tests that
+      toggle to this binding exercise the real code path.
+    score_metric: laplacian_variance
+    validity_check: texture_and_area
+    validity_params:
+      texture_threshold: 0.010
+      tissue_area_threshold: 0.200
+      rgb_brightness_threshold: 240.0
+      tissue_mask_range: [0.10, 0.90]
+      median_floor: 15.0
+    on_failure: defer
+
+  sparse_signal:
+    description: Sparse-spot gate for exercising the non-deferring path.
+    score_metric: laplacian_variance
+    validity_check: bright_spot_count
+    validity_params:
+      spot_sigma_above_bg: 5.0
+      spot_min_separation_px: 8
+      min_spots: 3
+      min_peak_intensity: 20.0
+      bright_pixel_floor: 50.0
+    on_failure: proceed
+
+  manual_only:
+    description: >
+      Default for mock tests. Always fails validity so the manual-focus
+      path fires and can be auto-dismissed in CI.
+    score_metric: none
+    validity_check: always_false
+    validity_params: {}
+    on_failure: manual
+
+# ========== PER-MODALITY STRATEGY BINDINGS (v2) ==========
+modalities:
+  brightfield:
+    strategy: manual_only
+  bf:
+    strategy: manual_only
+  fluorescence:
+    strategy: manual_only
+  fl:
+    strategy: manual_only
