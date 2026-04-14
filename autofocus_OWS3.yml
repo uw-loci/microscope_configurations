@@ -1,6 +1,30 @@
-# ========== AUTOFOCUS CONFIGURATION ==========
-# Autofocus parameters per objective
-# These settings control autofocus behavior during image acquisition
+# ========== AUTOFOCUS CONFIGURATION (schema v2) ==========
+#
+# Schema layout has three sections:
+#
+#   autofocus_settings  -- per-objective HARDWARE params (search range,
+#                          steps, sweep). These describe what the stage and
+#                          objective can safely do; sample physics lives in
+#                          strategies/modalities below.
+#
+#   strategies          -- LIBRARY of named recipes for "is this image
+#                          focusable?" + "what's the focus score?". Each
+#                          entry binds a validity check, a score metric,
+#                          and a failure mode (defer / proceed / manual).
+#
+#   modalities          -- BINDINGS that say which strategy each modality
+#                          should use, with optional per-modality overrides
+#                          of validity_params. Modality keys match the
+#                          ModalityRegistry prefix list (longest-prefix
+#                          wins, case-insensitive).
+#
+# Schema v1 (the bare per-objective rows with texture_threshold and
+# tissue_area_threshold inline) is still parseable as a fallback. Loaders
+# that see schema_version: 2 prefer the strategy library + modality
+# bindings; loaders that don't see it fall back to the v1 inline fields.
+#
+# Design doc:
+#   claude-reports/2026-04-13_modality-aware-autofocus-design.md
 #
 # STANDARD AUTOFOCUS (initial focus on first tissue position):
 #   n_steps: Number of Z positions to sample (higher = more accurate but slower)
@@ -14,14 +38,16 @@
 #
 # SHARED:
 #   n_tiles: Autofocus runs every N tiles (lower = more frequent)
-#   score_metric: 'normalized_variance' (recommended), 'laplacian_variance',
-#                 'sobel', 'brenner_gradient', or 'p98_p2'
-#   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
-#   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+#   score_metric (v1): 'normalized_variance', 'laplacian_variance',
+#                      'sobel', 'brenner_gradient', or 'p98_p2'.
+#                      In v2, this is set per-strategy in the strategies
+#                      block instead of per-objective here.
 #
 # GAP DETECTION (safety nets beyond the spatial grid):
 #   gap_index_multiplier: Force AF after this many x n_tiles without AF (default 3)
 #   gap_spatial_multiplier: Force AF when distance > this x af_min_distance (default 2.0)
+
+schema_version: 2
 
 autofocus_settings:
 - objective: 0.5NA_AIR_10x
@@ -34,8 +60,11 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 20.0
-  sweep_n_steps: 5
+  # Sweep drift check: 12 um / 3 steps (was 20 um / 5 steps). Halves the
+  # per-tile drift check cost on the 10x (~9s -> ~5.4s) without losing the
+  # ability to detect meaningful drift on a wide DoF objective.
+  sweep_range_um: 12.0
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 0.75NA_AIR_20x
@@ -48,8 +77,10 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5). Keeps the original 10 um range
+  # because the 20x DoF is already narrow; halving steps alone saves ~4s.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.15NA_WATER_LWD_40x
@@ -62,8 +93,10 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5). 40x water has slightly wider DoF
+  # than oil, so 3 points at 10 um range still bracket the peak.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.3NA_OIL_40x
@@ -76,8 +109,9 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5).
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.4NA_OIL_60x
@@ -90,7 +124,128 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 4 steps (was 5). 60x has the tightest DoF; keep an
+  # extra sample point to distinguish the peak on narrow depth of field.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 4
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+
+# ========== STRATEGY LIBRARY (v2) ==========
+# Each strategy is a self-contained recipe. validity_check + score_metric
+# are tags consumed by microscope_control/autofocus/strategies.py, which
+# maps them to concrete Python implementations.
+#
+# on_failure values: defer (current dense behavior), proceed (run AF
+# anyway -- sparse samples often focus fine even when the gate is
+# borderline), manual (pop the manual focus dialog immediately).
+strategies:
+  dense_texture:
+    description: >
+      Current behavior. Works for H&E, IHC, PPM, confluent IF.
+      Requires both sufficient gradient texture AND a significant
+      tissue-area fraction.
+    score_metric: laplacian_variance
+    validity_check: texture_and_area
+    validity_params:
+      texture_threshold: 0.010
+      tissue_area_threshold: 0.200
+      rgb_brightness_threshold: 240.0
+      tissue_mask_range: [0.10, 0.90]
+      median_floor: 15.0
+    on_failure: defer
+
+  sparse_signal:
+    description: >
+      For scattered fluorescent objects (beads, pollen, single cells on
+      a dark background). No area gate. Validity = count of bright local
+      maxima above an adaptive (median + k*MAD) background. Brightness
+      check uses dynamic range, NOT a median floor, so the dim-image
+      exposure-doubling loop does not fire on samples whose backgrounds
+      are intentionally near zero.
+    score_metric: laplacian_variance
+    validity_check: bright_spot_count
+    validity_params:
+      spot_sigma_above_bg: 5.0
+      spot_min_separation_px: 8
+      min_spots: 3
+      min_peak_intensity: 20.0
+      bright_pixel_floor: 50.0
+    on_failure: proceed
+
+  dark_field:
+    description: >
+      Background-dominated signal where neither a mid-gray mask nor a
+      bright-spot count fits (e.g. SHG, dark-field contrast). Whole-FOV
+      gradient magnitude. Validity = total gradient energy above a floor.
+    score_metric: brenner_gradient
+    validity_check: total_gradient_energy
+    validity_params:
+      min_gradient_energy: 0.002
+    on_failure: proceed
+
+  manual_only:
+    description: >
+      Skip auto entirely. Always prompts the user. Used for training
+      runs, edge-case samples, or when the user does not trust auto for
+      this modality.
+    score_metric: none
+    validity_check: always_false
+    validity_params: {}
+    on_failure: manual
+
+# ========== PER-MODALITY STRATEGY BINDINGS (v2) ==========
+# Modality keys are matched against ModalityRegistry's longest-prefix-
+# wins lookup (case-insensitive). overrides.validity_params merges into
+# the named strategy's defaults. To bind a modality to a custom strategy
+# at acquisition time, use the --af-strategy CLI flag (set via the
+# acquisition dialog autofocus dropdown).
+modalities:
+  bf:
+    strategy: dense_texture
+
+  brightfield:
+    strategy: dense_texture
+
+  ppm:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        # Polarized images can have wider intensity ranges
+        tissue_mask_range: [0.05, 0.95]
+        texture_threshold: 0.005
+
+  fl:
+    strategy: sparse_signal
+    overrides:
+      validity_params:
+        # OWS3 16-bit sCMOS data is cleaner than the defaults expect
+        spot_sigma_above_bg: 4.0
+        min_spots: 2
+
+  fluorescence:
+    strategy: sparse_signal
+    overrides:
+      validity_params:
+        spot_sigma_above_bg: 4.0
+        min_spots: 2
+
+  bf_if:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        # Slightly looser for IF-heavy slides where the BF channel is the
+        # dense reference but the tissue may be sparser than pure H&E
+        tissue_area_threshold: 0.10
+
+  lsm:
+    strategy: dark_field
+
+  shg:
+    strategy: dark_field
+
+  '2p':
+    strategy: dark_field
+
+  confocal:
+    strategy: dark_field

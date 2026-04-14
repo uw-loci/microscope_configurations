@@ -73,6 +73,153 @@ modalities:
       base_folder: "D:/path/to/backgrounds"
       # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
 
+  # ========================================================================
+  # Example: Widefield multi-channel immunofluorescence (IF)
+  # ------------------------------------------------------------------------
+  # Declare a `channels:` library under a widefield modality to opt into
+  # the multi-channel acquisition path. Each channel is a fully
+  # self-contained description: id, display name, default exposure,
+  # ordered Micro-Manager ConfigGroup presets, and ordered device
+  # property writes. The QPSC Java and Python base layers iterate this
+  # list and drive any vendor's illumination hardware uniformly -- no
+  # vendor-specific code is required.
+  #
+  # Schema reference: see the "Multi-Channel Widefield IF Schema" section
+  # of microscope_configurations/README.md, and
+  # QPSC/docs/multichannel-if-overview.md for the cross-repo design.
+  #
+  # The block below is a copy-ready Fluorescence modality example. Rename
+  # the modality key, channel ids, preset names, and device properties to
+  # match your microscope, then uncomment it and add a matching
+  # acquisition profile below.
+  # ------------------------------------------------------------------------
+  # Fluorescence:
+  #   type: 'widefield'
+  #
+  #   # Illumination control for the epi path. Points at a single MM device
+  #   # that represents the combined epi light source (e.g. a LAPP combiner).
+  #   illumination:
+  #     device: 'LappMainBranch1'
+  #     type: 'device_property'
+  #     state_property: 'State'
+  #     intensity_property: 'State'
+  #     max_intensity: 1.0
+  #     label: 'Epi LED'
+  #
+  #   background_correction:
+  #     enabled: false
+  #     method: 'divide'
+  #     base_folder: ''
+  #
+  #   # Channel library. Each entry is one acquisition step. The
+  #   # mm_setup_presets and device_properties run INSIDE the per-tile
+  #   # loop, once per channel per tile. Profile-level mm_setup_presets
+  #   # (see the acquisition_profiles section) run ONCE before the loop
+  #   # starts, for things like opening the epi shutter and selecting the
+  #   # epi camera port.
+  #   channels:
+  #     - id: DAPI
+  #       display_name: 'DAPI (385 nm)'
+  #       exposure_ms: 100
+  #       # ConfigGroup presets applied via core.setConfig(group, preset).
+  #       # These cover filter turrets, light paths, and channel-selector
+  #       # groups that have already been wrapped as MM presets.
+  #       mm_setup_presets:
+  #         - { group: 'Filter Turret', preset: 'Single photon LED-DA FI TR Cy5-B' }
+  #       # Direct device-property writes applied via
+  #       # core.setProperty(device, property, value). Used for fine-grained
+  #       # control that is not wrapped as a ConfigGroup, e.g. per-LED
+  #       # wavelength intensity on a multi-wavelength source. `value` is
+  #       # stringified on the Java side, so any MM property type works.
+  #       device_properties:
+  #         - { device: DLED, property: Intensity-385nm, value: 25 }
+  #         - { device: DLED, property: Intensity-475nm, value: 0 }
+  #         - { device: DLED, property: Intensity-550nm, value: 0 }
+  #         - { device: DLED, property: Intensity-621nm, value: 0 }
+  #       # Optional dumb-sleep (ms) after presets + properties have been
+  #       # applied, for hardware whose isBusy() returns too early.
+  #       # settle_ms: 50
+  #     - id: FITC
+  #       display_name: 'FITC (475 nm)'
+  #       exposure_ms: 80
+  #       mm_setup_presets:
+  #         - { group: 'Filter Turret', preset: 'Single photon LED-DA FI TR Cy5-B' }
+  #       device_properties:
+  #         - { device: DLED, property: Intensity-385nm, value: 0 }
+  #         - { device: DLED, property: Intensity-475nm, value: 30 }
+  #         - { device: DLED, property: Intensity-550nm, value: 0 }
+  #         - { device: DLED, property: Intensity-621nm, value: 0 }
+
+  # ========================================================================
+  # Example: Combined brightfield + immunofluorescence (BF+IF)
+  # ------------------------------------------------------------------------
+  # `type: bf_if` marks a modality as combined BF + IF for single-camera
+  # scopes. There is NO separate code path: BF is expressed as a regular
+  # entry in the channels library whose mm_setup_presets happen to switch
+  # the light path to the transmitted port and whose device_properties
+  # happen to drive the transmitted lamp. Downstream everything (tile
+  # loop, stitcher, multichannel merger) treats BF identically to every
+  # fluorescence channel.
+  #
+  # The BF channel should be the first entry in the library by convention,
+  # so the channel picker UI lists it at the top. Per-objective BF lamp
+  # tuning lives in the profile-level channel_overrides below, NOT in the
+  # library entry itself.
+  # ------------------------------------------------------------------------
+  # BF_IF:
+  #   type: 'bf_if'
+  #
+  #   illumination:
+  #     device: 'LappMainBranch1'
+  #     type: 'device_property'
+  #     state_property: 'State'
+  #     intensity_property: 'State'
+  #     max_intensity: 1.0
+  #     label: 'Epi LED'
+  #
+  #   background_correction:
+  #     enabled: false
+  #     method: 'divide'
+  #     base_folder: ''
+  #
+  #   channels:
+  #     - id: BF
+  #       display_name: 'Brightfield'
+  #       exposure_ms: 10
+  #       # The "BF Camera" light-path preset routes the image to the BF
+  #       # port and (on this example scope) also toggles DiaLamp State=1.
+  #       # Close the epi shutter defensively so no epi LED light leaks
+  #       # into the BF integration.
+  #       mm_setup_presets:
+  #         - { group: 'Light Path',  preset: '2-R100 (BF Camera)' }
+  #         - { group: 'Epi Shutter', preset: 'Closed' }
+  #       device_properties:
+  #         # Default transmitted-lamp intensity. Per-objective tuning
+  #         # lives in channel_overrides.BF.device_properties on each
+  #         # BF_IF_<Nx> profile below.
+  #         - { device: DiaLamp, property: Intensity, value: 500 }
+  #         # Defensive: make sure no epi LED is lit during BF integration.
+  #         - { device: DLED, property: Intensity-385nm, value: 0 }
+  #         - { device: DLED, property: Intensity-475nm, value: 0 }
+  #         - { device: DLED, property: Intensity-550nm, value: 0 }
+  #         - { device: DLED, property: Intensity-621nm, value: 0 }
+  #     - id: DAPI
+  #       display_name: 'DAPI (385 nm)'
+  #       exposure_ms: 100
+  #       # IF channels switch the light path back to the epi camera port,
+  #       # open the epi shutter, pick the filter cube, then drive the LED.
+  #       mm_setup_presets:
+  #         - { group: 'Light Path',    preset: '2-R100 (Epi Camera)' }
+  #         - { group: 'Epi Shutter',   preset: 'Open' }
+  #         - { group: 'Filter Turret', preset: 'Single photon LED-DA FI TR Cy5-B' }
+  #       device_properties:
+  #         # Turn the transmitted lamp fully off during epi acquisition.
+  #         - { device: DiaLamp, property: State, value: 0 }
+  #         - { device: DLED, property: Intensity-385nm, value: 25 }
+  #         - { device: DLED, property: Intensity-475nm, value: 0 }
+  #         - { device: DLED, property: Intensity-550nm, value: 0 }
+  #         - { device: DLED, property: Intensity-621nm, value: 0 }
+
   # Example: Second Harmonic Generation (SHG) multiphoton imaging
   # The Setup Wizard collects these fields when you choose type 'multiphoton'.
   # Fields marked [manual] are not collected by the wizard -- edit YAML directly.
@@ -226,6 +373,71 @@ id_detector:
 #         preset: '2-R100 (BF Camera)'
 #       - group: 'Lens Turret'
 #         preset: 'Nikon 20x 0.75NA air'
+#
+#   # ----------------------------------------------------------------------
+#   # Example: multi-channel widefield fluorescence profile
+#   # ----------------------------------------------------------------------
+#   # Consumes the Fluorescence channel library declared in the modalities
+#   # section above. The profile-level mm_setup_presets run ONCE before the
+#   # tile loop starts (light path, epi shutter, laser/LED combiner). The
+#   # per-channel mm_setup_presets and device_properties run INSIDE the
+#   # tile loop, once per channel per tile.
+#   Fluorescence_20x:
+#     modality: 'Fluorescence'
+#     detector: 'LOCI_DETECTOR_001'
+#     mm_setup_presets:
+#       - { group: 'Light Path',  preset: '2-R100 (Epi Camera)' }
+#       - { group: 'Epi Shutter', preset: 'Open' }
+#       - { group: 'Epi Channel: Laser/LED (LAPP)', preset: 'Epi LED (DLEDI)' }
+#     illumination_intensity: 1.0
+#     # Optional subset filter. If omitted, every channel from the modality
+#     # library is acquired in library order. If present, only the listed
+#     # ids are acquired, in the given order.
+#     channels: [DAPI, FITC, TRITC, Cy5]
+#     # Optional per-channel overrides. Each entry may override exposure_ms
+#     # and/or device_properties. The device_properties override uses the
+#     # extended "replace by (device, property), append on miss" merge rule:
+#     # for each override entry, the channel library's existing entries are
+#     # searched for a matching (device, property) tuple; if matched, the
+#     # value is replaced in place; if not matched, the entry is appended.
+#     channel_overrides:
+#       Cy5:
+#         exposure_ms: 250
+#       # Uncomment to tune one property on one channel for this profile
+#       # without redeclaring the whole channel in the modality library:
+#       # DAPI:
+#       #   device_properties:
+#       #     - { device: DLED, property: Intensity-385nm, value: 35 }
+#
+#   # ----------------------------------------------------------------------
+#   # Example: combined brightfield + immunofluorescence profile
+#   # ----------------------------------------------------------------------
+#   # Consumes the BF_IF channel library from the modalities section above.
+#   # The BF channel is the first entry in the subset list and therefore
+#   # acquired first per tile. The profile uses
+#   # channel_overrides.BF.device_properties to retune the transmitted-lamp
+#   # intensity for this objective -- the single-line pattern used by
+#   # config_OWS3.yml's BF_IF_10x profile to keep the BF channel library
+#   # entry itself free of per-objective tuning.
+#   BF_IF_20x:
+#     modality: 'BF_IF'
+#     detector: 'LOCI_DETECTOR_001'
+#     mm_setup_presets:
+#       - { group: 'Epi Channel: Laser/LED (LAPP)', preset: 'Epi LED (DLEDI)' }
+#     illumination_intensity: 1.0
+#     channels: [BF, DAPI, FITC, TRITC, Cy5]
+#     channel_overrides:
+#       BF:
+#         exposure_ms: 20
+#         # Replaces the BF channel library's (DiaLamp, Intensity) entry
+#         # in place, preserving the order of the rest of the property
+#         # list. This is the main reason the extended device_properties
+#         # override schema exists: per-objective lamp tuning without
+#         # redeclaring the whole BF channel.
+#         device_properties:
+#           - { device: DiaLamp, property: Intensity, value: 70 }
+#       Cy5:
+#         exposure_ms: 250
 
 # ========== PMT SAFETY (required for systems with PMTs) ==========
 # Devices disabled/closed BEFORE any light path or illumination change.
@@ -266,6 +478,14 @@ stage:
   # For microscopes with interchangeable slide holders.
   # Defines the viewable aperture (light transmission window) for each insert type.
   # Only the aperture area is shown in the Stage Map visualization.
+  #
+  # This entire block is OPTIONAL. When `stage.inserts` is absent, the
+  # Stage Map synthesizes a single-slide insert at the center of
+  # `stage.limits` using `slide_size_um` as the slide footprint. Simple
+  # setups with a single slide in the middle of the stage can omit the
+  # entire `inserts:` block below and rely on the fallback. Multi-slide
+  # holders and scopes with offset apertures still need an explicit
+  # calibrated block.
   #
   # CALIBRATION PROCEDURE (using 4 reference points):
   #   Center the objective on each edge and record stage positions:
@@ -377,8 +597,15 @@ objective_slider:
 # 6. MODALITY TYPES:
 #    - 'brightfield': Transmitted light with lamp control
 #    - 'polarized': Requires rotation_stage and rotation_angles
-#    - 'fluorescence': Requires filter_wheel or excitation control
+#    - 'fluorescence': Legacy single-snap fluorescence (filter_wheel based)
+#    - 'widefield': Multi-channel widefield IF with a channels: library
+#    - 'bf_if':     Combined BF + IF for single-camera scopes; uses the
+#                   same channels: library schema as 'widefield'. The BF
+#                   step is just the first entry in the channel library.
 #    - 'multiphoton': Laser-based with optional magnification_control
+#    See the "Multi-Channel Widefield IF Schema" section of
+#    microscope_configurations/README.md for the channels/channel_overrides
+#    schema used by 'widefield' and 'bf_if'.
 #
 # 7. STAGE INSERTS (Optional):
 #    - Only needed for microscopes with interchangeable slide holders
