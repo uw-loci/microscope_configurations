@@ -60,8 +60,11 @@ autofocus_settings:
   score_metric: normalized_variance
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 20.0
-  sweep_n_steps: 5
+  # Sweep drift check: 12 um / 3 steps (was 20 um / 5 steps). Halves the
+  # per-tile drift check cost on the 10x (~9s -> ~5.4s) without losing the
+  # ability to detect meaningful drift on a wide DoF objective.
+  sweep_range_um: 12.0
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 0.75NA_AIR_20x
@@ -74,8 +77,10 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5). Keeps the original 10 um range
+  # because the 20x DoF is already narrow; halving steps alone saves ~4s.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.15NA_WATER_LWD_40x
@@ -88,8 +93,10 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5). 40x water has slightly wider DoF
+  # than oil, so 3 points at 10 um range still bracket the peak.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.3NA_OIL_40x
@@ -102,8 +109,9 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 3 steps (was 5).
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 - objective: 1.4NA_OIL_60x
@@ -116,8 +124,10 @@ autofocus_settings:
   score_metric: laplacian_variance
   texture_threshold: 0.01
   tissue_area_threshold: 0.2
+  # Sweep drift check: 4 steps (was 5). 60x has the tightest DoF; keep an
+  # extra sample point to distinguish the peak on narrow depth of field.
   sweep_range_um: 10.0
-  sweep_n_steps: 5
+  sweep_n_steps: 4
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
 
