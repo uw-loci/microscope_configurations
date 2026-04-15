@@ -383,17 +383,63 @@ After writing the YAML, verify:
 
 ---
 
-## 5. Common mistakes
+## 5. Cross-modality hygiene (important)
+
+**Every channel entry must fully establish its hardware state, not deltas from
+some previous state.** This is load-bearing whenever a scope has more than one
+modality that writes to the same hardware, because the user can freely switch
+between acquisitions with no enforced teardown in between.
+
+The rule: any hardware that *another modality on this scope* can leave in a
+non-default state must be explicitly clobbered by every channel in this
+modality, not assumed to be reset somewhere else. The clearest case is the
+transmitted (brightfield) lamp on a combined BF / IF scope:
+
+- If you run a Brightfield acquisition first, the BF profile turns `DiaLamp
+  State=1` and sets an intensity.
+- If you then run a pure Fluorescence acquisition, there is no automatic
+  teardown step between the two. The Fluorescence profile-level presets
+  switch the light path and open the epi shutter, but nothing in the profile
+  touches `DiaLamp State`.
+- If the Fluorescence **channels** don't explicitly write `DiaLamp State=0`,
+  the transmitted lamp stays lit during every IF exposure. The IF images
+  still acquire, but brightness and background are wrong and the user is
+  blind to the cause.
+
+Fix: every Fluorescence channel on such a scope must include
+`{ device: DiaLamp, property: State, value: 0 }` in `device_properties`,
+alongside the LED intensity writes. Likewise every brightfield-style channel
+must write `{ device: <LED>, property: Intensity, value: 0 }` for any LED that
+an IF modality might have left on -- even if the scope "always" switches the
+light path first, don't rely on the Light Path preset to zero the LED as a
+side-effect. Write it explicitly.
+
+`config_OWS3.yml` is the reference: the `BF_IF` modality's IF channels and the
+standalone `Fluorescence` modality's channels both write `DiaLamp State=0`,
+and the BF channel inside `BF_IF` writes every DLED intensity to zero. Copy
+that pattern for any new scope with multiple modalities targeting the same
+hardware family.
+
+A channel is only a "state delta" in one narrow, documented case: channels
+that acquire on a multi-band dichroic where the cube doesn't physically move.
+In that case the cube preset is a no-op in practice, but it still lives
+inside every channel entry for schema uniformity -- do not remove it for "tidy
+YAML" reasons.
+
+---
+
+## 6. Common mistakes
 
 - **Using camelCase MMCore method names in vendor docs.** Vendor manuals often say `setConfig`, `setProperty`, `waitForDevice`. Pycromanager's MMCore wrapper uses snake_case (`set_config`, `set_property`, `wait_for_device`). QPSC's Java and Python sides both use the snake_case names internally -- but if you're debugging a failing preset, look for `AttributeError: 'mmcorej_CMMCore' object has no attribute 'setConfig'` in the server log.
 - **Profile key vs base modality name.** Channel library lookups, AF strategy bindings, and stitcher branch selection all need the *enhanced profile name* (`Fluorescence_10x`), not the base modality name (`Fluorescence`). Use `ObjectiveUtils.createEnhancedFolderName()` from the Java side if you're composing keys in code.
 - **Forgetting to restart Pycromanager after changing the MM config.** MMCore caches the config groups at startup; hot-reloading is not reliable. Kill and restart the server when the MM config changes.
 - **Using non-ASCII characters in YAML values.** Windows cp1252 encoding will mangle degree signs, mu symbols, and arrows. Use `deg`, `um`, and `->` in all logging strings and comments.
 - **Pointing `intensity_property` at a property that isn't in `device_properties`.** The dialog's intensity spinner reads the value from the property write matching the `intensity_property` pair. If they don't match, the spinner shows an empty or zero value.
+- **Writing channels as state deltas instead of state establishers.** See section 5. If a previous modality can leave hardware lit, every channel in every modality must clobber it. Do not rely on the profile's `mm_setup_presets` side-effects to reset state -- write it explicitly.
 
 ---
 
-## 6. Related files
+## 7. Related files
 
 - Session summary: `claude-reports/2026-04-14_ows3-widefield-if-session-summary.md`
 - AF redesign: `claude-reports/2026-04-13_modality-aware-autofocus-design.md`

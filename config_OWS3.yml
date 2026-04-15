@@ -36,6 +36,12 @@ modalities:
     # primitives (ConfigGroup presets + device property writes). The QPSC
     # Java and Python base layers iterate this list and drive any vendor's
     # illumination hardware uniformly -- no DLED/OWS3-specific code.
+    # Every channel explicitly sets DiaLamp State=0, Light Path -> Epi Camera,
+    # and Epi Shutter -> Open. This "cross-modality hygiene" is important: a
+    # bare Fluorescence acquisition that immediately follows a Brightfield
+    # acquisition must NOT inherit the transmitted lamp that the BF profile
+    # left on. Each channel is a fully state-establishing transaction, not a
+    # state delta -- see LLM_CONFIG_GUIDE.md "cross-modality hygiene" section.
     channels:
       - id: DAPI
         display_name: DAPI (385 nm)
@@ -46,8 +52,11 @@ modalities:
         # the specific hardware behind it.
         intensity_property: { device: DLED, property: Intensity-385nm }
         mm_setup_presets:
+          - { group: Light Path, preset: 2-R100 (Epi Camera) }
+          - { group: Epi Shutter, preset: Open }
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
+          - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-385nm, value: 25 }
           - { device: DLED, property: Intensity-475nm, value: 0 }
           - { device: DLED, property: Intensity-550nm, value: 0 }
@@ -57,8 +66,11 @@ modalities:
         exposure_ms: 80
         intensity_property: { device: DLED, property: Intensity-475nm }
         mm_setup_presets:
+          - { group: Light Path, preset: 2-R100 (Epi Camera) }
+          - { group: Epi Shutter, preset: Open }
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
+          - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-385nm, value: 0 }
           - { device: DLED, property: Intensity-475nm, value: 30 }
           - { device: DLED, property: Intensity-550nm, value: 0 }
@@ -68,8 +80,11 @@ modalities:
         exposure_ms: 120
         intensity_property: { device: DLED, property: Intensity-550nm }
         mm_setup_presets:
+          - { group: Light Path, preset: 2-R100 (Epi Camera) }
+          - { group: Epi Shutter, preset: Open }
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
+          - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-385nm, value: 0 }
           - { device: DLED, property: Intensity-475nm, value: 0 }
           - { device: DLED, property: Intensity-550nm, value: 30 }
@@ -79,8 +94,11 @@ modalities:
         exposure_ms: 200
         intensity_property: { device: DLED, property: Intensity-621nm }
         mm_setup_presets:
+          - { group: Light Path, preset: 2-R100 (Epi Camera) }
+          - { group: Epi Shutter, preset: Open }
           - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
         device_properties:
+          - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-385nm, value: 0 }
           - { device: DLED, property: Intensity-475nm, value: 0 }
           - { device: DLED, property: Intensity-550nm, value: 0 }
