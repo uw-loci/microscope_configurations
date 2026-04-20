@@ -77,7 +77,7 @@ stage:
       low: -39000   # Must be <= aperture_bottom_y_um (-38294)
       high: 34000   # Must be >= aperture_top_y_um (33007)
     z_um:
-      low: -5001 #stage raised with sample close to objective, this is the important one to NOT DAMAGE OBJECTIVE. SET CAREFULLY WITH HIGHEST POWER OBJECTIVE.
+      low: -5101 #stage raised with sample close to objective, this is the important one to NOT DAMAGE OBJECTIVE. SET CAREFULLY WITH HIGHEST POWER OBJECTIVE.
       high: -1600 #stage lowered far from objective
 
   # ========== STAGE INSERT CONFIGURATION ==========
