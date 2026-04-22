@@ -12,9 +12,16 @@
 !*template*.yml
 !*template*.yaml
 
-# Include example microscope configs (for reference / new system setup)
+# Include microscope configs (tracked during development for troubleshooting)
+# TODO(release): Remove site-specific configs before public release.
+#   Only templates and example configs should be tracked in the released repo.
+#   See TODO_LIST.md "Config files and gitignore cleanup for release".
+!config_PPM.yml
+!autofocus_PPM.yml
+!imageprocessing_PPM.yml
 !config_OWS3.yml
 !autofocus_OWS3.yml
+!config_CAMM.yml
 # Mock configs for CI-adjacent testing against the MM Demo adapter
 !config_mock.yml
 !autofocus_mock.yml
