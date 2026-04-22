@@ -1,0 +1,183 @@
+Micro-Manager Device Properties Dump
+Generated: 2026-04-22T14:21:34.011013
+MM Config: PPM
+Host: BOCKWK-00124W-I
+OS: Windows 10
+Devices: 11
+
+======================================================================
+DEVICE SUMMARY
+======================================================================
+  COM5                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AF6D0>  lib=SerialManager
+  COM1                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AEF50>  lib=SerialManager
+  COM3                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AE5C0>  lib=SerialManager
+  XYStage                         type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AF6D0>  lib=Prior
+  ZStage                          type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AEF50>  lib=Prior
+  DHub                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AE5C0>  lib=DemoCamera
+  DObjective                      type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AF6D0>  lib=DemoCamera
+  JAICamera                       type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AEF50>  lib=JAI
+  C-867                           type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AE5C0>  lib=PI_GCS_2
+  PIZStage                        type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AF6D0>  lib=PI_GCS_2
+  Core                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x0000016F342AEF50>  lib=
+
+======================================================================
+DEVICE: COM5  (12 properties)
+======================================================================
+  AnswerTimeout                       = 500.0000             [RW]
+  BaudRate                            = 115200               [RW]  allowed: ['1000000', '110', '115200', '1200', '128000', '14400', '19200', '2000000', '230400', '2400', '28800', '300', '38400', '460800', '4800', '500000', '57600', '576000', '600', '921600', '9600']
+  DTR                                 = Disable              [RW]  allowed: ['Disable', 'Enable']
+  DataBits                            = 8                    [RW]  allowed: ['7', '8']
+  DelayBetweenCharsMs                 = 0.0000               [RW]
+  Description                         = Serial port driver (boost:asio) [RO]
+  Fast USB to Serial                  = Disable              [RW]  allowed: ['Disable', 'Enable']
+  Handshaking                         = Off                  [RW]  allowed: ['Hardware', 'Off', 'Software']
+  Name                                = COM5                 [RO]
+  Parity                              = None                 [RW]  allowed: ['Even', 'None', 'Odd']
+  StopBits                            = 1                    [RW]  allowed: ['1', '1.5', '2']
+  Verbose                             = 1                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: COM1  (12 properties)
+======================================================================
+  AnswerTimeout                       = 500.0000             [RW]
+  BaudRate                            = 9600                 [RW]  allowed: ['1000000', '110', '115200', '1200', '128000', '14400', '19200', '2000000', '230400', '2400', '28800', '300', '38400', '460800', '4800', '500000', '57600', '576000', '600', '921600', '9600']
+  DTR                                 = Disable              [RW]  allowed: ['Disable', 'Enable']
+  DataBits                            = 8                    [RW]  allowed: ['7', '8']
+  DelayBetweenCharsMs                 = 0.0000               [RW]
+  Description                         = Serial port driver (boost:asio) [RO]
+  Fast USB to Serial                  = Disable              [RW]  allowed: ['Disable', 'Enable']
+  Handshaking                         = Off                  [RW]  allowed: ['Hardware', 'Off', 'Software']
+  Name                                = COM1                 [RO]
+  Parity                              = None                 [RW]  allowed: ['Even', 'None', 'Odd']
+  StopBits                            = 1                    [RW]  allowed: ['1', '1.5', '2']
+  Verbose                             = 1                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: COM3  (12 properties)
+======================================================================
+  AnswerTimeout                       = 500.0000             [RW]
+  BaudRate                            = 9600                 [RW]  allowed: ['1000000', '110', '115200', '1200', '128000', '14400', '19200', '2000000', '230400', '2400', '28800', '300', '38400', '460800', '4800', '500000', '57600', '576000', '600', '921600', '9600']
+  DTR                                 = Disable              [RW]  allowed: ['Disable', 'Enable']
+  DataBits                            = 8                    [RW]  allowed: ['7', '8']
+  DelayBetweenCharsMs                 = 0.0000               [RW]
+  Description                         = Serial port driver (boost:asio) [RO]
+  Fast USB to Serial                  = Disable              [RW]  allowed: ['Disable', 'Enable']
+  Handshaking                         = Off                  [RW]  allowed: ['Hardware', 'Off', 'Software']
+  Name                                = COM3                 [RO]
+  Parity                              = None                 [RW]  allowed: ['Even', 'None', 'Odd']
+  StopBits                            = 1                    [RW]  allowed: ['1', '1.5', '2']
+  Verbose                             = 1                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: XYStage  (9 properties)
+======================================================================
+  Acceleration                        = 100                  [RW]
+  Description                         = Prior XY stage driver adapter [RO]
+  MaxSpeed                            = 100                  [RW]
+  Port                                = COM1                 [RW]
+  SCurve                              = 100                  [RW]
+  StepSizeX_um                        = 1.0000               [RO]
+  StepSizeY_um                        = 1.0000               [RO]
+  TransposeMirrorX                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorY                    = 0                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: ZStage  (6 properties)
+======================================================================
+  Acceleration                        = 100                  [RW]
+  Description                         = Prior Z-stage driver adapter [RO]
+  MaxSpeed                            = 1                    [RW]
+  Name                                = ZStage               [RO]
+  Port                                = COM1                 [RW]
+  SCurve                              = 100                  [RW]
+
+======================================================================
+DEVICE: DHub  (0 properties)
+======================================================================
+
+======================================================================
+DEVICE: DObjective  (6 properties)
+======================================================================
+  Description                         = Demo objective turret driver [RO]
+  HubID                               =                      [RO]
+  Label                               = 20x 0.5              [RW]  allowed: ['10x 0.3', '20x 0.5', '20x 0.5 red Pol', '40x 0.5 red Pol', '40x 0.75', '40xAdapter0.5']
+  Name                                = DObjective           [RO]
+  State                               = 1                    [RW]
+  Trigger                             = -                    [RW]  allowed: ['+', '-']
+
+======================================================================
+DEVICE: JAICamera  (29 properties)
+======================================================================
+  Binning                             = 1                    [RW]  allowed: ['1', '2']
+  BlackLevel_DigitalAll               = 0.0000               [RW]
+  BlackLevel_DigitalBlue              = 0.0000               [RW]
+  BlackLevel_DigitalRed               = 0.0000               [RW]
+  CameraID                            = 0                    [RW]
+  Exposure                            = 0.5000               [RW]
+  ExposureIsIndividual                = On                   [RW]  allowed: ['Off', 'On']
+  Exposure_Blue                       = 0.7300               [RW]
+  Exposure_Green                      = 0.5400               [RW]
+  Exposure_Red                        = 0.3600               [RW]
+  FrameRateHz                         = 37.9997              [RW]
+  Gain                                = 1.0000               [RW]
+  GainIsIndividual                    = Off                  [RW]  allowed: ['Off', 'On']
+  Gain_AnalogBlue                     = 4.0000               [RW]
+  Gain_AnalogGreen                    = 1.0000               [RW]
+  Gain_AnalogRed                      = 1.0000               [RW]
+  Gain_DigitalBlue                    = 1.0000               [RW]
+  Gain_DigitalRed                     = 1.0000               [RW]
+  Gamma                               = 0.4500               [RW]
+  Model                               = AP-3200T-USB         [RO]
+  PixelType                           = 32bitRGB             [RW]  allowed: ['32bitRGB', '64bitRGB-10bit', '64bitRGB-12bit']
+  SerialNumber                        = U320461              [RO]
+  Temperature                         = 45.3750              [RO]
+  TestPattern                         = Off                  [RW]  allowed: ['GreyHorizontalRamp', 'GreyHorizontalRampMoving', 'GreyVerticalRamp', 'HorizontalColorBar', 'HorizontalColorBarMoving', 'Off', 'VerticalColorBar']
+  TransposeCorrection                 = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorX                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorY                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeXY                         = 0                    [RW]  allowed: ['0', '1']
+  WhiteBalance                        = Off                  [RW]  allowed: ['Continuous', 'Off', 'Once', 'Preset3200K', 'Preset5000K', 'Preset6500K', 'Preset7500K']
+
+======================================================================
+DEVICE: C-867  (5 properties)
+======================================================================
+  Description                         = Physik Instrumente (PI) GCS DLL Adapter [RO]
+  Error Check after MOV command       = 1                    [RW]
+  Name                                = PI_GCSController     [RO]
+  Port                                = COM5                 [RW]
+  Send command                        =                      [RW]
+
+======================================================================
+DEVICE: PIZStage  (15 properties)
+======================================================================
+  Alternative Homing Command          =                      [RW]
+  Axis                                = 4                    [RW]
+  Axis enabled (EAX)                  = 1                    [RW]
+  Axis in error state                 = 0                    [RW]
+  Controller Name                     = C-867                [RW]
+  Description                         = Physik Instrumente (PI) GCS DLL Adapter [RO]
+  HID active                          = 0                    [RW]
+  HOMING                              = 0                    [RW]
+  Invert travel range                 = 0                    [RW]
+  Limit_um                            = 500.0000             [RW]
+  Name                                = PIZStage             [RO]
+  Position                            = 0.0000               [RW]
+  Servo control activated (SVO)       = 1                    [RW]
+  Stage                               =                      [RW]
+  Velocity                            = 540.0000             [RW]
+
+======================================================================
+DEVICE: Core  (12 properties)
+======================================================================
+  AutoFocus                           =                      [RW]  allowed: ['']
+  AutoShutter                         = 1                    [RW]  allowed: ['0', '1']
+  Camera                              = JAICamera            [RW]  allowed: ['', 'JAICamera']
+  ChannelGroup                        =                      [RW]  allowed: ['', 'Exposure', 'ObjectiveLens', 'System', 'WB']
+  Focus                               = ZStage               [RW]  allowed: ['', 'PIZStage', 'ZStage']
+  Galvo                               =                      [RW]  allowed: ['']
+  ImageProcessor                      =                      [RW]  allowed: ['']
+  Initialize                          = 1                    [RW]  allowed: ['0', '1']
+  SLM                                 =                      [RW]  allowed: ['']
+  Shutter                             =                      [RW]  allowed: ['']
+  TimeoutMs                           = 5000                 [RW]
+  XYStage                             = XYStage              [RW]  allowed: ['', 'XYStage']
