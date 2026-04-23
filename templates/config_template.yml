@@ -51,6 +51,16 @@ modalities:
   ppm:
     type: 'polarized'
 
+    # PPM optics type. Set to "NA" to disable polarization optics (brightfield only).
+    # Read by: microscope_control/hardware/pycromanager.py (_find_rotation_stage_config)
+    optics: 1
+
+    # PIZ rotation stage calibration offset (hardware position for 0 deg reference).
+    # Written by: PolarizerCalibrationWorkflow.java (writeOffsetToYaml)
+    # Read by: microscope_control/hardware/pycromanager.py (_create_rotation_stage)
+    # Formula: hardware_position = (optical_angle * units_per_deg) + pizstage_offset
+    pizstage_offset: 50280.0
+
     # Rotation stage for polarizer control (separate from XYZ stage)
     rotation_stage:
       device: 'LOCI_STAGE_PI_001'   # Must match resources_LOCI.yml

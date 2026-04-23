@@ -154,6 +154,26 @@ modalities:
           # Transmitted lamp fully off during epi acquisition
           - { device: DiaLamp, property: State, value: 0 }
           - { device: DLED, property: Intensity-475nm, value: 30 }
+
+  # Polarized-light microscopy (PPM). Uses a rotation stage instead of
+  # a channel library. Angles are defined as rotation_angles; exposures
+  # come from imageprocessing_*.yml after WB calibration.
+  ppm:
+    type: polarized
+    # Set to "NA" to disable polarization optics and use brightfield only.
+    # Read by: microscope_control/hardware/pycromanager.py (_find_rotation_stage_config)
+    optics: 1
+    # PIZ rotation stage calibration offset. Written by Polarizer Calibration.
+    # Read by: microscope_control/hardware/pycromanager.py (_create_rotation_stage)
+    pizstage_offset: 50280.0
+    rotation_stage:
+      device: LOCI_STAGE_PI_001
+      type: polarizer
+    rotation_angles:
+      - { name: negative,  tick: -7 }
+      - { name: crossed,   tick: 0 }
+      - { name: positive,  tick: 7 }
+      - { name: uncrossed, tick: 90 }
 ```
 
 ### Acquisition profiles
