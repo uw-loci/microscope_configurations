@@ -3,11 +3,6 @@
 # Imaging conditions (exposure, gain, white balance) are in imageprocessing_PPM.yml
 # Autofocus settings are in autofocus_PPM.yml
 
-# Legacy top-level keys kept for backward compatibility.
-# Canonical location is now modalities.ppm.optics / modalities.ppm.pizstage_offset.
-ppm_optics : 1
-ppm_pizstage_offset : 177082.5
-
 microscope:
   name: 'PPM'
   type: 'UprightBrightfield'
