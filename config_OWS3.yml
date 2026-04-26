@@ -238,10 +238,10 @@ stage:
   limits:
     x_um:
       low: -28500.0
-      high: 40700.0
+      high: 12700.0
     y_um:
       low: -17652.0
-      high: 14395.0
+      high: 13395.0
     z_um:
       low: 0.0
       high: 2400.0
