@@ -43,14 +43,88 @@ imaging_profiles:
         white_balance:
           enabled: true
         exposures_ms:
-          negative: 500
-          crossed: 800
-          positive: 500
-          uncrossed: 10
+          negative:
+            all: 105.04
+            r: 105.04
+            g: 105.04
+            b: 105.04
+          crossed:
+            all: 285.92
+            r: 285.92
+            g: 285.92
+            b: 285.92
+          positive:
+            all: 128.19
+            r: 128.19
+            g: 128.19
+            b: 128.19
+          uncrossed:
+            all: 2.95
+            r: 1.96
+            g: 2.95
+            b: 3.83
         gains:
           r: 1.2
           g: 1.0
           b: 1.1
+          uncrossed:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+          negative:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+          crossed:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+          positive:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+        wb_last_modified: '2026-04-27T17:42:47.654959'
+        simple_wb:
+          last_calibrated: '2026-04-27T17:42:47.750054'
+          base_angle: uncrossed
+          base_exposures_ms:
+            r: 1.96
+            g: 2.95
+            b: 3.83
+          base_gains:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+          angles:
+            uncrossed:
+              scale: 1.0
+              unified_gain: 1.0
+              r: 1.96
+              g: 2.95
+              b: 3.83
+            negative:
+              scale: 35.599
+              unified_gain: 1.0
+              r: 105.04
+              g: 105.04
+              b: 105.04
+            crossed:
+              scale: 96.904
+              unified_gain: 1.0
+              r: 285.92
+              g: 285.92
+              b: 285.92
+            positive:
+              scale: 43.445
+              unified_gain: 1.0
+              r: 128.19
+              g: 128.19
+              b: 128.19
       LOCI_DETECTOR_JAI_001:
         white_balance:
           enabled: false
