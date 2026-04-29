@@ -237,8 +237,8 @@ stage:
   z_stage: ZDrive
   limits:
     x_um:
-      low: -28500.0
-      high: 12700.0
+      low: -44500.0
+      high: 0.0
     y_um:
       low: -17652.0
       high: 13395.0
