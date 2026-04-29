@@ -11,7 +11,7 @@
       "m02": -61950.961056,
       "m12": -17459.852254429687
     },
-    "createdDate": "Aug 13, 2025, 4:14:49 PM",
+    "createdDate": "Aug 13, 2025, 4:14:49 PM",
     "notes": "Transform from Ocus40 macro to stage. Macro: 1200x400, Green box detected, Validation: WARNING",
     "greenBoxParams": {
       "greenThreshold": 0.4,
@@ -24,7 +24,10 @@
       "minBoxHeight": 20,
       "edgeThickness": 3,
       "requireRectangle": true
-    }
+    },
+    "flipMacroX": true,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40"
   },
   "Ocus40_PPM": {
     "name": "Ocus40_PPM",
@@ -38,7 +41,7 @@
       "m02": -40778.315496,
       "m12": -21669.505488
     },
-    "createdDate": "Mar 27, 2026, 10:58:46 AM",
+    "createdDate": "Mar 27, 2026, 10:58:46 AM",
     "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
     "greenBoxParams": {
       "greenThreshold": 0.4,
@@ -51,6 +54,9 @@
       "minBoxHeight": 20,
       "edgeThickness": 3,
       "requireRectangle": true
-    }
+    },
+    "flipMacroX": true,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40"
   }
 }
