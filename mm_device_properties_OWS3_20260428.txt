@@ -1,0 +1,175 @@
+Micro-Manager Device Properties Dump
+Generated: 2026-04-28T23:59:01.906523
+MM Config: OWS3
+Host: Menominee
+OS: Windows 10
+Devices: 13
+
+======================================================================
+DEVICE SUMMARY
+======================================================================
+  Ti2-E__0                        type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D7910>  lib=NikonTi2
+  DLED                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=NikonTi2
+  ZDrive                          type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D6F80>  lib=NikonTi2
+  XYStage                         type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=NikonTi2
+  Nosepiece                       type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D7910>  lib=NikonTi2
+  FilterTurret1                   type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=NikonTi2
+  Turret1Shutter                  type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D6F80>  lib=NikonTi2
+  LightPath                       type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=NikonTi2
+  IntermediateMagnification       type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D7910>  lib=NikonTi2
+  LappMainBranch1                 type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=NikonTi2
+  DiaLamp                         type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D6F80>  lib=NikonTi2
+  HamamatsuHam_DCAM               type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6FC0A0>  lib=HamamatsuHam
+  Core                            type=<pyjavaz.bridge.mmcorej_DeviceType object at 0x000002405C6D7910>  lib=
+
+======================================================================
+DEVICE: Ti2-E__0  (0 properties)
+======================================================================
+
+======================================================================
+DEVICE: DLED  (10 properties)
+======================================================================
+  Enable-385nm                        = Off                  [RW]  allowed: ['Off', 'On']
+  Enable-475nm                        = Off                  [RW]  allowed: ['Off', 'On']
+  Enable-550nm                        = Off                  [RW]  allowed: ['Off', 'On']
+  Enable-621nm                        = Off                  [RW]  allowed: ['Off', 'On']
+  ExternalTrigger                     = Off                  [RW]  allowed: ['Off', 'On']
+  Intensity-385nm                     = 0                    [RW]
+  Intensity-475nm                     = 0                    [RW]
+  Intensity-550nm                     = 0                    [RW]
+  Intensity-621nm                     = 0                    [RW]
+  State                               = 0                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: ZDrive  (2 properties)
+======================================================================
+  Speed                               = 2.50mm/sec           [RW]  allowed: ['0.50mm/sec', '0.75mm/sec', '1.00mm/sec', '1.25mm/sec', '1.50mm/sec', '1.70mm/sec', '2.00mm/sec', '2.25mm/sec', '2.50mm/sec']
+  Tolerance                           = 0.000um              [RW]  allowed: ['0.000um', '0.020um', '0.040um', '0.060um', '0.080um', '0.100um', '0.120um', '0.140um', '0.160um', 'Open']
+
+======================================================================
+DEVICE: XYStage  (6 properties)
+======================================================================
+  Invert-X                            = Yes                  [RW]  allowed: ['No', 'Yes']
+  Invert-Y                            = No                   [RW]  allowed: ['No', 'Yes']
+  Speed                               = 25.00mm/sec          [RW]  allowed: ['0.25mm/sec', '0.50mm/sec', '1.00mm/sec', '12.00mm/sec', '17.00mm/sec', '2.50mm/sec', '22.00mm/sec', '25.00mm/sec', '51.00mm/sec']
+  Tolerance                           = 0.000um              [RW]  allowed: ['0.000um', '0.10um', '0.20um', '0.30um', '0.40um', '0.50um', '0.60um', '0.70um', '0.80um', 'Open']
+  TransposeMirrorX                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorY                    = 0                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: Nosepiece  (2 properties)
+======================================================================
+  Label                               = 2-                   [RW]  allowed: ['2-', '3-', '4-', '5-', '6-', 'Open Hole']
+  State                               = 1                    [RW]  allowed: ['0', '1', '2', '3', '4', '5']
+
+======================================================================
+DEVICE: FilterTurret1  (2 properties)
+======================================================================
+  Label                               = FLIM and two photon filter [RW]  allowed: ['2-', '3-', '4-', '5-', 'FLIM and two photon filter', 'Three-channel excitation filter']
+  State                               = 5                    [RW]  allowed: ['0', '1', '2', '3', '4', '5']
+
+======================================================================
+DEVICE: Turret1Shutter  (1 properties)
+======================================================================
+  State                               = 0                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: LightPath  (2 properties)
+======================================================================
+  Label                               = 2-R100               [RW]  allowed: ['1-EYE', '2-R100', '3-AUX', '4-L100']
+  State                               = 1                    [RW]  allowed: ['0', '1', '2', '3']
+
+======================================================================
+DEVICE: IntermediateMagnification  (1 properties)
+======================================================================
+  Magnification                       = 1.0x                 [RO]  allowed: ['1.0x', '1.5x']
+
+======================================================================
+DEVICE: LappMainBranch1  (2 properties)
+======================================================================
+  Label                               = LED_Nikon_EpiLamp    [RW]  allowed: ['LED_Nikon_EpiLamp', 'TiSapph_Laser_MaiTai']
+  State                               = 1                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: DiaLamp  (2 properties)
+======================================================================
+  Intensity                           = 465                  [RW]
+  State                               = 1                    [RW]  allowed: ['0', '1']
+
+======================================================================
+DEVICE: HamamatsuHam_DCAM  (58 properties)
+======================================================================
+  BUFFER FRAMEBYTES                   = 8388608              [RW]
+  BUFFER PIXEL TYPE                   = MONO16               [RW]  allowed: ['MONO16']
+  BUFFER ROWBYTES                     = 4096                 [RW]
+  BUFFER TOP OFFSET BYTES             = 0                    [RW]
+  Binning                             = 1x1                  [RW]  allowed: ['1x1', '2x2', '4x4']
+  Bits per Channel                    = 16                   [RW]
+  CONVERSION FACTOR COEFF             = 0.4800               [RW]
+  CONVERSION FACTOR OFFSET            = 100.0000             [RW]
+  Camera Bus                          = USB3                 [RO]
+  Camera Version                      = 3.20.A               [RO]
+  CameraID                            = S/N: 003255          [RO]
+  CameraName                          = C11440-22CU          [RO]
+  DEFECT CORRECT MODE                 = ON                   [RW]  allowed: ['OFF', 'ON']
+  Description                         = Hamamatsu device adapter 2.2.1.71 [RO]
+  EXPOSURE FULL RANGE                 = DISABLE              [RW]  allowed: ['DISABLE', 'ENABLE']
+  EXPOSURE TIME UNITS                 = MILLISECONDS         [RW]  allowed: ['MICROSECONDS', 'MILLISECONDS', 'SECONDS']
+  Exposure                            = 2.0070               [RW]
+  FRAME STAMP PRODUCER                = IMAGING DEVICE       [RW]  allowed: ['IMAGING DEVICE']
+  IMAGE TOP OFFSET BYTES              = 0                    [RW]
+  MINIMUM ACQUISITION TIMEOUT         = 60000                [RW]
+  Name                                = HamamatsuHam_DCAM    [RO]
+  OUTPUT TRIGGER DELAY UNITS          = SECONDS              [RW]  allowed: ['MILLISECONDS', 'SECONDS']
+  OUTPUT TRIGGER DELAY[0]             = 0.0000               [RW]
+  OUTPUT TRIGGER DELAY[1]             = 0.0000               [RW]
+  OUTPUT TRIGGER DELAY[2]             = 0.0000               [RW]
+  OUTPUT TRIGGER KIND[0]              = LOW                  [RW]  allowed: ['EXPOSURE', 'HIGH', 'LOW', 'PROGRAMABLE', 'TRIGGER READY']
+  OUTPUT TRIGGER KIND[1]              = LOW                  [RW]  allowed: ['EXPOSURE', 'HIGH', 'LOW', 'PROGRAMABLE', 'TRIGGER READY']
+  OUTPUT TRIGGER KIND[2]              = LOW                  [RW]  allowed: ['EXPOSURE', 'HIGH', 'LOW', 'PROGRAMABLE', 'TRIGGER READY']
+  OUTPUT TRIGGER PERIOD UNITS         = SECONDS              [RW]  allowed: ['MILLISECONDS', 'SECONDS']
+  OUTPUT TRIGGER PERIOD[0]            = 0.0010               [RW]
+  OUTPUT TRIGGER PERIOD[1]            = 0.0010               [RW]
+  OUTPUT TRIGGER PERIOD[2]            = 0.0010               [RW]
+  OUTPUT TRIGGER POLARITY[0]          = NEGATIVE             [RW]  allowed: ['NEGATIVE', 'POSITIVE']
+  OUTPUT TRIGGER POLARITY[1]          = NEGATIVE             [RW]  allowed: ['NEGATIVE', 'POSITIVE']
+  OUTPUT TRIGGER POLARITY[2]          = NEGATIVE             [RW]  allowed: ['NEGATIVE', 'POSITIVE']
+  OUTPUT TRIGGER SOURCE[0]            = READOUT END          [RW]  allowed: ['READOUT END', 'VSYNC']
+  OUTPUT TRIGGER SOURCE[1]            = READOUT END          [RW]  allowed: ['READOUT END', 'VSYNC']
+  OUTPUT TRIGGER SOURCE[2]            = READOUT END          [RW]  allowed: ['READOUT END', 'VSYNC']
+  PixelType                           = 16bit                [RW]
+  RECORD FIXED BYTES PER FILE         = 256                  [RW]
+  RECORD FIXED BYTES PER FRAME        = 8388656              [RW]
+  RECORD FIXED BYTES PER SESSION      = 800                  [RW]
+  ReadoutTime                         = 0.0333               [RO]
+  SENSOR MODE                         = AREA                 [RW]  allowed: ['AREA']
+  SYSTEM ALIVE                        = ONLINE               [RW]  allowed: ['OFFLINE', 'ONLINE']
+  ScanMode                            = 2                    [RW]
+  TIME STAMP PRODUCER                 = IMAGING DEVICE       [RW]  allowed: ['IMAGING DEVICE']
+  TRIGGER ACTIVE                      = EDGE                 [RW]  allowed: ['EDGE', 'LEVEL', 'SYNCREADOUT']
+  TRIGGER DELAY                       = 0.0000               [RW]
+  TRIGGER GLOBAL EXPOSURE             = DELAYED              [RW]  allowed: ['DELAYED', 'GLOBAL RESET']
+  TRIGGER SOURCE                      = INTERNAL             [RW]  allowed: ['EXTERNAL', 'INTERNAL', 'SOFTWARE']
+  TRIGGER TIMES                       = 1                    [RW]
+  TransposeCorrection                 = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorX                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeMirrorY                    = 0                    [RW]  allowed: ['0', '1']
+  TransposeXY                         = 0                    [RW]  allowed: ['0', '1']
+  Trigger                             = NORMAL               [RW]  allowed: ['NORMAL', 'START']
+  TriggerPolarity                     = NEGATIVE             [RW]  allowed: ['NEGATIVE', 'POSITIVE']
+
+======================================================================
+DEVICE: Core  (12 properties)
+======================================================================
+  AutoFocus                           =                      [RW]  allowed: ['']
+  AutoShutter                         = 1                    [RW]  allowed: ['0', '1']
+  Camera                              = HamamatsuHam_DCAM    [RW]  allowed: ['', 'HamamatsuHam_DCAM']
+  ChannelGroup                        =                      [RW]  allowed: ['', 'DiaLamp-Intensity', 'DiaLamp-State', 'Epi Channel: Laser/LED (LAPP)', 'Epi Shutter', 'Epi-Intensity-385nm', 'Epi-Intensity-475nm', 'Epi-Intensity-550nm', 'Epi-Intensity-621nm', 'Filter Turret', 'Lens Turret', 'Light Path', 'Transmitted Lamp']
+  Focus                               = ZDrive               [RW]  allowed: ['', 'ZDrive']
+  Galvo                               =                      [RW]  allowed: ['']
+  ImageProcessor                      =                      [RW]  allowed: ['']
+  Initialize                          = 1                    [RW]  allowed: ['0', '1']
+  SLM                                 =                      [RW]  allowed: ['']
+  Shutter                             =                      [RW]  allowed: ['', 'DLED', 'Turret1Shutter', 'DiaLamp']
+  TimeoutMs                           = 20000                [RW]
+  XYStage                             = XYStage              [RW]  allowed: ['', 'XYStage']
