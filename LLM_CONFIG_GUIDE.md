@@ -232,6 +232,48 @@ acquisition_profiles:
 
 If a Fluorescence profile has **no `channels:` list** AND the modality has **no channel library**, the system falls back to the original single-snap path. This is how brightfield-only and laser-scanning modalities stay unchanged.
 
+### Streaming-autofocus speed (`stage.streaming_af`, schema v3)
+
+Streaming AF drives the focus stage at a slow velocity while streaming
+camera frames, then parabolic-fits the focus peak. The slow value is
+hardware-specific and lives in `stage.streaming_af`. **Do not hand-edit
+this block** unless you really know your stage -- run the **Re-probe
+Stage AF** workflow from the QPSC menu (or the wizard's probe step on
+fresh installs) and let the server discover the right values.
+
+```yaml
+stage:
+  z_stage: ZDrive
+  limits: { ... }
+  streaming_af:                       # required in v3
+    enabled: true                     # false routes streaming AF through Brent
+    speed_property: MaxSpeed          # null if no writable speed property
+    slow_speed_value: '1'             # raw stage value; unit varies by hardware
+    slow_speed_um_per_s: 11.5         # actual velocity in micrometers/second
+    normal_speed_value: '100'         # value to restore after the slow sweep
+```
+
+**Choosing values per stage class:**
+
+- **Prior 1-100 percent (PPM):** the speed property accepts a unitless
+  numeric percentage. `slow_speed_value: '1'` and
+  `normal_speed_value: '100'` work; `slow_speed_um_per_s: 11.5` is the
+  empirical measurement.
+- **Nikon Ti2 mm/sec enum (OWS3):** `Speed` is a fixed enum
+  (`'0.50mm/sec'`, `'1.00mm/sec'`, ..., `'5.00mm/sec'`). The slowest
+  enum is still 500 um/s -- too fast for streaming AF on this stage,
+  so the wizard sets `enabled: false` and streaming AF transparently
+  falls back to Brent's method.
+- **Stages with no writable speed property:** set
+  `speed_property: null` and `enabled: false`. Streaming AF falls back
+  to Brent.
+
+**Auto-migration**: configs written before schema v3 (no
+`stage.streaming_af`) are auto-migrated on first load with legacy
+Prior-style defaults. The QPSC log emits
+`[CONFIG] auto-migrated <path>: added stage.streaming_af` and a
+one-time UI dialog prompts you to verify with **Re-probe Stage AF**.
+
 ---
 
 ## 2. autofocus_\<SCOPE\>.yml (schema v2)

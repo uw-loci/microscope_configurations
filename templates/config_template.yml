@@ -484,6 +484,34 @@ stage:
       low: -18000
       high: 0
 
+  # ========== STREAMING AUTOFOCUS PARAMETERS (Required, schema v3) ==========
+  # Drives streaming-AF velocity behavior. Populated by the Setup Wizard's
+  # "Re-probe Stage AF" probe (PRBSAFZ command), which queries the focus
+  # device's writable speed property, parses its allowed-values nameplate,
+  # and time-verifies via a 1-um round-trip. Re-run "Re-probe Stage AF"
+  # from the QPSC menu after any stage hardware change.
+  #
+  # Per-stage examples:
+  #   Prior 1-100 percent (PPM):
+  #     enabled: true
+  #     speed_property: MaxSpeed
+  #     slow_speed_value: '1'
+  #     slow_speed_um_per_s: 11.5
+  #     normal_speed_value: '100'
+  #
+  #   Nikon Ti2 mm/sec enum (OWS3):
+  #     enabled: false                  # 0.50mm/sec is still too fast for streaming
+  #     speed_property: Speed
+  #     slow_speed_value: '0.50mm/sec'
+  #     slow_speed_um_per_s: 500.0
+  #     normal_speed_value: '2.50mm/sec'
+  streaming_af:
+    enabled: true                   # false routes streaming AF through Brent fallback
+    speed_property: MaxSpeed        # null if no writable speed property
+    slow_speed_value: '1'           # raw stage value (unit varies by hardware)
+    slow_speed_um_per_s: 11.5       # actual velocity in micrometers/second
+    normal_speed_value: '100'       # value to restore after the slow sweep
+
   # ========== STAGE INSERT CONFIGURATION (Optional) ==========
   # For microscopes with interchangeable slide holders.
   # Defines the viewable aperture (light transmission window) for each insert type.
