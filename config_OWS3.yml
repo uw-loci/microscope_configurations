@@ -31,89 +31,124 @@ modalities:
       enabled: false
       method: divide
       base_folder: ''
-    # Vendor-agnostic multi-channel library. Each channel is a fully
-    # self-contained acquisition step expressed in terms of Micro-Manager
-    # primitives (ConfigGroup presets + device property writes). The QPSC
-    # Java and Python base layers iterate this list and drive any vendor's
-    # illumination hardware uniformly -- no DLED/OWS3-specific code.
-    # Every channel explicitly sets DiaLamp State=0, Light Path -> Epi Camera,
-    # and Epi Shutter -> Open. This "cross-modality hygiene" is important: a
-    # bare Fluorescence acquisition that immediately follows a Brightfield
-    # acquisition must NOT inherit the transmitted lamp that the BF profile
-    # left on. Each channel is a fully state-establishing transaction, not a
-    # state delta -- see LLM_CONFIG_GUIDE.md "cross-modality hygiene" section.
     channels:
-      - id: DAPI
-        display_name: DAPI (385 nm)
-        exposure_ms: 100
-        # intensity_property marks which entry in device_properties is the
-        # primary "brightness knob" for this channel, so the per-acquisition
-        # dialog can expose it as a spinner without knowing anything about
-        # the specific hardware behind it.
-        intensity_property: { device: DLED, property: Intensity-385nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 25 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: FITC
-        display_name: FITC (475 nm)
-        exposure_ms: 80
-        intensity_property: { device: DLED, property: Intensity-475nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 30 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: TRITC
-        display_name: TRITC (550 nm)
-        exposure_ms: 120
-        intensity_property: { device: DLED, property: Intensity-550nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 30 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: Cy5
-        display_name: Cy5 (621 nm)
-        exposure_ms: 200
-        intensity_property: { device: DLED, property: Intensity-621nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 30 }
+    - id: DAPI
+      display_name: DAPI (385 nm)
+      exposure_ms: 100
+      intensity_property:
+        device: DLED
+        property: Intensity-385nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 25
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: FITC
+      display_name: FITC (475 nm)
+      exposure_ms: 80
+      intensity_property:
+        device: DLED
+        property: Intensity-475nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 30
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: TRITC
+      display_name: TRITC (550 nm)
+      exposure_ms: 120
+      intensity_property:
+        device: DLED
+        property: Intensity-550nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 30
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: Cy5
+      display_name: Cy5 (621 nm)
+      exposure_ms: 200
+      intensity_property:
+        device: DLED
+        property: Intensity-621nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 30
   BF_IF:
-    # Combined brightfield + widefield immunofluorescence, using the same
-    # camera for both. The BF step is expressed as a regular entry in the
-    # channel library whose mm_setup_presets switch the light path to the
-    # BF camera port + turn on the transmitted lamp (via the Light Path
-    # preset which also toggles DiaLamp State=1), and whose device_properties
-    # ensure no LED is lit during the BF exposure. The subsequent IF
-    # channels mirror the Fluorescence modality exactly -- this duplication
-    # is intentional (see the LLM config-authoring guide): each channel is
-    # fully self-contained so a human or LLM editing the YAML sees every
-    # hardware step in one place without needing to cross-reference profiles.
     type: bf_if
     illumination:
       device: LappMainBranch1
@@ -127,82 +162,149 @@ modalities:
       method: divide
       base_folder: ''
     channels:
-      - id: BF
-        display_name: Brightfield
-        exposure_ms: 10
-        # intensity_property targets the transmitted lamp instead of a DLED
-        # wavelength -- the BF channel picker spinner exposes lamp intensity.
-        intensity_property: { device: DiaLamp, property: Intensity }
-        # Light Path "2-R100 (BF Camera)" preset already sets DiaLamp State=1
-        # and routes the image to the BF camera port via the LAPP branch.
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (BF Camera) }
-          - { group: Epi Shutter, preset: Closed }
-        device_properties:
-          # Transmitted lamp intensity. Default is tuned for 20x/40x/60x;
-          # per-objective tuning lives in channel_overrides below.
-          - { device: DiaLamp, property: Intensity, value: 500 }
-          # Defensive: make sure no epi LED is lit during BF integration.
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: DAPI
-        display_name: DAPI (385 nm)
-        exposure_ms: 100
-        intensity_property: { device: DLED, property: Intensity-385nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 25 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: FITC
-        display_name: FITC (475 nm)
-        exposure_ms: 80
-        intensity_property: { device: DLED, property: Intensity-475nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 30 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: TRITC
-        display_name: TRITC (550 nm)
-        exposure_ms: 120
-        intensity_property: { device: DLED, property: Intensity-550nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 30 }
-          - { device: DLED, property: Intensity-621nm, value: 0 }
-      - id: Cy5
-        display_name: Cy5 (621 nm)
-        exposure_ms: 200
-        intensity_property: { device: DLED, property: Intensity-621nm }
-        mm_setup_presets:
-          - { group: Light Path, preset: 2-R100 (Epi Camera) }
-          - { group: Epi Shutter, preset: Open }
-          - { group: Filter Turret, preset: Single photon LED-DA FI TR Cy5-B }
-        device_properties:
-          - { device: DiaLamp, property: State, value: 0 }
-          - { device: DLED, property: Intensity-385nm, value: 0 }
-          - { device: DLED, property: Intensity-475nm, value: 0 }
-          - { device: DLED, property: Intensity-550nm, value: 0 }
-          - { device: DLED, property: Intensity-621nm, value: 30 }
+    - id: BF
+      display_name: Brightfield
+      exposure_ms: 10
+      intensity_property:
+        device: DiaLamp
+        property: Intensity
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (BF Camera)
+      - group: Epi Shutter
+        preset: Closed
+      device_properties:
+      - device: DiaLamp
+        property: Intensity
+        value: 500
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: DAPI
+      display_name: DAPI (385 nm)
+      exposure_ms: 100
+      intensity_property:
+        device: DLED
+        property: Intensity-385nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 25
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: FITC
+      display_name: FITC (475 nm)
+      exposure_ms: 80
+      intensity_property:
+        device: DLED
+        property: Intensity-475nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 30
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: TRITC
+      display_name: TRITC (550 nm)
+      exposure_ms: 120
+      intensity_property:
+        device: DLED
+        property: Intensity-550nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 30
+      - device: DLED
+        property: Intensity-621nm
+        value: 0
+    - id: Cy5
+      display_name: Cy5 (621 nm)
+      exposure_ms: 200
+      intensity_property:
+        device: DLED
+        property: Intensity-621nm
+      mm_setup_presets:
+      - group: Light Path
+        preset: 2-R100 (Epi Camera)
+      - group: Epi Shutter
+        preset: Open
+      - group: Filter Turret
+        preset: Single photon LED-DA FI TR Cy5-B
+      device_properties:
+      - device: DiaLamp
+        property: State
+        value: 0
+      - device: DLED
+        property: Intensity-385nm
+        value: 0
+      - device: DLED
+        property: Intensity-475nm
+        value: 0
+      - device: DLED
+        property: Intensity-550nm
+        value: 0
+      - device: DLED
+        property: Intensity-621nm
+        value: 30
 hardware:
   objectives:
   - id: 0.5NA_AIR_10x
@@ -245,14 +347,16 @@ stage:
     z_um:
       low: 0.0
       high: 2400.0
+  streaming_af:
+    enabled: true
+    speed_property: Speed
+    slow_speed_value: 0.50mm/sec
+    slow_speed_um_per_s: 6.079
+    normal_speed_value: 2.50mm/sec
 slide_size_um:
   x: 40000
   y: 20000
 acquisition_profiles:
-  # Keys match the scan_type prefix sent by the Java extension,
-  # which is "<Modality>_<Objective>" (e.g. "Brightfield_10x").
-  # apply_mode_setup strips the trailing "_<counter>" suffix before
-  # looking up the profile.
   Brightfield_10x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
@@ -300,7 +404,11 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [DAPI, FITC, TRITC, Cy5]
+    channels:
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
   Fluorescence_20x:
     modality: Fluorescence
     detector: HAMAMATSU_DCAM_01
@@ -312,7 +420,11 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [DAPI, FITC, TRITC, Cy5]
+    channels:
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 250
@@ -327,7 +439,11 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [DAPI, FITC, TRITC, Cy5]
+    channels:
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 300
@@ -342,18 +458,14 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [DAPI, FITC, TRITC, Cy5]
+    channels:
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 400
-  # Combined brightfield + immunofluorescence profiles. The channel library
-  # BF_IF.channels has BF as the first channel and DAPI/FITC/TRITC/Cy5 after.
-  # Each profile overrides per-objective exposures and (for the BF step on
-  # low-magnification objectives) the transmitted-lamp intensity via
-  # channel_overrides.<id>.device_properties. The override merge replaces an
-  # existing (device, property) pair in the channel's library entry, so a
-  # single line here tunes just the lamp without having to redeclare the
-  # whole BF channel.
   BF_IF_10x:
     modality: BF_IF
     detector: HAMAMATSU_DCAM_01
@@ -361,14 +473,19 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [BF, DAPI, FITC, TRITC, Cy5]
+    channels:
+    - BF
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       BF:
         exposure_ms: 20
-        # 10x BF uses much less lamp intensity than higher-mag objectives;
-        # matches the pure Brightfield_10x profile's illumination_intensity: 70.
         device_properties:
-          - { device: DiaLamp, property: Intensity, value: 70 }
+        - device: DiaLamp
+          property: Intensity
+          value: 70
   BF_IF_20x:
     modality: BF_IF
     detector: HAMAMATSU_DCAM_01
@@ -376,7 +493,12 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [BF, DAPI, FITC, TRITC, Cy5]
+    channels:
+    - BF
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 250
@@ -387,7 +509,12 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [BF, DAPI, FITC, TRITC, Cy5]
+    channels:
+    - BF
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 300
@@ -398,7 +525,12 @@ acquisition_profiles:
     - group: 'Epi Channel: Laser/LED (LAPP)'
       preset: Epi LED (DLEDI)
     illumination_intensity: 1.0
-    channels: [BF, DAPI, FITC, TRITC, Cy5]
+    channels:
+    - BF
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
     channel_overrides:
       Cy5:
         exposure_ms: 400
