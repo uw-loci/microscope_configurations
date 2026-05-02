@@ -26,6 +26,9 @@
 !config_mock.yml
 !autofocus_mock.yml
 
+# Canonical AF metric registry (shared by Python + Java; checked in)
+!focus_metrics_manifest.yml
+
 # Include templates folder and all contents
 !templates/
 !templates/**
