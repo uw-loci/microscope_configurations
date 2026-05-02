@@ -46,9 +46,32 @@ modalities:
       - group: Filter Turret
         preset: Single photon LED-DA FI TR Cy5-B
       device_properties:
+      # Brightfield lamp off.
       - device: DiaLamp
         property: State
         value: 0
+      # Master DLED switch + per-wavelength gate. On the Nikon Ti2 DLED,
+      # Intensity-XXXnm alone does NOT emit -- DLED.State must be 1 and
+      # Enable-XXXnm must be On for that wavelength. Without these the
+      # APPLYCH succeeds but no light reaches the sample (observed
+      # 2026-05-02 on OWS3). Enable the active wavelength, gate the
+      # others off so a residual Enable from a prior channel doesn't
+      # leak emission.
+      - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'On'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
       - device: DLED
         property: Intensity-385nm
         value: 25
@@ -79,6 +102,21 @@ modalities:
         property: State
         value: 0
       - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'On'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
+      - device: DLED
         property: Intensity-385nm
         value: 0
       - device: DLED
@@ -108,6 +146,21 @@ modalities:
         property: State
         value: 0
       - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'On'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
+      - device: DLED
         property: Intensity-385nm
         value: 0
       - device: DLED
@@ -136,6 +189,21 @@ modalities:
       - device: DiaLamp
         property: State
         value: 0
+      - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'On'
       - device: DLED
         property: Intensity-385nm
         value: 0
@@ -177,6 +245,23 @@ modalities:
       - device: DiaLamp
         property: Intensity
         value: 500
+      # Force DLED fully off so a stale Enable from a previous fluorescence
+      # channel doesn't keep emitting in the BF leg.
+      - device: DLED
+        property: State
+        value: 0
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
       - device: DLED
         property: Intensity-385nm
         value: 0
@@ -203,9 +288,32 @@ modalities:
       - group: Filter Turret
         preset: Single photon LED-DA FI TR Cy5-B
       device_properties:
+      # Brightfield lamp off.
       - device: DiaLamp
         property: State
         value: 0
+      # Master DLED switch + per-wavelength gate. On the Nikon Ti2 DLED,
+      # Intensity-XXXnm alone does NOT emit -- DLED.State must be 1 and
+      # Enable-XXXnm must be On for that wavelength. Without these the
+      # APPLYCH succeeds but no light reaches the sample (observed
+      # 2026-05-02 on OWS3). Enable the active wavelength, gate the
+      # others off so a residual Enable from a prior channel doesn't
+      # leak emission.
+      - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'On'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
       - device: DLED
         property: Intensity-385nm
         value: 25
@@ -236,6 +344,21 @@ modalities:
         property: State
         value: 0
       - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'On'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
+      - device: DLED
         property: Intensity-385nm
         value: 0
       - device: DLED
@@ -265,6 +388,21 @@ modalities:
         property: State
         value: 0
       - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'On'
+      - device: DLED
+        property: Enable-621nm
+        value: 'Off'
+      - device: DLED
         property: Intensity-385nm
         value: 0
       - device: DLED
@@ -293,6 +431,21 @@ modalities:
       - device: DiaLamp
         property: State
         value: 0
+      - device: DLED
+        property: State
+        value: 1
+      - device: DLED
+        property: Enable-385nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-475nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-550nm
+        value: 'Off'
+      - device: DLED
+        property: Enable-621nm
+        value: 'On'
       - device: DLED
         property: Intensity-385nm
         value: 0
