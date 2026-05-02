@@ -64,14 +64,14 @@
     "microscope": "OWS3",
     "mountingMethod": "Ocus40",
     "transform": {
-      "m00": 81.0,
+      "m00": -81.0,
       "m10": 0.0,
       "m01": 0.0,
-      "m11": 81.0,
-      "m02": -77121.780326625,
-      "m12": -17433.28459834375
+      "m11": -81.0,
+      "m02": 28826.219673375002,
+      "m12": 11807.71540165625
     },
-    "createdDate": "Apr 29, 2026, 11:25:39 PM",
+    "createdDate": "May 1, 2026, 1:27:11 PM",
     "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
     "greenBoxParams": {
       "greenThreshold": 0.4,
@@ -87,6 +87,13 @@
     },
     "flipMacroX": true,
     "flipMacroY": false,
-    "sourceScanner": "Ocus40"
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 654.5,
+    "greenBoxDisplayCenterY": 180.5,
+    "stageAnchorX": -24188.280326624998,
+    "stageAnchorY": -2812.784598343749,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }
