@@ -1,161 +1,108 @@
-# ========== PPM MICROSCOPE CONFIGURATION ==========
-# Hardware and physical configuration only
-# Imaging conditions (exposure, gain, white balance) are in imageprocessing_PPM.yml
-# Autofocus settings are in autofocus_PPM.yml
-
 microscope:
-  name: 'PPM'
-  type: 'UprightBrightfield'
+  name: PPM
+  type: UprightBrightfield
   detector_in_use: null
   objective_in_use: null
   modality: null
-
 test-push:
-  MSN: 'PPM_001'
-
-# ========== MODALITY-SPECIFIC SETTINGS ==========
+  MSN: PPM_001
 modalities:
   ppm:
-    type: 'polarized'
-    optics: 1              # set to "NA" to disable PPM optics (brightfield only)
-    pizstage_offset: 177082.5  # calibrated by Polarizer Calibration workflow
+    type: polarized
+    optics: 1
+    pizstage_offset: 177082.5
     rotation_stage:
-      device: 'LOCI_STAGE_PI_001'
-      type: 'polarizer'
+      device: LOCI_STAGE_PI_001
+      type: polarizer
     rotation_angles:
-      - name: 'negative'
-        tick: -7  # 1 tick = 1 degrees
-      - name: 'crossed'
-        tick: 0   # 1 tick = 1 degrees
-      - name: 'positive'
-        tick: 7   # 1 tick = 1 degrees
-      - name: 'uncrossed'
-        tick: 90  # 1 tick = 1 degrees
-
+    - name: negative
+      tick: -7
+    - name: crossed
+      tick: 0
+    - name: positive
+      tick: 7
+    - name: uncrossed
+      tick: 90
   brightfield:
-    type: 'brightfield'
-
-# ========== AVAILABLE HARDWARE ==========
-# Lists of available hardware components on this microscope.
-# All combinations of modality/objective/detector are currently valid.
-# NOTE: If specific combinations need to be restricted in the future,
-#       consider adding a 'restricted_combinations' section or reverting
-#       to explicit profile definitions.
+    type: brightfield
 hardware:
   objectives:
-    - id: 'LOCI_OBJECTIVE_OLYMPUS_10X_001'
-      pixel_size_xy_um:
-        LOCI_DETECTOR_TELEDYNE_001: 0.4537  # MicroPublisher 6
-        LOCI_DETECTOR_JAI_001: 0.347        # JAI prism detector
-      pixel_size_z_um: null  # Set when Z-stacks are calibrated (um per Z step)
-    - id: 'LOCI_OBJECTIVE_OLYMPUS_20X_POL_001'
-      pixel_size_xy_um:
-        LOCI_DETECTOR_TELEDYNE_001: 0.2271
-        LOCI_DETECTOR_JAI_001: 0.1725
-      pixel_size_z_um: null
-    - id: 'LOCI_OBJECTIVE_OLYMPUS_40X_POL_001'
-      pixel_size_xy_um:
-        LOCI_DETECTOR_TELEDYNE_001: 0.1142
-        LOCI_DETECTOR_JAI_001: 0.0871
-      pixel_size_z_um: null
-
+  - id: LOCI_OBJECTIVE_OLYMPUS_10X_001
+    pixel_size_xy_um:
+      LOCI_DETECTOR_TELEDYNE_001: 0.4537
+      LOCI_DETECTOR_JAI_001: 0.347
+    pixel_size_z_um: null
+  - id: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
+    pixel_size_xy_um:
+      LOCI_DETECTOR_TELEDYNE_001: 0.2271
+      LOCI_DETECTOR_JAI_001: 0.1725
+    pixel_size_z_um: null
+  - id: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
+    pixel_size_xy_um:
+      LOCI_DETECTOR_TELEDYNE_001: 0.1142
+      LOCI_DETECTOR_JAI_001: 0.0871
+    pixel_size_z_um: null
   detectors:
-    - 'LOCI_DETECTOR_TELEDYNE_001'   # MicroPublisher 6
-    - 'LOCI_DETECTOR_JAI_001'        # JAI prism detector
-
-# ========== STAGE CONFIGURATION ==========
+  - LOCI_DETECTOR_TELEDYNE_001
+  - LOCI_DETECTOR_JAI_001
 stage:
-  stage_id: 'LOCI_STAGE_PRIOR_001'  # Prior XYZ stage
+  stage_id: LOCI_STAGE_PRIOR_001
   limits:
-    # XY limits should match or exceed aperture calibration bounds
-    # (aperture_left/right_x_um, aperture_top/bottom_y_um in insert config below)
     x_um:
-      low: -36000   # Must be <= aperture_right_x_um (-35085)
-      high: 35500   # Must be >= aperture_left_x_um (34873)
+      low: -36000
+      high: 35500
     y_um:
-      low: -39000   # Must be <= aperture_bottom_y_um (-38294)
-      high: 34000   # Must be >= aperture_top_y_um (33007)
+      low: -39000
+      high: 34000
     z_um:
-      low: -100 #stage raised with sample close to objective, this is the important one to NOT DAMAGE OBJECTIVE. SET CAREFULLY WITH HIGHEST POWER OBJECTIVE.
-      high: 1000 #stage lowered far from objective
-
-  # ========== STAGE INSERT CONFIGURATION ==========
-  # Defines the viewable aperture (light transmission window) for each insert type.
-  # Only the aperture area is shown in the Stage Map.
-  #
-  # CALIBRATION using 4 reference points (center the objective on each edge):
-  #   1. aperture_left_x_um:  Left edge of aperture (black edge in center of FOV)
-  #   2. aperture_right_x_um: Right edge of aperture (black edge in center of FOV)
-  #   3. slide_top_y_um:      Top edge of slide glass (edge in center of FOV)
-  #   4. slide_bottom_y_um:   Bottom edge of slide glass (edge in center of FOV)
-  #
-  # The system calculates aperture width from left/right X coordinates.
-  # Aperture height is estimated (default 60mm) - exact value less critical.
-  # The slide is assumed centered vertically within the aperture.
+      low: -100
+      high: 1000
   inserts:
-    # Safety margin around slides for "legal zone" computation (um)
     slide_margin_um: 2000
-
-    # Default insert configuration to use
     default: single_h
-
-    # Insert configurations - each defines its own aperture size and slide positions
     configurations:
       single_h:
-        name: "Single Slide (Horizontal)"
-        description: "Standard single slide holder with horizontal orientation"
-
-        # ---------- CALIBRATION REFERENCE POINTS ----------
-        # Measure these 4 positions with objective centered on each edge:
-        aperture_left_x_um: 34873      # Stage X when left aperture edge is centered
-        aperture_right_x_um: -35085 # Stage X when right aperture edge is centered
-        aperture_top_y_um: 23007      # Stage Y when  aperture edge closest to microscope is centered
-        aperture_bottom_y_um: -48114 # Stage Y when aperture edge farther from microscope is centered
-        slide_left_x_um: 35400         # Stage X when left edge of slide glass is centered +700test
-        slide_right_x_um: -40000      # Stage X when right edge of slide glass is centered
-        slide_top_y_um: 4807          # Stage Y when top of slide glass is centered +1600 test
-        slide_bottom_y_um: -23241   # Stage Y when bottom of slide glass is centered
-
-        # Estimated aperture height (vertical) - less critical for accuracy
-        aperture_height_mm: 60.0   # ~6cm Y distance opening
-
-        # Slide dimensions (standard 1" x 3" slide)
-        slide_width_mm: 75         # 3 inches
-        slide_height_mm: 25        # 1 inch
-
+        name: Single Slide (Horizontal)
+        description: Standard single slide holder with horizontal orientation
+        aperture_left_x_um: 34873
+        aperture_right_x_um: -35085
+        aperture_top_y_um: 23007
+        aperture_bottom_y_um: -48114
+        slide_left_x_um: 35400
+        slide_right_x_um: -40000
+        slide_top_y_um: 4807
+        slide_bottom_y_um: -23241
+        aperture_height_mm: 60.0
+        slide_width_mm: 75
+        slide_height_mm: 25
       single_v:
-        name: "Single Slide (Vertical)"
-        description: "Standard single slide holder with vertical orientation"
-
-        # Calibration reference points (measure when using this insert)
+        name: Single Slide (Vertical)
+        description: Standard single slide holder with vertical orientation
         aperture_left_x_um: 0
         aperture_right_x_um: 60000
         slide_top_y_um: 0
-        slide_bottom_y_um: 75000   # Slide is 75mm tall when vertical
-
+        slide_bottom_y_um: 75000
         aperture_height_mm: 55.0
-        slide_width_mm: 25         # Rotated
+        slide_width_mm: 25
         slide_height_mm: 75
-
       quad_v:
-        name: "Four Slides (Vertical)"
-        description: "Four slides arranged vertically"
-
-        # Calibration reference points
+        name: Four Slides (Vertical)
+        description: Four slides arranged vertically
         aperture_left_x_um: 0
         aperture_right_x_um: 120000
         slide_top_y_um: 0
         slide_bottom_y_um: 75000
-
         aperture_height_mm: 55.0
         slide_width_mm: 25
         slide_height_mm: 75
-
-        # Spacing between slides (center-to-center distance)
         slide_spacing_mm: 30.0
         num_slides: 4
-
-# ========== GENERAL SETTINGS ==========
+  streaming_af:
+    enabled: true
+    speed_property: MaxSpeed
+    slow_speed_value: '1'
+    slow_speed_um_per_s: 1.422
+    normal_speed_value: '100'
 slide_size_um:
   x: 40000
   y: 20000
