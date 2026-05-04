@@ -1,30 +1,80 @@
 # ========== AUTOFOCUS CONFIGURATION ==========
-# Autofocus parameters per objective
-# These settings control autofocus behavior during image acquisition
+# Per-objective autofocus parameters and per-modality strategy bindings.
+# Vocabulary (metric / strategy / validity-check names) is sourced from
+# focus_metrics_manifest.yml; this header is regenerated on every save.
 #
-# STANDARD AUTOFOCUS (initial focus on first tissue position):
-#   n_steps: Number of Z positions to sample (higher = more accurate but slower)
-#   search_range_um: Total Z range to search in micrometers
-#   interp_strength: Interpolation density factor (typical: 50-200)
-#   interp_kind: Interpolation method - 'linear', 'quadratic', or 'cubic'
+# OBJECTIVE FIELDS:
+#   n_steps              -- Z positions sampled for the standard sweep
+#   search_range_um      -- total Z range searched in micrometres
+#   interp_strength      -- interpolation density factor (typical 50-200)
+#   interp_kind          -- 'linear', 'quadratic', or 'cubic'
+#   sweep_range_um       -- in-acquisition drift-check Z range (default 10)
+#   sweep_n_steps        -- in-acquisition drift-check Z samples (default 6)
+#   n_tiles              -- run AF every N tiles; sets af_min_distance
+#   score_metric         -- focus metric (see AVAILABLE SCORE METRICS below)
+#   gap_index_multiplier -- force AF after (this x n_tiles) positions w/o one
+#   gap_spatial_multiplier -- force AF beyond (this x af_min_distance)
 #
-# SWEEP DRIFT CHECK (in-acquisition focus correction):
-#   sweep_range_um: Total Z range for drift check (default 10 = +/-5um)
-#   sweep_n_steps: Number of Z positions to sample (default 6)
+# AVAILABLE SCORE METRICS:
+#   [recommended]
+#     tenengrad
+#       best for : Brightfield, PPM at typical magnifications. Streaming-AF default for tissue. Sum of squared Sobel gradients -- inherently high-pass, immune to lamp vignette.
+#       avoid    : Very dark or sparse fluorescence with sub-resolution objects -- gradient signal is weak relative to noise. Use laplacian_variance for sparse particle samples (pollen grains, beads, FISH spots) where bright-spot detection is more reliable than edge gradients.
+#     laplacian_variance
+#       best for : Lower magnifications (10x and below) on brightfield. Sparse particles on dark background (pollen grains, beads, FISH spots, scattered fluorescent objects) -- the second derivative is highly responsive to bright point-like features. The internal sparse_signal strategy uses this metric paired with a bright-spot validity check. Variance of the Laplacian-filtered image; high-pass.
+#       avoid    : High magnification brightfield -- sensitivity falls off as features become large compared to the kernel. Continuous tissue at high mag -- the Laplacian over-emphasises pixel-scale noise relative to feature edges.
+#     brenner_gradient
+#       best for : Fast checks, low-contrast and dark-field samples. Sum of squared lag-2 horizontal differences. Robust to noise and dark backgrounds; reasonable second-choice for sparse fluorescence if laplacian_variance over-responds to single-pixel noise.
+#       avoid    : Samples needing fine peak resolution -- robust but coarse.
+#   [advanced]
+#     normalized_variance
+#       best for : High-magnification brightfield with dim or non-uniform illumination where var/mean stays focus-sensitive.
+#       avoid    : Low magnifications on brightfield -- known to fail because the lamp vignette dominates var/mean. Confirmed on OWS3 BF 10x 2026-05-01.
+#     vollath_f5
+#       best for : Samples with periodic or striated structure. Autocorrelation at lag 1 minus N*mean^2.
+#       avoid    : Cell smears, amorphous tissue.
+#     sobel
+#       best for : High-contrast features, edge-rich tissue.
+#       avoid    : Smooth gradients without edges.
+#     robust_sharpness_metric
+#       best for : Modality-aware multi-metric strategies (used by dense_texture). Median filter + Otsu mask + sharpness on the masked region.
+#       avoid    : Non-strategy / ad-hoc paths.
+#     hybrid_sharpness_metric
+#       best for : Modality-aware combination of Brenner + soft tissue mask + Gaussian smoothing.
+#       avoid    : Non-strategy / ad-hoc paths.
+#   [special]
+#     p98_p2  (fallback)
+#       best for : Histogram-spread fallback. Always computed alongside the primary metric in the standard AF path and used when peak validation fails on the primary -- no extra acquisition cost.
+#       avoid    : Picking it as a primary unless you specifically want histogram- spread behavior.
+#     none
+#       best for : Used by the manual_only strategy (no scoring needed).
+#       avoid    : Anywhere else.
 #
-# SHARED:
-#   n_tiles: Autofocus runs every N tiles (lower = more frequent)
-#            Also sets af_min_distance = n_tiles x mean(camera FOV)
-#   score_metric: 'normalized_variance' (recommended), 'laplacian_variance',
-#                 'sobel', 'brenner_gradient', or 'p98_p2'
-#   texture_threshold: Min texture variance for tissue detection (0.005-0.030)
-#   tissue_area_threshold: Min tissue coverage fraction (0.05-0.30)
+# STRATEGIES (referenced by per-modality bindings):
+#   dense_texture -> score_metric_default=laplacian_variance, validity_check=texture_and_area, on_failure=defer
+#   sparse_signal -> score_metric_default=laplacian_variance, validity_check=bright_spot_count, on_failure=proceed
+#   dark_field -> score_metric_default=brenner_gradient, validity_check=total_gradient_energy, on_failure=proceed
+#   manual_only -> score_metric_default=none, validity_check=always_false, on_failure=manual
 #
-# AF SAFETY NETS (force an extra autofocus when the planned grid is sparse):
-#   gap_index_multiplier: force AF after (this x n_tiles) positions without one
-#                         Default 3, typical 1-5. Lower = more aggressive safety net.
-#   gap_spatial_multiplier: force AF beyond (this x af_min_distance) from nearest AF
-#                           Default 2.0, typical 1.0-3.0. Catches disconnected fragments.
+# MODALITY DEFAULTS (used when no per-objective score_metric is set):
+#   1p -> vollath_f5
+#   2p -> vollath_f5
+#   bf -> tenengrad
+#   brightfield -> tenengrad
+#   fluorescence -> vollath_f5
+#   fluorescent -> vollath_f5
+#   laser_scanning -> vollath_f5
+#   lsm -> vollath_f5
+#   multiphoton -> vollath_f5
+#   polarized -> tenengrad
+#   ppm -> tenengrad
+#   shg -> vollath_f5
+#   wf -> vollath_f5
+#   widefield -> vollath_f5
+#
+# RENAMED METRICS (loader rejects the old name):
+#   volath5 -> vollath_f5
+#   tenenbaum_gradient -> tenengrad
 
 schema_version: 2
 autofocus_settings:
@@ -35,7 +85,7 @@ autofocus_settings:
   n_tiles: 5
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: laplacian_variance
+  score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 12.0
@@ -43,6 +93,7 @@ autofocus_settings:
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
 - objective: 0.75NA_AIR_20x
   calibrated: true
   n_steps: 35
@@ -58,6 +109,7 @@ autofocus_settings:
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
 - objective: 1.15NA_WATER_LWD_40x
   calibrated: true
   n_steps: 35
@@ -73,6 +125,7 @@ autofocus_settings:
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
 - objective: 1.3NA_OIL_40x
   calibrated: true
   n_steps: 35
@@ -88,6 +141,7 @@ autofocus_settings:
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
 - objective: 1.4NA_OIL_60x
   calibrated: true
   n_steps: 35
@@ -103,6 +157,7 @@ autofocus_settings:
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
 strategies:
   dense_texture:
     description: Current behavior. Works for H&E, IHC, PPM, confluent IF. Requires
