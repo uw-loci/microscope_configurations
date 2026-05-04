@@ -35,7 +35,7 @@ autofocus_settings:
   n_tiles: 4
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: normalized_variance
+  score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 50.0
@@ -50,7 +50,7 @@ autofocus_settings:
   n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: normalized_variance
+  score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
@@ -65,7 +65,7 @@ autofocus_settings:
   n_tiles: 7
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: normalized_variance
+  score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 6.0
