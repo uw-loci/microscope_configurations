@@ -6,27 +6,27 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-04-27T23:31:24.269391'
+    last_calibrated: '2026-05-05T11:33:31.154659'
     modality: ppm
-    objective: LOCI_OBJECTIVE_OLYMPUS_10X_001
+    objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 35.12
-        achieved_intensity: 158.0
+        exposure_ms: 153.2
+        achieved_intensity: 160.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 44.24
+        exposure_ms: 135.94
         achieved_intensity: 159.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 97.58
-        achieved_intensity: 123.0
+        exposure_ms: 374.25
+        achieved_intensity: 117.0
       uncrossed:
         angle_degrees: 90.0
-        exposure_ms: 4.05
-        achieved_intensity: 244.0
+        exposure_ms: 4.55
+        achieved_intensity: 245.0
 background_correction:
   ppm:
     enabled: true
@@ -343,46 +343,84 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           negative:
-            all: 25.12
-            r: 15.9
-            g: 25.12
-            b: 25.52
+            all: 106.65
+            r: 106.65
+            g: 106.65
+            b: 106.65
           crossed:
-            all: 38.48
-            r: 38.48
-            g: 38.48
-            b: 38.48
+            all: 287.23
+            r: 287.23
+            g: 287.23
+            b: 287.23
           positive:
-            all: 14.91
-            r: 14.91
-            g: 14.91
-            b: 14.91
+            all: 136.81
+            r: 136.81
+            g: 136.81
+            b: 136.81
           uncrossed:
-            all: 0.49
-            r: 0.33
-            g: 0.49
-            b: 0.49
+            all: 3.14
+            r: 1.95
+            g: 3.14
+            b: 4.32
         gains:
           negative:
             unified_gain: 1.0
             analog_red: 1.0
-            analog_blue: 2.231
-            wb_method: manual_ppm
+            analog_blue: 4.0
+            wb_method: manual_simple
           crossed:
-            unified_gain: 3.0
-            analog_red: 0.761
-            analog_blue: 1.714
-            wb_method: manual_ppm
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
           positive:
-            unified_gain: 2.0
-            analog_red: 0.757
-            analog_blue: 2.784
-            wb_method: manual_ppm
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
           uncrossed:
             unified_gain: 1.0
             analog_red: 1.0
-            analog_blue: 2.858
-            wb_method: manual_ppm
+            analog_blue: 4.0
+            wb_method: manual_simple
+        wb_last_modified: '2026-05-05T10:43:50.874165'
+        simple_wb:
+          last_calibrated: '2026-05-05T10:43:51.019682'
+          base_angle: uncrossed
+          base_exposures_ms:
+            r: 1.95
+            g: 3.14
+            b: 4.32
+          base_gains:
+            unified_gain: 1.0
+            analog_red: 1.0
+            analog_blue: 4.0
+            wb_method: manual_simple
+          angles:
+            uncrossed:
+              scale: 1.0
+              unified_gain: 1.0
+              r: 1.95
+              g: 3.14
+              b: 4.32
+            negative:
+              scale: 33.952
+              unified_gain: 1.0
+              r: 106.65
+              g: 106.65
+              b: 106.65
+            crossed:
+              scale: 91.436
+              unified_gain: 1.0
+              r: 287.23
+              g: 287.23
+              b: 287.23
+            positive:
+              scale: 43.552
+              unified_gain: 1.0
+              r: 136.81
+              g: 136.81
+              b: 136.81
   brightfield:
     LOCI_OBJECTIVE_OLYMPUS_10X_001:
       LOCI_DETECTOR_TELEDYNE_001:
