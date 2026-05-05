@@ -113,7 +113,7 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   calibrated: true
   n_steps: 12
-  search_range_um: 10.0
+  search_range_um: 20.0
   n_tiles: 7
   interp_strength: 100
   interp_kind: quadratic
