@@ -101,7 +101,15 @@ stage:
     enabled: true
     speed_property: MaxSpeed
     slow_speed_value: '1'
-    slow_speed_um_per_s: 1.422
+    # 2026-05-06: corrected from 1.422 (a flaky early PRBSAFZ probe).
+    # Z-poll trace measured ~10.5 um/s actual on the PPM ZStage at
+    # MaxSpeed=1, matching the pre-YAML hardcoded MIN_VELOCITY_UM_S=11.5
+    # from streaming_focus.py (commit 7c59d2b). The bad 1.422 made
+    # motion_duration_ms = 14000 instead of ~1700, so the scan loop
+    # waited 14 s while the stage actually finished in <2 s -- the
+    # remaining 12 s captured stationary frames mis-labelled across
+    # the full scan range, parking the metric peak at the wrong end.
+    slow_speed_um_per_s: 11.5
     normal_speed_value: '100'
 slide_size_um:
   x: 40000
