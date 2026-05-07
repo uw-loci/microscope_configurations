@@ -27,9 +27,9 @@
 #       best for : Fast checks, low-contrast and dark-field samples. Sum of squared lag-2 horizontal differences. Robust to noise and dark backgrounds; reasonable second-choice for sparse fluorescence if laplacian_variance over-responds to single-pixel noise.
 #       avoid    : Samples needing fine peak resolution -- robust but coarse.
 #   [advanced]
-#     normalized_variance
-#       best for : High-magnification brightfield with dim or non-uniform illumination where var/mean stays focus-sensitive.
-#       avoid    : Low magnifications on brightfield -- known to fail because the lamp vignette dominates var/mean. Confirmed on OWS3 BF 10x 2026-05-01.
+#     normalized_variance  [brightfield/ppm only, 20x+]
+#       best for : High-magnification brightfield with dim or non-uniform illumination where var/mean stays focus-sensitive. Brightfield ONLY -- the var/mean ratio is meaningful only when the mean reflects sample- scale illumination, not background dark current.
+#       avoid    : Low magnifications on brightfield -- known to fail because the lamp vignette dominates var/mean. Confirmed on OWS3 BF 10x 2026-05-01. Fluorescence at any magnification -- background dark current makes both var and mean small and noisy, so the ratio is unstable.
 #     vollath_f5
 #       best for : Samples with periodic or striated structure. Autocorrelation at lag 1 minus N*mean^2.
 #       avoid    : Cell smears, amorphous tissue.
@@ -39,13 +39,13 @@
 #     robust_sharpness_metric
 #       best for : Modality-aware multi-metric strategies (used by dense_texture). Median filter + Otsu mask + sharpness on the masked region.
 #       avoid    : Non-strategy / ad-hoc paths.
-#     hybrid_sharpness_metric
-#       best for : Modality-aware combination of Brenner + soft tissue mask + Gaussian smoothing.
-#       avoid    : Non-strategy / ad-hoc paths.
+#     hybrid_sharpness_metric  [brightfield/ppm only]
+#       best for : Modality-aware combination of Brenner + soft tissue mask + Gaussian smoothing. Brightfield / PPM ONLY: the soft mask weights mid-gray pixels highest, which matches BF tissue (dark features against a bright background) but actively suppresses fluorescence signal (bright features against a dark background) -- under FL the brighter and sharper the field, the LOWER this metric scores.
+#       avoid    : Fluorescence at any magnification -- the mid-gray soft mask inverts the metric (sharper FL -> smaller score). Use vollath_f5 or laplacian_variance for FL instead. Non-strategy / ad-hoc paths -- this metric is wired into the dense_texture strategy and not directly usable by streaming or standard AF.
 #   [special]
 #     p98_p2  (fallback)
-#       best for : Histogram-spread fallback. Always computed alongside the primary metric in the standard AF path and used when peak validation fails on the primary -- no extra acquisition cost.
-#       avoid    : Picking it as a primary unless you specifically want histogram- spread behavior.
+#       best for : Histogram-spread fallback. Always computed alongside the primary metric in the standard AF path and used when peak validation fails on the primary -- no extra acquisition cost. Modality- agnostic AS A PEAK FINDER: standard AF compares p98_p2 across Z and picks the maximum-difference Z, which works for both BF (focus pulls p2 down -> larger spread) and FL (focus pulls p98 up -> larger spread). The intermediate Z extreme of the curve is what matters; "higher = sharper" comparisons across modalities are NOT meaningful.
+#       avoid    : Picking it as a primary unless you specifically want histogram- spread behavior. Any code path that compares p98_p2 values across different modalities or different fields-of-view -- the metric's sign and magnitude meaning changes with the sample's brightness direction (BF: dark features on bright bg; FL: bright features on dark bg).
 #     none
 #       best for : Used by the manual_only strategy (no scoring needed).
 #       avoid    : Anywhere else.
@@ -53,6 +53,7 @@
 # STRATEGIES (referenced by per-modality bindings):
 #   dense_texture -> score_metric_default=laplacian_variance, validity_check=texture_and_area, on_failure=defer
 #   sparse_signal -> score_metric_default=laplacian_variance, validity_check=bright_spot_count, on_failure=proceed
+#   dense_fluorescence -> score_metric_default=vollath_f5, validity_check=total_gradient_energy, on_failure=proceed
 #   dark_field -> score_metric_default=brenner_gradient, validity_check=total_gradient_energy, on_failure=proceed
 #   manual_only -> score_metric_default=none, validity_check=always_false, on_failure=manual
 #
