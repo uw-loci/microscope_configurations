@@ -503,8 +503,5 @@ YAML" reasons.
 
 ## 7. Related files
 
-- Session summary: `claude-reports/2026-04-14_ows3-widefield-if-session-summary.md`
-- AF redesign: `claude-reports/2026-04-13_modality-aware-autofocus-design.md`
-- Phase A/B/C/D progress: `claude-reports/2026-04-14_phase-ABCD-progress.md`
 - Java-side channel types: `qupath-extension-qpsc/src/main/java/qupath/ext/qpsc/modality/Channel.java`
 - Python-side strategy types: `microscope_control/microscope_control/autofocus/strategies.py`

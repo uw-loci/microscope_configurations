@@ -91,3 +91,8 @@ _*/
 # Testing files
 testing*
 test_*
+
+# Internal Claude collaboration files (do not ship)
+CLAUDE.md
+TOC.md
+claude-reports/
