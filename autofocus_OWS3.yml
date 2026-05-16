@@ -82,15 +82,15 @@ autofocus_settings:
 - objective: 0.5NA_AIR_10x
   calibrated: true
   n_steps: 9
-  search_range_um: 15.0
+  search_range_um: 55.0
   n_tiles: 5
   interp_strength: 100
   interp_kind: quadratic
   score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 50.0
-  sweep_n_steps: 3
+  sweep_range_um: 55.0
+  sweep_n_steps: 15
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
