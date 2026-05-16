@@ -501,7 +501,40 @@ stage:
       low: 0.0
       high: 2400.0
   streaming_af:
-    enabled: true
+    # Disabled 2026-05-16 after empirical analysis confirmed the Prior
+    # Z controller on this rig does NOT honor the Speed property for
+    # non-blocking moves. A "0.50mm/sec" preset that should produce
+    # ~6 um/s velocity actually runs the stage at ~169 um/s (the full
+    # 55 um sweep range completes in ~330 ms then sits stationary for
+    # the remaining 8.8 s of the scan window). Streaming AF therefore
+    # captures essentially-identical frames during the post-motion
+    # stationary period, sees no Z-dependent metric variation, and
+    # fails to find focus.
+    #
+    # The ZDrive device exposes only two properties (Speed, Tolerance);
+    # Speed accepts only the named enum values (rejects fractional and
+    # integer probes), and the streaming AF property survey found no
+    # Acceleration / MaxSpeed / Velocity / SCurve knob that could
+    # alternatively slow continuous motion. Streaming AF is therefore
+    # fundamentally incompatible with this rig's stage driver.
+    #
+    # Live Viewer "Autofocus" should fall back to Sweep AF on OWS3
+    # (which uses blocking step-and-snap and works on this stage).
+    # Acquisition AF (per-tile drift check) already uses Sweep, so
+    # this only affects the Live Viewer button.
+    #
+    # Re-enable IF/WHEN one of:
+    #   - The Prior controller firmware adds non-blocking Speed support
+    #   - A different MM driver exposes Acceleration / Velocity
+    #   - We patch streaming AF to use a stepped-snap mode on rigs
+    #     where continuous-velocity motion isn't available
+    enabled: false
+    # Legacy values preserved for reference / potential re-enable.
+    # slow_speed_um_per_s here is the OVERHEAD-DOMINATED reading from
+    # the 1um PROBEZ verify, not the actual stage motion velocity --
+    # do not trust this number until the rig supports velocity-
+    # controlled non-blocking moves (see 2026-05-16 analysis in
+    # claude-reports/design/autofocus-empirical/SYNTHESIS.md).
     speed_property: Speed
     slow_speed_value: 0.50mm/sec
     slow_speed_um_per_s: 6.079
@@ -518,7 +551,7 @@ acquisition_profiles:
       preset: 2-R100 (BF Camera)
     - group: Epi Shutter
       preset: Closed
-    illumination_intensity: 70
+    illumination_intensity: 700
   Brightfield_20x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
