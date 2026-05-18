@@ -501,43 +501,28 @@ stage:
       low: 0.0
       high: 2400.0
   streaming_af:
-    # Disabled 2026-05-16 after empirical analysis confirmed the Prior
-    # Z controller on this rig does NOT honor the Speed property for
-    # non-blocking moves. A "0.50mm/sec" preset that should produce
-    # ~6 um/s velocity actually runs the stage at ~169 um/s (the full
-    # 55 um sweep range completes in ~330 ms then sits stationary for
-    # the remaining 8.8 s of the scan window). Streaming AF therefore
-    # captures essentially-identical frames during the post-motion
-    # stationary period, sees no Z-dependent metric variation, and
-    # fails to find focus.
+    # Re-enabled 2026-05-17 for retest after PROBEZ verify-um=20 run
+    # showed the slowest enum (0.50mm/sec) actually achieves 75.2 um/s
+    # peak-interval velocity (vs 55.6 um/s endpoint-averaged) -- well
+    # under the 10x rapid-jump threshold. Prior IS honoring Speed on
+    # blocking moves with internal polling. The original disable on
+    # 2026-05-16 was based on a 1um verify run whose timing was
+    # dominated by busy-poll overhead, not real motion.
     #
-    # The ZDrive device exposes only two properties (Speed, Tolerance);
-    # Speed accepts only the named enum values (rejects fractional and
-    # integer probes), and the streaming AF property survey found no
-    # Acceleration / MaxSpeed / Velocity / SCurve knob that could
-    # alternatively slow continuous motion. Streaming AF is therefore
-    # fundamentally incompatible with this rig's stage driver.
+    # Open question this re-enable is meant to answer: does Prior also
+    # honor Speed on the NON-blocking continuous move that streaming
+    # AF uses? The rapid-jump detector (server commit db80d94) will
+    # catch and cleanly abort if it does not.
     #
-    # Live Viewer "Autofocus" should fall back to Sweep AF on OWS3
-    # (which uses blocking step-and-snap and works on this stage).
-    # Acquisition AF (per-tile drift check) already uses Sweep, so
-    # this only affects the Live Viewer button.
-    #
-    # Re-enable IF/WHEN one of:
-    #   - The Prior controller firmware adds non-blocking Speed support
-    #   - A different MM driver exposes Acceleration / Velocity
-    #   - We patch streaming AF to use a stepped-snap mode on rigs
-    #     where continuous-velocity motion isn't available
-    enabled: false
-    # Legacy values preserved for reference / potential re-enable.
-    # slow_speed_um_per_s here is the OVERHEAD-DOMINATED reading from
-    # the 1um PROBEZ verify, not the actual stage motion velocity --
-    # do not trust this number until the rig supports velocity-
-    # controlled non-blocking moves (see 2026-05-16 analysis in
-    # claude-reports/design/autofocus-empirical/SYNTHESIS.md).
+    # If streaming AF rapid-jumps again here: set enabled=false again
+    # and consider patching streaming AF to use a stepped-snap mode on
+    # rigs where continuous-velocity motion isn't available.
+    enabled: true
     speed_property: Speed
     slow_speed_value: 0.50mm/sec
-    slow_speed_um_per_s: 6.079
+    # Endpoint-averaged measurement from PROBEZ verify-um=20 on
+    # 2026-05-17. Peak-interval velocity was 75.2 um/s (no rapid jump).
+    slow_speed_um_per_s: 55.6
     normal_speed_value: 2.50mm/sec
 slide_size_um:
   x: 40000
