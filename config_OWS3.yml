@@ -501,27 +501,32 @@ stage:
       low: 0.0
       high: 2400.0
   streaming_af:
-    # Re-enabled 2026-05-17 for retest after PROBEZ verify-um=20 run
-    # showed the slowest enum (0.50mm/sec) actually achieves 75.2 um/s
-    # peak-interval velocity (vs 55.6 um/s endpoint-averaged) -- well
-    # under the 10x rapid-jump threshold. Prior IS honoring Speed on
-    # blocking moves with internal polling. The original disable on
-    # 2026-05-16 was based on a 1um verify run whose timing was
-    # dominated by busy-poll overhead, not real motion.
+    # DISABLED 2026-05-21 -- retest conclusive. The 2026-05-17 re-enable
+    # existed to answer one question: does the Prior ZDrive honor the
+    # Speed property on the NON-blocking continuous move that streaming
+    # AF uses? Answer: no. Server log 2026-05-21 14:27:03 -- a 110um
+    # non-blocking move completed in 289ms (381 um/s actual vs the
+    # 55.6 um/s configured), and the property survey showed ZDrive.Speed
+    # rejects every fractional and integer probe and accepts only the
+    # named positioning-speed enums. There is no knob that slows
+    # continuous motion on this controller. Streaming AF rapid-jumps
+    # 100% of the time here and cannot be made to work without a
+    # different stage or a different MM adapter.
     #
-    # Open question this re-enable is meant to answer: does Prior also
-    # honor Speed on the NON-blocking continuous move that streaming
-    # AF uses? The rapid-jump detector (server commit db80d94) will
-    # catch and cleanly abort if it does not.
+    # The PROBEZ verify-um=20 run that motivated the re-enable used a
+    # BLOCKING move with internal polling -- Prior honors Speed there.
+    # It does not on the non-blocking path. That gap is the bug.
     #
-    # If streaming AF rapid-jumps again here: set enabled=false again
-    # and consider patching streaming AF to use a stepped-snap mode on
-    # rigs where continuous-velocity motion isn't available.
-    enabled: true
+    # Keeping this disabled also avoids the rapid_jump-abort CONFIG hang
+    # (the streaming handler cleanup wedges on abort). With enabled=false
+    # the Live Viewer routes straight to Sweep Focus (commit 455ee3d)
+    # and never sends STRMAFZ, so the hang cannot be triggered.
+    #
+    # Do not re-enable on OWS3 unless the ZDrive is replaced or a MM
+    # adapter exposing a continuous-motion velocity knob is found.
+    enabled: false
     speed_property: Speed
     slow_speed_value: 0.50mm/sec
-    # Endpoint-averaged measurement from PROBEZ verify-um=20 on
-    # 2026-05-17. Peak-interval velocity was 75.2 um/s (no rapid jump).
     slow_speed_um_per_s: 55.6
     normal_speed_value: 2.50mm/sec
 slide_size_um:
