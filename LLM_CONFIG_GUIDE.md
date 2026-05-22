@@ -25,10 +25,10 @@ microscope:
 # Shared hardware, looked up by ID from resources_LOCI.yml.
 slide_size_um: { X: 75000, Y: 25000 }    # physical slide dimensions
 
-stage_limits:
-  xlimit: { low: -37500, high: 37500 }
-  ylimit: { low: -12500, high: 12500 }
-  zlimit: { low: -5000, high: 5000 }
+stage_limits:                            # MUST be MicroManager coordinates,
+  xlimit: { low: -37500, high: 37500 }   #   not the scope's own stage readout.
+  ylimit: { low: -12500, high: 12500 }   # low/high are numeric min/max labels;
+  zlimit: { low: -5000, high: 5000 }     #   QPSC tolerates either ordering.
 
 available_objectives:
   - 0.5NA_AIR_10x           # IDs resolved via resources_LOCI.yml

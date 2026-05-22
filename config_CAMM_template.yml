@@ -173,6 +173,10 @@ stage:
   stage_id: 'LOCI_STAGE_ASI_001'
   z_stage: 'ZStage:Z:32'       # Primary Z (focus)
   f_stage: 'ZStage:F:32'       # Secondary Z (condenser/collector)
+  # Movement limits in micrometers. These MUST be MicroManager coordinates
+  # (what MM's getXYPosition / Z reports), NOT the microscope's own stage
+  # readout -- on some scopes MM's frame is mirrored from the physical stage.
+  # 'low'/'high' are numeric min/max labels; QPSC normalizes either order.
   limits:
     x_um:
       low: -5000

@@ -469,11 +469,21 @@ id_detector:
 stage:
   stage_id: 'LOCI_STAGE_001'        # Must match resources_LOCI.yml entry
 
-  # Movement limits in micrometers
+  # Movement limits in micrometers.
+  #
+  # IMPORTANT: these MUST be MicroManager coordinates -- the values
+  # MicroManager's getXYPosition / Z reports -- NOT the microscope's own
+  # stage readout. On some scopes (e.g. OWS3) MicroManager's frame is
+  # mirrored relative to the physical stage; QPSC drives the stage through
+  # MicroManager, so the config and the Stage Map must agree with MM.
+  #
+  # 'low' and 'high' are just numeric min/max labels. QPSC normalizes them,
+  # so listing them in descending order will not break the bounds check --
+  # but for clarity prefer low < high (low = most negative MM coordinate).
   limits:
     x_um:
-      low: -36000                   # Minimum X position
-      high: 34000                   # Maximum X position
+      low: -36000                   # Minimum X position (MicroManager coordinate)
+      high: 34000                   # Maximum X position (MicroManager coordinate)
     y_um:
       low: -39000
       high: 34000
