@@ -492,8 +492,8 @@ stage:
   z_stage: ZDrive
   limits:
     x_um:
-      low: -44500.0
-      high: 0.0
+      low: -27500.0
+      high: 49500.0
     y_um:
       low: -17652.0
       high: 13395.0
@@ -530,8 +530,8 @@ stage:
     slow_speed_um_per_s: 55.6
     normal_speed_value: 2.50mm/sec
 slide_size_um:
-  x: 40000
-  y: 20000
+  x: 75000
+  y: 25000
 acquisition_profiles:
   Brightfield_10x:
     modality: Brightfield
