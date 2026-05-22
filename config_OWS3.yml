@@ -462,7 +462,7 @@ hardware:
   objectives:
   - id: 0.5NA_AIR_10x
     pixel_size_xy_um:
-      HAMAMATSU_DCAM_01: 0.6502
+      HAMAMATSU_DCAM_01: 0.653
   - id: 0.75NA_AIR_20x
     pixel_size_xy_um:
       HAMAMATSU_DCAM_01: 0.3248
@@ -492,8 +492,8 @@ stage:
   z_stage: ZDrive
   limits:
     x_um:
-      low: -27500.0
-      high: 49500.0
+      low: -49500.0
+      high: 27500.0
     y_um:
       low: -17652.0
       high: 13395.0
