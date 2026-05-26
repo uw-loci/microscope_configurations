@@ -81,7 +81,7 @@ schema_version: 2
 autofocus_settings:
 - objective: 0.5NA_AIR_10x
   calibrated: true
-  n_steps: 9
+  n_steps: 15
   search_range_um: 55.0
   n_tiles: 5
   interp_strength: 100
