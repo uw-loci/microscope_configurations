@@ -141,6 +141,13 @@ strategies:
       - 0.1
       - 0.9
       median_floor: 15.0
+      # Max fraction (0-1) of pixels the brightest channel may have saturated
+      # before autofocus auto-reduces its own exposure/illumination for the
+      # run. A saturated focus frame inverts the focus metric and walks the
+      # stage (2026-05-31 PPM 40x runaway). Dense tissue tolerates ~10%;
+      # sparse/dark-field samples need a much lower value (they clip all their
+      # signal in a few percent). Omit to use the per-strategy code default.
+      saturation_threshold: 0.10
     on_failure: defer
   manual_only:
     description: Skip auto entirely. Always prompts the user.
