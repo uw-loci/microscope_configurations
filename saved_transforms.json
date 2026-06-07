@@ -95,5 +95,79 @@
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
+  },
+  "PPM_Transform_20260526": {
+    "name": "PPM_Transform_20260526",
+    "microscope": "PPM",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -41145.01885171875,
+      "m12": -22144.04452371875
+    },
+    "createdDate": "May 26, 2026, 9:55:31 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": true,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 664.5,
+    "greenBoxDisplayCenterY": 143.0,
+    "stageAnchorX": 12679.481148281251,
+    "stageAnchorY": -10561.044523718749,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
+  },
+  "PPM_Transform_20260531": {
+    "name": "PPM_Transform_20260531",
+    "microscope": "PPM",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -41165.07936,
+      "m12": -22292.32312
+    },
+    "createdDate": "May 31, 2026, 11:29:52 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": true,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 664.5,
+    "greenBoxDisplayCenterY": 143.0,
+    "stageAnchorX": 12659.42064,
+    "stageAnchorY": -10709.323120000001,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }
