@@ -105,7 +105,13 @@ autofocus_settings:
   score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 6.0
+  # Streaming AF discards the first stage.streaming_af.head_discard_ms (600 ms
+  # default) of every scan to skip the acceleration ramp. At 11.5 um/s a 6 um
+  # sweep only lasts ~520 ms, so the whole scan fell inside the discard window
+  # and produced "0 usable samples". The scan must outlast the discard plus a
+  # few frames; 20 um (matching 40x) gives ~1.7 s of motion. Do not drop this
+  # below ~14 um without also lowering slow_speed_um_per_s.
+  sweep_range_um: 20.0
   sweep_n_steps: 3
   edge_retries: 2
   gap_index_multiplier: 3
