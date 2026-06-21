@@ -219,9 +219,9 @@ strategies:
     on_failure: manual
 modalities:
   bf:
-    strategy: sparse_signal
+    strategy: dense_texture
   brightfield:
-    strategy: sparse_signal
+    strategy: dense_texture
   ppm:
     strategy: dense_texture
     overrides:
