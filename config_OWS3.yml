@@ -541,7 +541,13 @@ acquisition_profiles:
       preset: 2-R100 (BF Camera)
     - group: Epi Shutter
       preset: Closed
-    illumination_intensity: 700
+    # DiaLamp power applied at mode setup AND background collection (the single
+    # source of truth -- interactive Live tuning is NOT persisted back here). At
+    # 700 the 10x blank field clipped (~6-7% saturated), which the flat-field
+    # divide cannot correct; 603 matches the level tuned in Live with no
+    # saturation. Re-collect the background after changing this so the reference
+    # matches the acquisition lamp level.
+    illumination_intensity: 603
   Brightfield_20x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
