@@ -547,7 +547,7 @@ acquisition_profiles:
     # divide cannot correct; 603 matches the level tuned in Live with no
     # saturation. Re-collect the background after changing this so the reference
     # matches the acquisition lamp level.
-    illumination_intensity: 603
+    illumination_intensity: 662
   Brightfield_20x:
     modality: Brightfield
     detector: HAMAMATSU_DCAM_01
