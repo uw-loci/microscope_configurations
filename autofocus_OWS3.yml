@@ -83,7 +83,7 @@ autofocus_settings:
   calibrated: true
   n_steps: 15
   search_range_um: 55.0
-  n_tiles: 5
+  n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
   score_metric: tenengrad
@@ -173,11 +173,7 @@ strategies:
       - 0.1
       - 0.9
       median_floor: 15.0
-      # Max saturated-pixel fraction (0-1) on the brightest channel before AF
-      # auto-reduces its own exposure/illumination for the run. Dense tissue
-      # tolerates ~10%; a saturated focus frame inverts the metric and walks
-      # the stage (2026-05-31 PPM 40x runaway). Omit to use the code default.
-      saturation_threshold: 0.10
+      saturation_threshold: 0.1
     on_failure: defer
   sparse_signal:
     description: For scattered fluorescent objects (beads, pollen, single cells on
@@ -193,8 +189,6 @@ strategies:
       min_spots: 3
       min_peak_intensity: 20.0
       bright_pixel_floor: 50.0
-      # Sparse fields (beads/FISH spots) clip ALL their real signal in only a
-      # few percent of pixels, so the tolerance is far tighter than tissue.
       saturation_threshold: 0.03
     on_failure: proceed
   dark_field:
@@ -205,8 +199,6 @@ strategies:
     validity_check: total_gradient_energy
     validity_params:
       min_gradient_energy: 0.002
-      # Dark-field signal is a bright tail on a dark field; saturation there
-      # means the real signal is clipping. Tight tolerance, like sparse.
       saturation_threshold: 0.03
     on_failure: proceed
   manual_only:
