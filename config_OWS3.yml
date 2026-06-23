@@ -529,6 +529,50 @@ stage:
     slow_speed_value: 0.50mm/sec
     slow_speed_um_per_s: 55.6
     normal_speed_value: 2.50mm/sec
+  # Stage inserts for the Stage Map. The normal single-slide insert is
+  # synthesized from stage.limits + slide_size_um (correct stage polarity), so
+  # only the special petri-dish carriers are declared here. Calibrate each dish
+  # by driving to the well edge in Live View and capturing the stage position
+  # (Stage Map -> Calibrate...): the four aperture_* fields are the well-edge
+  # stage coordinates, from which the Stage Map derives the well center and
+  # extent. The placeholder values below assume a well near stage origin --
+  # recalibrate before trusting positions.
+  inserts:
+    slide_margin_um: 2000
+    default: single_h
+    configurations:
+      dish35_well20:
+        name: 35mm Dish (20mm well)
+        description: 35mm petri dish with a 20mm imaging well. Ground-truth points are the well edge.
+        kind: dish_holder
+        aperture_left_x_um: 10000      # stage X when the well LEFT edge is centered in FOV
+        aperture_right_x_um: -10000    # stage X when the well RIGHT edge is centered in FOV
+        aperture_top_y_um: 10000       # stage Y when the well TOP edge is centered in FOV
+        aperture_bottom_y_um: -10000   # stage Y when the well BOTTOM edge is centered in FOV
+        aperture_height_mm: 20.0
+        slide_width_mm: 20
+        slide_height_mm: 20
+        samples:
+        - kind: well
+          shape: circle
+          label: Well (20mm)
+          well_diameter_mm: 20
+      dish35_well14:
+        name: 35mm Dish (14mm well)
+        description: 35mm petri dish with a 14mm imaging well. Ground-truth points are the well edge.
+        kind: dish_holder
+        aperture_left_x_um: 7000       # stage X when the well LEFT edge is centered in FOV
+        aperture_right_x_um: -7000     # stage X when the well RIGHT edge is centered in FOV
+        aperture_top_y_um: 7000        # stage Y when the well TOP edge is centered in FOV
+        aperture_bottom_y_um: -7000    # stage Y when the well BOTTOM edge is centered in FOV
+        aperture_height_mm: 14.0
+        slide_width_mm: 14
+        slide_height_mm: 14
+        samples:
+        - kind: well
+          shape: circle
+          label: Well (14mm)
+          well_diameter_mm: 14
 slide_size_um:
   x: 75000
   y: 25000
