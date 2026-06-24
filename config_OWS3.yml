@@ -475,6 +475,9 @@ hardware:
   - id: 1.4NA_OIL_60x
     pixel_size_xy_um:
       HAMAMATSU_DCAM_01: 0.11
+  - id: 1.2NA_WATER_60x
+    pixel_size_xy_um:
+      HAMAMATSU_DCAM_01: 0.11
   detectors:
   - HAMAMATSU_DCAM_01
 id_detector:
@@ -499,7 +502,7 @@ stage:
       high: 13395.0
     z_um:
       low: 0.0
-      high: 2400.0
+      high: 2800.0
   streaming_af:
     # DISABLED 2026-05-21 -- retest conclusive. The 2026-05-17 re-enable
     # existed to answer one question: does the Prior ZDrive honor the
@@ -564,10 +567,10 @@ stage:
         name: 35mm Dish (14mm well)
         description: 35mm petri dish with a 14mm imaging well. Ground-truth points are the well edge.
         kind: dish_holder
-        aperture_left_x_um: 7000       # stage X when the well LEFT edge is centered in FOV
-        aperture_right_x_um: -7000     # stage X when the well RIGHT edge is centered in FOV
-        aperture_top_y_um: 7000        # stage Y when the well TOP edge is centered in FOV
-        aperture_bottom_y_um: -7000    # stage Y when the well BOTTOM edge is centered in FOV
+        aperture_left_x_um: 3799.3  # stage X when the well LEFT edge is centered in FOV
+        aperture_right_x_um: -10470.3  # stage X when the well RIGHT edge is centered in FOV
+        aperture_top_y_um: 6570.3  # stage Y when the well TOP edge is centered in FOV
+        aperture_bottom_y_um: -7694.3  # stage Y when the well BOTTOM edge is centered in FOV
         aperture_height_mm: 14.0
         slide_width_mm: 14
         slide_height_mm: 14
