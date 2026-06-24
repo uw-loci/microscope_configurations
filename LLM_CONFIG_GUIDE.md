@@ -228,6 +228,26 @@ acquisition_profiles:
           - { device: DiaLamp, property: Intensity, value: 70 }
 ```
 
+### Profile-key resolution and same-magnification objectives
+
+A profile key does NOT have to spell out the full objective id. At runtime
+`MicroscopeConfigManager.resolveProfileKey(modality, objective)` matches the
+profile whose key is `<Modality>_<suffix>` where `<suffix>` is a **case-insensitive
+substring of the objective id, longest match wins**. That is why OWS3 uses short
+magnification-only keys (`Brightfield_60x`, `Fluorescence_40x`): `60x` is a
+substring of `1.4NA_OIL_60x`, so the lens resolves to that profile.
+
+The catch: when **two objectives share a magnification** (OWS3 has both
+`1.4NA_OIL_60x` and `1.2NA_WATER_60x`), a bare `_60x` key is ambiguous and the
+longest-substring rule can only pick one of them. Disambiguate by giving the
+second objective a key with a longer suffix that is a substring of ONLY that
+objective's id. OWS3 does this with `Brightfield_water_60x` /
+`Fluorescence_water_60x`: `water_60x` is a substring of `1.2NA_WATER_60x` (length
+9, beats `60x`) but not of `1.4NA_OIL_60x`, so the water lens routes to the new
+profiles and the oil 60x keeps mapping to `Brightfield_60x` / `Fluorescence_60x`.
+Pick the suffix from the objective id's own text (here `WATER_60x`), not an
+arbitrary label -- it has to literally appear in the id to match.
+
 ### Backward compat
 
 If a Fluorescence profile has **no `channels:` list** AND the modality has **no channel library**, the system falls back to the original single-snap path. This is how brightfield-only and laser-scanning modalities stay unchanged.
