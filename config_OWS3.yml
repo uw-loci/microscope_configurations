@@ -628,6 +628,20 @@ acquisition_profiles:
     - group: Epi Shutter
       preset: Closed
     illumination_intensity: 500
+  # 60x WATER objective (1.2NA_WATER_60x). The "water_60x" suffix is a substring
+  # of that objective id but NOT of 1.4NA_OIL_60x, so resolveProfileKey's
+  # longest-substring rule routes the water lens here while the oil 60x keeps
+  # mapping to Brightfield_60x above. Starting lamp level mirrors Brightfield_60x;
+  # tune in Live and re-collect the flat-field background after changing it.
+  Brightfield_water_60x:
+    modality: Brightfield
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (BF Camera)
+    - group: Epi Shutter
+      preset: Closed
+    illumination_intensity: 500
   Fluorescence_10x:
     modality: Fluorescence
     detector: HAMAMATSU_DCAM_01
@@ -683,6 +697,27 @@ acquisition_profiles:
       Cy5:
         exposure_ms: 300
   Fluorescence_60x:
+    modality: Fluorescence
+    detector: HAMAMATSU_DCAM_01
+    mm_setup_presets:
+    - group: Light Path
+      preset: 2-R100 (Epi Camera)
+    - group: Epi Shutter
+      preset: Open
+    - group: 'Epi Channel: Laser/LED (LAPP)'
+      preset: Epi LED (DLEDI)
+    illumination_intensity: 1.0
+    channels:
+    - DAPI
+    - FITC
+    - TRITC
+    - Cy5
+    channel_overrides:
+      Cy5:
+        exposure_ms: 400
+  # 60x WATER objective (1.2NA_WATER_60x) -- see the note on Brightfield_water_60x
+  # for why the "water_60x" key suffix disambiguates it from the oil 60x.
+  Fluorescence_water_60x:
     modality: Fluorescence
     detector: HAMAMATSU_DCAM_01
     mm_setup_presets:
