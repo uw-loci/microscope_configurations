@@ -552,6 +552,9 @@ stage:
         aperture_height_mm: 20.0
         slide_width_mm: 20
         slide_height_mm: 20
+        # Outer dish outline drawn for context on the Stage Map (purely visual:
+        # not a move target, not a legal zone). Concentric with the well.
+        dish_diameter_mm: 35
         samples:
         - kind: well
           shape: circle
@@ -568,6 +571,9 @@ stage:
         aperture_height_mm: 14.0
         slide_width_mm: 14
         slide_height_mm: 14
+        # Outer dish outline drawn for context on the Stage Map (purely visual:
+        # not a move target, not a legal zone). Concentric with the well.
+        dish_diameter_mm: 35
         samples:
         - kind: well
           shape: circle
