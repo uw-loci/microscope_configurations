@@ -98,24 +98,18 @@ autofocus_settings:
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   calibrated: true
   n_steps: 40
-  search_range_um: 30.0
+  search_range_um: 60.0
   n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
   score_metric: tenengrad
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  # Streaming AF discards the first stage.streaming_af.head_discard_ms (600 ms
-  # default) of every scan to skip the acceleration ramp. At 11.5 um/s a 6 um
-  # sweep only lasts ~520 ms, so the whole scan fell inside the discard window
-  # and produced "0 usable samples". The scan must outlast the discard plus a
-  # few frames; 20 um (matching 40x) gives ~1.7 s of motion. Do not drop this
-  # below ~14 um without also lowering slow_speed_um_per_s.
   sweep_range_um: 20.0
-  sweep_n_steps: 3
+  sweep_n_steps: 20
   edge_retries: 2
   gap_index_multiplier: 3
-  gap_spatial_multiplier: 2.0
+  gap_spatial_multiplier: 0.5
   p98_p2_fallback_enabled: true
 - objective: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
   calibrated: true
@@ -147,13 +141,7 @@ strategies:
       - 0.1
       - 0.9
       median_floor: 15.0
-      # Max fraction (0-1) of pixels the brightest channel may have saturated
-      # before autofocus auto-reduces its own exposure/illumination for the
-      # run. A saturated focus frame inverts the focus metric and walks the
-      # stage (2026-05-31 PPM 40x runaway). Dense tissue tolerates ~10%;
-      # sparse/dark-field samples need a much lower value (they clip all their
-      # signal in a few percent). Omit to use the per-strategy code default.
-      saturation_threshold: 0.10
+      saturation_threshold: 0.1
     on_failure: defer
   manual_only:
     description: Skip auto entirely. Always prompts the user.
