@@ -102,7 +102,18 @@ autofocus_settings:
   n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
-  score_metric: tenengrad
+  # 2026-06-28: switched tenengrad -> p98_p2. On PPM at 20x the bright
+  # background swamps the tenengrad gradient, so it reads flat (0.6-1.6%
+  # of peak, "within noise") over the drift window and cannot discriminate
+  # focus -- the per-tile sweep drift check then freezes Z, and streaming
+  # AF wastes attempts widening 20->40->80 um before tenengrad registers
+  # a gradient (landing on a scan boundary). p98_p2 (percentile spread)
+  # fit a clean peak on the same frames every time (R^2=0.99, amplitude
+  # 13-29%); the streaming handler logged "consider switching score_metric
+  # to 'p98_p2'" across four runs. p98_p2 as PRIMARY is explicitly
+  # supported (streaming_focus: "primary metric is p98_p2; no secondary
+  # needed").
+  score_metric: p98_p2
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 20.0
