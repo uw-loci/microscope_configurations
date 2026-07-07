@@ -109,6 +109,24 @@ id_detector:
         flip_x: false
         flip_y: false
         description: 'JAI 3-CCD prism detector'
+        # Optional: enables the opt-in "High Bit Depth PPM Capture" preference.
+        # When that preference is ON, the server flips this MM device property to
+        # high_value for the PPM angle snaps (so the birefringence is computed
+        # from high-precision inputs) and restores it afterward. Without this
+        # block the preference is a no-op (stays 8-bit). Discover the real
+        # property name and its allowed high-bit value on the scope first, e.g.
+        # in a MicroManager script:
+        #   mmc.getAllowedPropertyValues('JAICamera', 'PixelFormat')
+        # then uncomment and fill in below. data_max is the full-scale of the
+        # returned data (e.g. 4095 for 12-bit delivered in a uint16 container,
+        # 65535 if the adapter left-justifies to full 16-bit); it rescales the
+        # birefringence dark-mask threshold and the sum normalization.
+        # high_bit_depth:
+        #   property: 'PixelFormat'   # MM device property that selects bit depth
+        #   high_value: 'BGR12'       # value that selects the high-bit format
+        #   low_value: 'BGR8'         # optional; captured from HW if omitted
+        #   bit_depth: 12             # real sensor bits (for logging)
+        #   data_max: 4095            # full-scale of the returned uint16 data
 
     OWS3_DETECTOR_HAMAMATSU_001:
         name: 'Hamamatsu ORCA'
