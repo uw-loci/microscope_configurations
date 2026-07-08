@@ -55,7 +55,7 @@ stage:
       low: -39000
       high: 34000
     z_um:
-      low: -100
+      low: -120
       high: 1000
   inserts:
     slide_margin_um: 2000
