@@ -88,6 +88,15 @@ stage:
       quad_v:
         name: Four Slides (Vertical)
         description: Four slides arranged vertically
+        kind: slide_holder
+        # Two calibration modes (Stage Map -> Calibrate...):
+        #  - Fixed pitch (default): capture the aperture edges below; the 4 slots
+        #    are laid out at num_slides / slide_spacing_mm.
+        #  - Per-slot (overrides pitch): capture each slot's center, written as
+        #    slide1_center_x_um/_y_um ... slide4_center_x_um/_y_um. When present,
+        #    these take precedence over the fixed pitch. Use per-slot when the
+        #    holder's slide placement is not trusted to match a fixed pitch.
+        # The aperture values below are placeholders -- recapture on the scope.
         aperture_left_x_um: 0
         aperture_right_x_um: 120000
         slide_top_y_um: 0
