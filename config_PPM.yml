@@ -49,13 +49,13 @@ stage:
   stage_id: LOCI_STAGE_PRIOR_001
   limits:
     x_um:
-      low: -36000
-      high: 35500
+      low: -56723 #-36000
+      high: 51571 #35500
     y_um:
-      low: -39000
-      high: 34000
+      low: -50072 #-39000
+      high: 25826 #34000
     z_um:
-      low: -120
+      low: -720
       high: 1000
   inserts:
     slide_margin_um: 2000
@@ -97,15 +97,23 @@ stage:
         #    these take precedence over the fixed pitch. Use per-slot when the
         #    holder's slide placement is not trusted to match a fixed pitch.
         # The aperture values below are placeholders -- recapture on the scope.
-        aperture_left_x_um: 0
-        aperture_right_x_um: 120000
-        slide_top_y_um: 0
-        slide_bottom_y_um: 75000
+        aperture_left_x_um: 51571
+        aperture_right_x_um: -56723
+        slide_top_y_um: 25826
+        slide_bottom_y_um: -50072
         aperture_height_mm: 55.0
         slide_width_mm: 25
         slide_height_mm: 75
         slide_spacing_mm: 30.0
         num_slides: 4
+        slide1_center_x_um: 37978.5
+        slide1_center_y_um: -12011.5
+        slide2_center_x_um: 10598.5
+        slide2_center_y_um: -12592
+        slide3_center_x_um: -16933.5
+        slide3_center_y_um: -12553.5
+        slide4_center_x_um: -44259.5
+        slide4_center_y_um: -12446
   streaming_af:
     enabled: true
     speed_property: MaxSpeed
