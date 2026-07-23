@@ -97,26 +97,15 @@ autofocus_settings:
   p98_p2_fallback_enabled: true
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   calibrated: true
-  n_steps: 40
-  search_range_um: 60.0
-  n_tiles: 3
+  n_steps: 100
+  search_range_um: 100.0
+  n_tiles: 2
   interp_strength: 100
   interp_kind: quadratic
-  # 2026-06-28: switched tenengrad -> p98_p2. On PPM at 20x the bright
-  # background swamps the tenengrad gradient, so it reads flat (0.6-1.6%
-  # of peak, "within noise") over the drift window and cannot discriminate
-  # focus -- the per-tile sweep drift check then freezes Z, and streaming
-  # AF wastes attempts widening 20->40->80 um before tenengrad registers
-  # a gradient (landing on a scan boundary). p98_p2 (percentile spread)
-  # fit a clean peak on the same frames every time (R^2=0.99, amplitude
-  # 13-29%); the streaming handler logged "consider switching score_metric
-  # to 'p98_p2'" across four runs. p98_p2 as PRIMARY is explicitly
-  # supported (streaming_focus: "primary metric is p98_p2; no secondary
-  # needed").
   score_metric: p98_p2
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 20.0
+  sweep_range_um: 30.0
   sweep_n_steps: 20
   edge_retries: 2
   gap_index_multiplier: 3
