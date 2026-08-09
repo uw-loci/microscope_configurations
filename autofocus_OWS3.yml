@@ -83,7 +83,7 @@ autofocus_settings:
   calibrated: true
   n_steps: 15
   search_range_um: 55.0
-  n_tiles: 1
+  n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
   score_metric: tenengrad
@@ -155,6 +155,22 @@ autofocus_settings:
   tissue_area_threshold: 0.2
   sweep_range_um: 10.0
   sweep_n_steps: 4
+  edge_retries: 2
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
+- objective: 1.2NA_WATER_60x
+  calibrated: true
+  n_steps: 9
+  search_range_um: 15.0
+  n_tiles: 5
+  interp_strength: 100
+  interp_kind: quadratic
+  score_metric: normalized_variance
+  texture_threshold: 0.005
+  tissue_area_threshold: 0.2
+  sweep_range_um: 10.0
+  sweep_n_steps: 6
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0

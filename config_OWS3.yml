@@ -817,3 +817,6 @@ acquisition_profiles:
     channel_overrides:
       Cy5:
         exposure_ms: 400
+light_path:
+  scope_type: upright
+  slide_insertion: A
