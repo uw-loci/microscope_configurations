@@ -818,5 +818,6 @@ acquisition_profiles:
       Cy5:
         exposure_ms: 400
 light_path:
-  scope_type: upright
+  scope_type: inverted
   slide_insertion: A
+  optical_flip: xy
