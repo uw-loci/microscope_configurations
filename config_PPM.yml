@@ -35,7 +35,7 @@ hardware:
   - id: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     pixel_size_xy_um:
       LOCI_DETECTOR_TELEDYNE_001: 0.2271
-      LOCI_DETECTOR_JAI_001: 0.1725
+      LOCI_DETECTOR_JAI_001: 0.1732
     pixel_size_z_um: null
   - id: LOCI_OBJECTIVE_OLYMPUS_40X_POL_001
     pixel_size_xy_um:
@@ -131,3 +131,5 @@ stage:
 slide_size_um:
   x: 40000
   y: 20000
+light_path:
+  optical_flip: xy
