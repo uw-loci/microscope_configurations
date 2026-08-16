@@ -99,7 +99,7 @@ autofocus_settings:
   calibrated: true
   n_steps: 100
   search_range_um: 100.0
-  n_tiles: 2
+  n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
   score_metric: p98_p2
