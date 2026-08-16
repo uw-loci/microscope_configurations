@@ -1,0 +1,373 @@
+# ============================================================================
+# LC-PolScope (Meadowlark liquid-crystal universal compensator + Oryx mono)
+#
+# Derived from the MicroManager config saved alongside this file at
+#   _MM2/config_LCPolScope.cfg   (Configurator output, 2026-08-14)
+#
+# Reconstruction target: QLIPP-style math (Guo et al., eLife 2020;9:e55502;
+# reference implementation mehta-lab/recOrder, now archived -> waveorder).
+# QPSC acquires the raw LC states; retardance / orientation / transmittance /
+# depolarization are computed downstream. See
+#   claude-reports/design/2026-08-15_lc-polscope-qpsc-support-plan.md
+#
+# STATUS: NOT YET RUNNABLE. Two classes of gap remain --
+#   (A) UNKNOWN VALUES, marked "TODO(bench)" below. Everything the
+#       MicroManager config does not state (objectives, pixel sizes, stage
+#       travel, slide placement, LC settle time) is a placeholder. Do not
+#       trust a placeholder because it parses.
+#   (B) MISSING CODE. The 'lcpolscope' modality name matches no registered
+#       ModalityHandler (Java) or ModalityConfig (Python), so it currently
+#       resolves to the no-op handler: no channel picker, no 5-state loop.
+#       The 'brightfield' modality below works today. Phase 1 of the plan
+#       doc registers the handler; until then this file is a
+#       specification, not a working config.
+# ============================================================================
+
+microscope:
+  name: LCPolScope
+  # Free-text category. Upright vs inverted is NOT recorded here -- the
+  # authoritative value is light_path.scope_type below.
+  type: Multimodal
+  detector_in_use: null
+  objective_in_use: null
+  modality: null
+
+# ---------------------------------------------------------------------------
+# Orientation single source of truth (LightPathModel).
+# TODO(bench): all three are unverifiable from the MM config. Set them from
+# the Stage Map physical drop-downs / setup wizard once the scope is up, then
+# confirm against a slide with a known asymmetric feature.
+# ---------------------------------------------------------------------------
+light_path:
+  scope_type: upright        # upright | inverted   TODO(bench)
+  slide_insertion: A         # A | B                TODO(bench)
+  optical_flip: none         # none | x | y | xy    TODO(bench)
+
+modalities:
+
+  # -------------------------------------------------------------------------
+  # LC-PolScope: 5 liquid-crystal states per tile, one snap each.
+  #
+  # The states are expressed through the generic channel library rather than
+  # the PPM rotation-stage mechanism: there is no rotation stage on this
+  # scope, the polarization state is set electrically by the Meadowlark
+  # D5020 driving two LCs. Each channel applies the MM "Channel" ConfigGroup
+  # preset AND writes both LC voltages explicitly, so a state is always fully
+  # established rather than a delta from whatever ran last (see LLM_CONFIG_GUIDE
+  # section 5).
+  #
+  # type: polarized is deliberate. It is an existing, recognized modality
+  # type and it selects the right sample-physics defaults downstream (relaxed
+  # saturation tolerance, wider tissue mask). Rotation-stage behaviour is
+  # gated on the modality NAME "ppm", not on this type, so nothing here will
+  # go looking for a PIZ stage.
+  # -------------------------------------------------------------------------
+  lcpolscope:
+    type: polarized
+
+    # No illumination block: this MM config declares no lamp, shutter or
+    # LED device. Kohler illumination on this scope is set by hand and is
+    # not under MicroManager control, so there is no state_property /
+    # intensity_property to name. AutoShutter is on in MM with no shutter
+    # device, which is a no-op.
+    #
+    # The LC-PolScope is nonetheless a MONOCHROMATIC technique: the standard
+    # configuration uses a green interference filter (546 nm), and the
+    # wavelength enters the reconstruction directly -- retardance comes out
+    # as R = (lambda / 2pi) * arctan(sqrt(A^2 + B^2)), so lambda sets the
+    # physical units. The filter is not MM-controllable here, which is
+    # exactly why it has to be recorded as data instead.
+    #
+    # TODO(bench): fill in and keep current. Neither value is derivable from
+    # the MM config or from the LC voltages, and reconstruction cannot run
+    # without both.
+    reconstruction:
+      wavelength_nm: 546        # TODO(bench): confirm the installed filter
+      swing_waves: null         # TODO(bench): swing (chi) in waves, typically
+                                #   ~0.03 (about 16.4 nm at 546 nm). Comes
+                                #   from the LC calibration, NOT from the
+                                #   voltages.
+      scheme: 5-State           # 5 MM presets are declared; the 4-State
+                                #   scheme also exists. Must match the
+                                #   calibration that produced the presets.
+
+    background_correction:
+      # Raw-tile flat-field division is WRONG for this modality. QLIPP
+      # background correction operates on the reconstructed Stokes vectors
+      # using a separately acquired empty-field 5-state stack, not by
+      # dividing each raw state by a brightfield reference. Keep this off
+      # and handle background in the reconstruction step.
+      enabled: false
+      method: divide
+      base_folder: ''
+
+    channels:
+    # -----------------------------------------------------------------
+    # EXPOSURE MUST BE IDENTICAL ACROSS ALL FIVE STATES.
+    # The Stokes inversion treats the five intensities as samples of one
+    # radiometric scale. Per-state exposure or gain differences silently
+    # bias retardance and orientation. Do NOT add per-channel exposure
+    # overrides in the acquisition profiles below, and do not let adaptive
+    # exposure run on this modality.
+    #
+    # 50 ms is a placeholder. TODO(bench): set it from the BRIGHTEST state
+    # (so no state clips), then re-check that the extinction state still
+    # sits above the camera noise floor at that exposure.
+    #
+    # STATE ORDER IS PART OF THE ALGORITHM, NOT A DISPLAY CHOICE.
+    # The canonical Oldenbourg 5-frame scheme (LOCI courseware
+    # uw-loci/interactive-microscopy-courseware, lc-polscope/app.js) is:
+    #   Setting 1 = extinction   (LC-A nominal pi/2, LC-B nominal pi)
+    #   Setting 2 = LC-A + swing, LC-B nominal
+    #   Setting 3 = LC-A nominal, LC-B + swing
+    #   Setting 4 = LC-A nominal, LC-B - swing
+    #   Setting 5 = LC-A - swing, LC-B nominal
+    # i.e. exactly TWO settings swing LC-A with LC-B held at extinction, and
+    # exactly TWO swing LC-B with LC-A held at extinction. Reconstruction
+    # indexes the states positionally, so State0..State4 must be fed in the
+    # order the calibration defined.
+    #
+    # THE SHIPPED PRESETS DO NOT FIT THAT PATTERN -- but note up front that
+    # this scope is already producing good collagen birefringence images
+    # (compared against PPM and SHG), so the calibration works. The open
+    # question is WHICH scheme these implement, not whether they are valid.
+    # Voltages are transcribed verbatim from the MM ConfigGroup "Channel":
+    #   State0  LC-A 6.4280  LC-B 4.0370
+    #   State1  LC-A 1.1400  LC-B 1.7000
+    #   State2  LC-A 2.8400  LC-B 4.0370
+    #   State3  LC-A 1.7000  LC-B 4.0370
+    #   State4  LC-A 0.9400  LC-B 4.0370
+    # Four of the five share LC-B = 4.0370, and NO two states share a common
+    # LC-A value -- the symmetric scheme needs the extinction LC-A to reappear
+    # in exactly two other settings. That holds whichever state you call
+    # extinction, so it is not a labelling artifact.
+    #
+    # The symmetric scheme is only one parameterisation. recOrder's own
+    # 5-state calibration walks the elliptical analyzer through a sequence
+    # and produces exactly this shape (one LC largely fixed while the other
+    # sweeps, one state moving both). Given the scope images well, a valid
+    # calibration in a scheme we have not identified is the likely reading.
+    #
+    # Why it still matters: the intensity-to-Stokes matrix is scheme-specific
+    # (waveorder: calculate_intensity_to_stokes_matrix(swing, scheme)). A
+    # scheme mismatch yields a wrong retardance scale and possibly rotated
+    # orientation, while qualitative birefringence contrast stays perfectly
+    # good -- contrast only needs one dark state and some brighter ones, so
+    # it is not evidence either way about the inversion.
+    #
+    # TODO(bench): identify the calibration tool and the scheme selected. If
+    # the answer is "recOrder, 5-state", `scheme: 5-State` below is already
+    # correct and nothing changes.
+    # -----------------------------------------------------------------
+    - id: State0
+      display_name: State0 (extinction)
+      exposure_ms: 50
+      mm_setup_presets:
+      - group: Channel
+        preset: State0
+      device_properties:
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-A
+        value: 6.4280
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-B
+        value: 4.0370
+      # LC relaxation is slower than the driver reports busy. TODO(bench):
+      # measure the settle time (step the LC, snap a burst, find where the
+      # mean stops drifting) and set it here. 50 ms is a guess.
+      settle_ms: 50
+    - id: State1
+      display_name: State1
+      exposure_ms: 50
+      mm_setup_presets:
+      - group: Channel
+        preset: State1
+      device_properties:
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-A
+        value: 1.1400
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-B
+        value: 1.7000
+      settle_ms: 50
+    - id: State2
+      display_name: State2
+      exposure_ms: 50
+      mm_setup_presets:
+      - group: Channel
+        preset: State2
+      device_properties:
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-A
+        value: 2.8400
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-B
+        value: 4.0370
+      settle_ms: 50
+    - id: State3
+      display_name: State3
+      exposure_ms: 50
+      mm_setup_presets:
+      - group: Channel
+        preset: State3
+      device_properties:
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-A
+        value: 1.7000
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-B
+        value: 4.0370
+      settle_ms: 50
+    - id: State4
+      display_name: State4
+      exposure_ms: 50
+      mm_setup_presets:
+      - group: Channel
+        preset: State4
+      device_properties:
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-A
+        value: 0.9400
+      - device: MeadowlarkLC
+        property: Voltage (V) LC-B
+        value: 4.0370
+      settle_ms: 50
+
+  # -------------------------------------------------------------------------
+  # Plain transmitted-light brightfield. Needed for macro / overview capture,
+  # slide alignment and Live-View navigation before any polarization run.
+  # This modality DOES work today (the "brightfield" prefix has registered
+  # handlers on both the Java and Python sides).
+  #
+  # No mm_setup_presets: getting a bright, polarization-neutral field on an
+  # LC-PolScope means backing the analyzer out of the light path (or parking
+  # the LC at maximum transmission), and neither is under MM control here.
+  # Which LC state is brightest is not derivable from the voltages -- it
+  # depends on the compensator's retardance calibration. TODO(bench): decide
+  # the operator procedure, and if a "brightest" LC state exists, add it here
+  # as an explicit Channel preset so the state is established rather than
+  # inherited from the previous acquisition.
+  # -------------------------------------------------------------------------
+  brightfield:
+    type: brightfield
+    background_correction:
+      enabled: false
+      method: divide
+      base_folder: ''
+
+hardware:
+  objectives:
+  # TODO(bench): the MM config declares no objective turret, so the lenses on
+  # this scope are unknown -- these three are placeholders covering the usual
+  # LC-PolScope set. Replace the ids with the real strain-free/pol objectives.
+  #
+  # PIXEL SIZE IS THE HIGHEST-RISK FIELD IN THIS FILE. The values below are
+  # nominal sensor-pixel / magnification (Oryx IMX250, 3.45 um pixels, assuming
+  # a 1.0x C-mount relay). Real scopes disagree with that arithmetic -- the PPM
+  # JAI is 5.5 um yet reads 0.347 um at 10x, not 0.55, because of the relay.
+  # Measure with a stage micrometer per objective before acquiring anything.
+  #
+  # Note also: the MM config's "# PixelSize settings" section is EMPTY. QPSC
+  # reads MM's pixel-size calibration at runtime; with none configured,
+  # getPixelSizeUm() returns 0.0, which surfaces as a 0x0 field of view and
+  # failed SIFT alignment (the OWS3 failure mode, 2026-07). Create a MM
+  # pixel-size preset per objective in addition to filling these in.
+  - id: LCPS_OBJECTIVE_10X_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.345    # TODO(bench): nominal, verify
+    pixel_size_z_um: null
+  - id: LCPS_OBJECTIVE_20X_POL_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725   # TODO(bench): nominal, verify
+    pixel_size_z_um: null
+  - id: LCPS_OBJECTIVE_40X_POL_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.08625  # TODO(bench): nominal, verify
+    pixel_size_z_um: null
+  detectors:
+  - LCPS_DETECTOR_FLIR_ORYX_001
+
+stage:
+  stage_id: LCPS_STAGE_ASI_001
+  # MM device label for the focus drive (Core-Focus role in the MM config).
+  z_stage: ZStage
+  limits:
+    # TODO(bench): placeholders. These MUST be MicroManager stage coordinates,
+    # not the ASI controller's own readout. Read the real travel from the ASI
+    # controller (or drive to each physical limit in Live View and record the
+    # MM position) before the first acquisition -- QPSC bounds-checks every
+    # move against these and will happily clip a real region to a fake limit.
+    x_um:
+      low: -50000
+      high: 50000
+    y_um:
+      low: -25000
+      high: 25000
+    z_um:
+      low: 0
+      high: 5000
+  streaming_af:
+    # DISABLED pending measurement. The ASIStage adapter's speed property and
+    # its behaviour on NON-blocking continuous moves are both unverified on
+    # this hardware, and that exact gap is what made streaming AF unusable on
+    # OWS3 (the Prior ZDrive honours Speed on blocking moves only). With
+    # enabled:false, autofocus routes through Brent and none of the values
+    # below are used.
+    #
+    # Do not hand-tune these: run the QPSC "Re-probe Stage AF" workflow and
+    # let the server write measured values. The four numeric keys are required
+    # by the config schema, so they carry legacy defaults as placeholders.
+    enabled: false
+    speed_property: null      # TODO(bench): probe for a writable speed property
+    slow_speed_value: '1'
+    slow_speed_um_per_s: 11.5
+    normal_speed_value: '100'
+  # No 'inserts' block: the standard single-slide insert is synthesized from
+  # stage.limits + slide_size_um. Add entries here only for special carriers
+  # (multi-slide holders, petri dishes) once they exist on this scope.
+
+slide_size_um:
+  x: 75000
+  y: 25000
+
+acquisition_profiles:
+  # Profile keys resolve as <Modality>_<suffix> where <suffix> is a
+  # case-insensitive substring of the objective id, longest match wins.
+  # "20x" matches LCPS_OBJECTIVE_20X_POL_001, and so on.
+  #
+  # No illumination_intensity on any profile: nothing on this scope's light
+  # path is MM-controllable (see the modality notes above).
+
+  lcpolscope_10x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    channels: [State0, State1, State2, State3, State4]
+    # Deliberately NO channel_overrides -- see the equal-exposure note in the
+    # channel library. Changing one state's exposure breaks the Stokes math.
+  lcpolscope_20x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    channels: [State0, State1, State2, State3, State4]
+  lcpolscope_40x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_40X_POL_001
+    channels: [State0, State1, State2, State3, State4]
+
+  brightfield_10x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    exposure_ms: 10          # TODO(bench)
+  brightfield_20x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    exposure_ms: 20          # TODO(bench)
+  brightfield_40x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_40X_POL_001
+    exposure_ms: 40          # TODO(bench)

@@ -56,7 +56,19 @@ id_stage:
         # It belongs in config_<microscope>.yml as ppm_pizstage_offset,
         # NOT here in the shared resources file.
         units_per_deg: 1000.0         # Hardware units per optical degree
-        
+
+    LCPS_STAGE_ASI_001:
+        name: 'ASI XY + Z (LC-PolScope)'
+        vendor: 'ASI'
+        serial: null
+        type: 'xyz'
+        # MM device labels from _MM2/config_LCPolScope.cfg: both the XY stage
+        # and the Z drive are ASIStage devices on serial port COM3.
+        devices:
+            xy: 'XYStage'
+            z: 'ZStage'
+            f: null                   # no separate focus axis declared in MM
+
 id_detector:
     LOCI_DETECTOR_QCAM_001:
         name: 'QCAM'
@@ -173,6 +185,25 @@ id_detector:
         flip_y: false
         description: 'Non-descanned bottom epi PMT via DCU module, channel 1'
 
+    LCPS_DETECTOR_FLIR_ORYX_001:
+        name: 'Oryx ORX-10G-51S5M'
+        manufacturer: 'Teledyne FLIR'
+        camera_type: 'generic'
+        # MM device label is the model string itself (SpinnakerCamera adapter).
+        device: 'Oryx ORX-10G-51S5M'
+        # Sony IMX250 mono, 5.0 MP, 3.45 um pixels. The trailing M in the model
+        # is the monochrome variant -- no Bayer mosaic, so no debayering.
+        # TODO(bench): confirm the reported ROI against mmc.getImageWidth/Height
+        # on the rig; a non-default binning or ROI in MM would change these.
+        width_px: 2448
+        height_px: 2048
+        sensor_pixel_width_um: 3.45
+        sensor_pixel_height_um: 3.45
+        requires_debayering: false
+        flip_x: false
+        flip_y: false
+        description: 'Teledyne FLIR Oryx 10GigE mono, S/N 20236320, LC-PolScope'
+
 id_objective_lens:
     LOCI_OBJECTIVE_NIKON_20X_001:
         name: '20x Nikon' 
@@ -283,3 +314,43 @@ id_objective_lens:
         description: 'Nikon CFI Plan Apochromat Lambda 60x Oil'
         manufacturer_id: null
         on_scope: 'OWS3'
+
+    # --- LC-PolScope objectives ---
+    #
+    # PLACEHOLDERS. The LC-PolScope MicroManager config declares no objective
+    # turret, so the actual lenses are unknown -- these three cover the usual
+    # LC-PolScope set so config_LCPolScope.yml resolves. Replace the ids,
+    # magnifications and NAs with the real strain-free / pol-corrected
+    # objectives on the scope, and update the matching pixel_size_xy_um and
+    # autofocus_LCPolScope.yml rows at the same time.
+    #
+    # Polarization imaging needs strain-free optics: an ordinary objective adds
+    # its own birefringence and biases the retardance measurement everywhere in
+    # the field. Record which of these are actually pol-rated.
+
+    LCPS_OBJECTIVE_10X_001:
+        name: '10x LC-PolScope'
+        magnification: 10.0
+        na: null                      # TODO(bench)
+        wd_um: null
+        description: 'PLACEHOLDER -- replace with the real 10x on the LC-PolScope'
+        manufacturer_id: null
+        on_scope: 'LCPolScope'
+
+    LCPS_OBJECTIVE_20X_POL_001:
+        name: '20x Pol LC-PolScope'
+        magnification: 20.0
+        na: null                      # TODO(bench)
+        wd_um: null
+        description: 'PLACEHOLDER -- replace with the real 20x on the LC-PolScope'
+        manufacturer_id: null
+        on_scope: 'LCPolScope'
+
+    LCPS_OBJECTIVE_40X_POL_001:
+        name: '40x Pol LC-PolScope'
+        magnification: 40.0
+        na: null                      # TODO(bench)
+        wd_um: null
+        description: 'PLACEHOLDER -- replace with the real 40x on the LC-PolScope'
+        manufacturer_id: null
+        on_scope: 'LCPolScope'

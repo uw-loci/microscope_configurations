@@ -1,0 +1,120 @@
+# ========== AUTOFOCUS CONFIGURATION -- LC-PolScope ==========
+# Companion to config_LCPolScope.yml. Schema v2: per-objective HARDWARE
+# parameters, a strategy library (sample physics), and per-modality bindings.
+# The metric / strategy / validity-check vocabulary comes from
+# focus_metrics_manifest.yml.
+#
+# NOTHING HERE IS CALIBRATED. Every row is calibrated: false and carries
+# starting values borrowed from the PPM scope, which is the closest analogue
+# we have (transmitted polarized light, tissue-like dense samples). Search
+# ranges depend on the objective depth of field and the ASI Z drive's backlash,
+# neither of which is known yet. Run the AF calibration workflow per objective
+# before relying on any of this.
+#
+# LC-POLSCOPE-SPECIFIC HAZARD: autofocus must NOT run on the extinction state.
+# State0 is near-black by construction, so every gradient- and texture-based
+# metric collapses into noise there and the validity check will either defer
+# forever or lock onto a noise peak. Focus on a bright state instead. Until
+# the modality handler exposes a focus-channel choice (Phase 1 of the plan
+# doc), this is an operator-visible constraint, not something this file can
+# enforce -- Channel.getFocusChannelId() is the hook that will enforce it.
+
+schema_version: 2
+
+autofocus_settings:
+- objective: LCPS_OBJECTIVE_10X_001
+  calibrated: false
+  n_steps: 25
+  search_range_um: 50.0
+  n_tiles: 4
+  interp_strength: 100
+  interp_kind: quadratic
+  # brenner_gradient over laplacian_variance at low mag: on PPM 10x the
+  # Laplacian was dominated by bright dust specks while Brenner stayed
+  # robust. Same optical regime here.
+  score_metric: brenner_gradient
+  texture_threshold: 0.005
+  tissue_area_threshold: 0.2
+  sweep_range_um: 30.0
+  sweep_n_steps: 3
+  edge_retries: 2
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
+- objective: LCPS_OBJECTIVE_20X_POL_001
+  calibrated: false
+  n_steps: 30
+  search_range_um: 30.0
+  n_tiles: 3
+  interp_strength: 100
+  interp_kind: quadratic
+  score_metric: tenengrad
+  texture_threshold: 0.005
+  tissue_area_threshold: 0.2
+  sweep_range_um: 20.0
+  sweep_n_steps: 5
+  edge_retries: 2
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
+- objective: LCPS_OBJECTIVE_40X_POL_001
+  calibrated: false
+  n_steps: 20
+  search_range_um: 20.0
+  n_tiles: 7
+  interp_strength: 100
+  interp_kind: quadratic
+  score_metric: tenengrad
+  texture_threshold: 0.005
+  tissue_area_threshold: 0.2
+  sweep_range_um: 15.0
+  sweep_n_steps: 5
+  edge_retries: 2
+  gap_index_multiplier: 3
+  gap_spatial_multiplier: 2.0
+  p98_p2_fallback_enabled: true
+
+strategies:
+  dense_texture:
+    description: H&E, IHC, PPM, LC-PolScope, confluent IF. Requires both sufficient
+      gradient texture AND a significant tissue-area fraction.
+    score_metric: laplacian_variance
+    validity_check: texture_and_area
+    validity_params:
+      texture_threshold: 0.01
+      tissue_area_threshold: 0.2
+      rgb_brightness_threshold: 240.0
+      tissue_mask_range:
+      - 0.1
+      - 0.9
+      median_floor: 15.0
+      saturation_threshold: 0.1
+    on_failure: defer
+  manual_only:
+    description: Skip auto entirely. Always prompts the user.
+    score_metric: none
+    validity_check: always_false
+    validity_params: {}
+    on_failure: manual
+
+modalities:
+  # Bindings are matched longest-prefix-wins, case-insensitive, against the
+  # modality name from config_LCPolScope.yml.
+  lcpolscope:
+    strategy: dense_texture
+    overrides:
+      validity_params:
+        # Polarized transmitted light spreads intensity over a wider range
+        # than brightfield and birefringent structures sit outside the
+        # ordinary tissue band -- same widening PPM needed.
+        tissue_mask_range:
+        - 0.05
+        - 0.95
+        texture_threshold: 0.005
+        # A polarization image is mostly dark background even on a bright
+        # state, so the standard 20% tissue-area floor rejects valid fields.
+        tissue_area_threshold: 0.1
+  brightfield:
+    strategy: dense_texture
+  bf:
+    strategy: dense_texture

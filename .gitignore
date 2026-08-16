@@ -22,6 +22,8 @@
 !config_OWS3.yml
 !autofocus_OWS3.yml
 !config_CAMM.yml
+!config_LCPolScope.yml
+!autofocus_LCPolScope.yml
 # Mock configs for CI-adjacent testing against the MM Demo adapter
 !config_mock.yml
 !autofocus_mock.yml
