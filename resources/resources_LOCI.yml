@@ -317,40 +317,22 @@ id_objective_lens:
 
     # --- LC-PolScope objectives ---
     #
-    # PLACEHOLDERS. The LC-PolScope MicroManager config declares no objective
-    # turret, so the actual lenses are unknown -- these three cover the usual
-    # LC-PolScope set so config_LCPolScope.yml resolves. Replace the ids,
-    # magnifications and NAs with the real strain-free / pol-corrected
-    # objectives on the scope, and update the matching pixel_size_xy_um and
-    # autofocus_LCPolScope.yml rows at the same time.
+    # The MM config's "Objective Lens" group labels 4x / 10x / 20x / 40x plus
+    # two spare slots, but that group is driven by a DemoCamera labelling
+    # device, not a real turret, and only 20x carries a pixel-size
+    # calibration. Only the calibrated objective is declared here; add the
+    # others as they are measured, with their pixel_size_xy_um and autofocus
+    # rows at the same time.
     #
     # Polarization imaging needs strain-free optics: an ordinary objective adds
     # its own birefringence and biases the retardance measurement everywhere in
     # the field. Record which of these are actually pol-rated.
 
-    LCPS_OBJECTIVE_10X_001:
-        name: '10x LC-PolScope'
-        magnification: 10.0
-        na: null                      # TODO(bench)
-        wd_um: null
-        description: 'PLACEHOLDER -- replace with the real 10x on the LC-PolScope'
-        manufacturer_id: null
-        on_scope: 'LCPolScope'
-
     LCPS_OBJECTIVE_20X_POL_001:
-        name: '20x Pol LC-PolScope'
+        name: '20x 0.4 LC-PolScope'
         magnification: 20.0
-        na: null                      # TODO(bench)
+        na: 0.4
         wd_um: null
-        description: 'PLACEHOLDER -- replace with the real 20x on the LC-PolScope'
-        manufacturer_id: null
-        on_scope: 'LCPolScope'
-
-    LCPS_OBJECTIVE_40X_POL_001:
-        name: '40x Pol LC-PolScope'
-        magnification: 40.0
-        na: null                      # TODO(bench)
-        wd_um: null
-        description: 'PLACEHOLDER -- replace with the real 40x on the LC-PolScope'
+        description: 'ObjectiveA on the LC-PolScope. MM pixel-size preset "20x 0.4 ORYX" = 0.1715 um. Strain-free / pol rating NOT yet confirmed.'
         manufacturer_id: null
         on_scope: 'LCPolScope'

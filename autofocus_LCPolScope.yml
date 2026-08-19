@@ -22,25 +22,6 @@
 schema_version: 2
 
 autofocus_settings:
-- objective: LCPS_OBJECTIVE_10X_001
-  calibrated: false
-  n_steps: 25
-  search_range_um: 50.0
-  n_tiles: 4
-  interp_strength: 100
-  interp_kind: quadratic
-  # brenner_gradient over laplacian_variance at low mag: on PPM 10x the
-  # Laplacian was dominated by bright dust specks while Brenner stayed
-  # robust. Same optical regime here.
-  score_metric: brenner_gradient
-  texture_threshold: 0.005
-  tissue_area_threshold: 0.2
-  sweep_range_um: 30.0
-  sweep_n_steps: 3
-  edge_retries: 2
-  gap_index_multiplier: 3
-  gap_spatial_multiplier: 2.0
-  p98_p2_fallback_enabled: true
 - objective: LCPS_OBJECTIVE_20X_POL_001
   calibrated: false
   n_steps: 30
@@ -57,23 +38,6 @@ autofocus_settings:
   gap_index_multiplier: 3
   gap_spatial_multiplier: 2.0
   p98_p2_fallback_enabled: true
-- objective: LCPS_OBJECTIVE_40X_POL_001
-  calibrated: false
-  n_steps: 20
-  search_range_um: 20.0
-  n_tiles: 7
-  interp_strength: 100
-  interp_kind: quadratic
-  score_metric: tenengrad
-  texture_threshold: 0.005
-  tissue_area_threshold: 0.2
-  sweep_range_um: 15.0
-  sweep_n_steps: 5
-  edge_retries: 2
-  gap_index_multiplier: 3
-  gap_spatial_multiplier: 2.0
-  p98_p2_fallback_enabled: true
-
 strategies:
   dense_texture:
     description: H&E, IHC, PPM, LC-PolScope, confluent IF. Requires both sufficient

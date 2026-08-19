@@ -13,9 +13,9 @@
 # STATUS: NOT YET RUNNABLE. Two classes of gap remain --
 #   (A) UNKNOWN VALUES, marked "TODO(bench)" below. As of 2026-08-19 the
 #       calibration values (swing 0.03, 5-State, 549 nm, condenser NA 0.5,
-#       MM-Voltage) and the orientation are CONFIRMED. Still open: pixel
-#       size / which camera (see the objectives block -- two incompatible
-#       figures), stage travel, and LC settle time. Do not trust a
+#       MM-Voltage), the orientation, and the 20x pixel size (0.1715 um,
+#       measured) are CONFIRMED. Still open: pixel size for every objective
+#       other than 20x, stage travel, and LC settle time. Do not trust a
 #       placeholder because it parses.
 #   (B) MISSING CODE. The 'lcpolscope' modality name matches no registered
 #       ModalityHandler (Java) or ModalityConfig (Python), so it currently
@@ -278,47 +278,40 @@ modalities:
 
 hardware:
   objectives:
-  # TODO(bench): the MM config declares no objective turret, so the lenses on
-  # this scope are unknown -- these three are placeholders covering the usual
-  # LC-PolScope set. Replace the ids with the real strain-free/pol objectives.
+  # Objectives, from the MM config's "Objective Lens" ConfigGroup (updated
+  # 2026-08-19). NOTE that group is driven by a DemoCamera DObjective device,
+  # not real hardware: it is a labelling device so pixel-size presets can be
+  # switched. The nosepiece is turned BY HAND and the operator must set the
+  # matching preset. QPSC can read and set the preset, but doing so moves
+  # nothing -- never treat it as a motorized turret.
   #
-  # PIXEL SIZE IS THE HIGHEST-RISK FIELD IN THIS FILE. The values below are
-  # nominal sensor-pixel / magnification (Oryx IMX250, 3.45 um pixels, assuming
-  # a 1.0x C-mount relay). Real scopes disagree with that arithmetic -- the PPM
-  # JAI is 5.5 um yet reads 0.347 um at 10x, not 0.55, because of the relay.
-  # Measure with a stage micrometer per objective before acquiring anything.
+  # Only 20x is calibrated so far. The MM config carries exactly one
+  # pixel-size preset ("20x 0.4 ORYX" -> 0.1715 um). The other labels exist
+  # but have no calibration, so acquiring on them would fall back to a zero
+  # or wrong pixel size.
   #
-  # Note also: the MM config's "# PixelSize settings" section is EMPTY. QPSC
-  # reads MM's pixel-size calibration at runtime; with none configured,
-  # getPixelSizeUm() returns 0.0, which surfaces as a 0x0 field of view and
-  # failed SIFT alignment (the OWS3 failure mode, 2026-07). Create a MM
-  # pixel-size preset per objective in addition to filling these in.
-  - id: LCPS_OBJECTIVE_10X_001
-    pixel_size_xy_um:
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.345    # TODO(bench): nominal, verify
-    pixel_size_z_um: null
-  # ObjectiveA on the scope: 20x, 0.4 NA (confirmed 2026-08-19). Whether it is
-  # strain-free / polarization-rated is still unanswered.
-  #
-  # *** UNRESOLVED: WHICH CAMERA, AND THEREFORE WHICH PIXEL SIZE? ***
-  # Two incompatible figures are in play as of 2026-08-19:
-  #   - This MM config declares ONE camera, the FLIR Oryx (3.45 um pixels).
-  #     20x with a 1.0x relay would give 0.1725 um.
-  #   - The bench notes say "HAM Orca Flash 0.32 um at 20x". 0.32 um at 20x
-  #     implies a ~6.5 um sensor, which is an Orca Flash, not the Oryx.
-  # Either there is a second camera not in this MM config, or that figure
-  # came from a different instrument, or there is a relay. Do NOT pick one:
-  # the wrong pixel size gives the wrong field of view and wrong tiling.
-  # Resolve, then set the value against whichever detector id is real and add
-  # the matching MicroManager pixel-size preset.
+  # CAMERA-TO-STAGE ROTATION -- read before tiling. The MM PixelSizeAffine for
+  # this preset decomposes to a +2.2 deg rotation with 0.17151 / 0.17141 um
+  # scales (0.06% anisotropy, negligible):
+  #   PixelSizeAffine = [ 0.171385  0.006683 ; -0.006526  0.171283 ]
+  # The camera is therefore rotated about 2.2 deg relative to the stage axes.
+  # QPSC lays tiles out on a stage-axis-aligned grid, so over a large mosaic
+  # this accumulates as a progressive shear between tile content and tile
+  # position. Confirm how it behaves on a multi-tile acquisition before
+  # trusting a big montage.
   - id: LCPS_OBJECTIVE_20X_POL_001
     pixel_size_xy_um:
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725   # TODO(bench): UNRESOLVED, see above
+      # Measured, from the MM "20x 0.4 ORYX" pixel-size preset. Reassuringly
+      # close to the nominal 3.45/20 = 0.1725, so the relay is ~1.0x.
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.1715
     pixel_size_z_um: null
-  - id: LCPS_OBJECTIVE_40X_POL_001
-    pixel_size_xy_um:
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.08625  # TODO(bench): nominal, verify
-    pixel_size_z_um: null
+  # The remaining nosepiece positions are declared in MM but NOT calibrated.
+  # Uncomment and fill in as each gets a stage-micrometer measurement and a
+  # matching MM pixel-size preset. Nominal values (3.45 um / magnification)
+  # are given only as a sanity check, never as a substitute for measuring.
+  # - id: LCPS_OBJECTIVE_4X_001     # nominal 0.8625
+  # - id: LCPS_OBJECTIVE_10X_001    # nominal 0.345
+  # - id: LCPS_OBJECTIVE_40X_001    # nominal 0.08625
   detectors:
   - LCPS_DETECTOR_FLIR_ORYX_001
 
@@ -373,36 +366,21 @@ acquisition_profiles:
   # No illumination_intensity on any profile: nothing on this scope's light
   # path is MM-controllable (see the modality notes above).
 
-  lcpolscope_10x:
-    modality: lcpolscope
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
-    objective: LCPS_OBJECTIVE_10X_001
-    channels: [State0, State1, State2, State3, State4]
-    # Deliberately NO channel_overrides -- see the equal-exposure note in the
-    # channel library. Changing one state's exposure breaks the Stokes math.
+  # Only the 20x profiles are declared, because 20x is the only objective with
+  # a pixel-size calibration. Add 4x / 10x / 40x profiles as those objectives
+  # get measured and added to hardware.objectives above -- a profile whose
+  # objective does not exist is a validation failure, not a harmless stub.
+
   lcpolscope_20x:
     modality: lcpolscope
     detector: LCPS_DETECTOR_FLIR_ORYX_001
     objective: LCPS_OBJECTIVE_20X_POL_001
     channels: [State0, State1, State2, State3, State4]
-  lcpolscope_40x:
-    modality: lcpolscope
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
-    objective: LCPS_OBJECTIVE_40X_POL_001
-    channels: [State0, State1, State2, State3, State4]
+    # Deliberately NO channel_overrides -- see the equal-exposure note in the
+    # channel library. Changing one state's exposure breaks the Stokes math.
 
-  brightfield_10x:
-    modality: brightfield
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
-    objective: LCPS_OBJECTIVE_10X_001
-    exposure_ms: 10          # TODO(bench)
   brightfield_20x:
     modality: brightfield
     detector: LCPS_DETECTOR_FLIR_ORYX_001
     objective: LCPS_OBJECTIVE_20X_POL_001
     exposure_ms: 20          # TODO(bench)
-  brightfield_40x:
-    modality: brightfield
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
-    objective: LCPS_OBJECTIVE_40X_POL_001
-    exposure_ms: 40          # TODO(bench)
