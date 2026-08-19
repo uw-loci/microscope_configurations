@@ -11,10 +11,12 @@
 #   claude-reports/design/2026-08-15_lc-polscope-qpsc-support-plan.md
 #
 # STATUS: NOT YET RUNNABLE. Two classes of gap remain --
-#   (A) UNKNOWN VALUES, marked "TODO(bench)" below. Everything the
-#       MicroManager config does not state (objectives, pixel sizes, stage
-#       travel, slide placement, LC settle time) is a placeholder. Do not
-#       trust a placeholder because it parses.
+#   (A) UNKNOWN VALUES, marked "TODO(bench)" below. As of 2026-08-19 the
+#       calibration values (swing 0.03, 5-State, 549 nm, condenser NA 0.5,
+#       MM-Voltage) and the orientation are CONFIRMED. Still open: pixel
+#       size / which camera (see the objectives block -- two incompatible
+#       figures), stage travel, and LC settle time. Do not trust a
+#       placeholder because it parses.
 #   (B) MISSING CODE. The 'lcpolscope' modality name matches no registered
 #       ModalityHandler (Java) or ModalityConfig (Python), so it currently
 #       resolves to the no-op handler: no channel picker, no 5-state loop.
@@ -39,9 +41,21 @@ microscope:
 # confirm against a slide with a known asymmetric feature.
 # ---------------------------------------------------------------------------
 light_path:
-  scope_type: upright        # upright | inverted   TODO(bench)
-  slide_insertion: A         # A | B                TODO(bench)
-  optical_flip: none         # none | x | y | xy    TODO(bench)
+  # Confirmed 2026-08-19: inverted scope, slide face DOWN, label on the right.
+  # Camera view matches the eyepiece view.
+  scope_type: inverted
+  # Slide insertion A/B is the in-plane 180 (which side the label sits on).
+  # "Label on the right" is recorded; which of A/B that corresponds to has to
+  # be settled against the Stage Map once, then left alone.
+  slide_insertion: A         # A | B   TODO(bench): confirm against Stage Map
+  # Camera matches the eyepiece, so there is no extra optical parity between
+  # what the operator sees and what the camera records.
+  optical_flip: none
+  # Stage sense, confirmed 2026-08-19: in MicroManager, +/-Y moves away from /
+  # towards the operator; X left/right matches the Stage View (i.e. it is
+  # mirrored from the sample's own perspective, as expected on an inverted
+  # scope). Recorded here as prose; the authoritative polarity is the
+  # auto-detected stage-polarity preference, not this comment.
 
 modalities:
 
@@ -72,21 +86,27 @@ modalities:
     # device, which is a no-op.
     #
     # The LC-PolScope is nonetheless a MONOCHROMATIC technique: the standard
-    # configuration uses a green interference filter (546 nm), and the
+    # configuration uses a green interference filter (549 nm here), and the
     # wavelength enters the reconstruction directly -- retardance comes out
     # as R = (lambda / 2pi) * arctan(sqrt(A^2 + B^2)), so lambda sets the
     # physical units. The filter is not MM-controllable here, which is
     # exactly why it has to be recorded as data instead.
     #
-    # TODO(bench): fill in and keep current. Neither value is derivable from
-    # the MM config or from the LC voltages, and reconstruction cannot run
-    # without both.
+    # None of these is derivable from the MM config or from the LC voltages;
+    # they come from the recOrder calibration and must be kept current with it.
     reconstruction:
-      wavelength_nm: 546        # TODO(bench): confirm the installed filter
-      swing_waves: null         # TODO(bench): swing (chi) in waves, typically
-                                #   ~0.03 (about 16.4 nm at 546 nm). Comes
-                                #   from the LC calibration, NOT from the
-                                #   voltages.
+      # All confirmed 2026-08-19.
+      wavelength_nm: 549        # installed interference filter
+      swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
+      condenser_na: 0.5
+      # Refractive index of the objective immersion medium. Reported as
+      # "1.3 maybe" -- confirm before it is used for anything quantitative.
+      objective_medium_ri: 1.3  # TODO(bench): confirm
+      # recOrder LC control mode. MM-Voltage writes LC voltages directly (what
+      # the MM ConfigGroup presets in this file do); MM-Retardance asks the
+      # MicroManager LC adapter for a retardance and lets it pick the voltage.
+      # Default to MM-Voltage.
+      lc_control_mode: MM-Voltage
       scheme: 5-State           # 5 MM presets are declared; the 4-State
                                 #   scheme also exists. Must match the
                                 #   calibration that produced the presets.
@@ -110,9 +130,10 @@ modalities:
     # overrides in the acquisition profiles below, and do not let adaptive
     # exposure run on this modality.
     #
-    # 50 ms is a placeholder. TODO(bench): set it from the BRIGHTEST state
-    # (so no state clips), then re-check that the extinction state still
-    # sits above the camera noise floor at that exposure.
+    # ~50 ms at 20x is the reported working value (confirmed 2026-08-19).
+    # Still worth confirming on the rig that it is set from the BRIGHTEST
+    # state so nothing clips, and that extinction stays above the noise
+    # floor at that same exposure.
     #
     # STATE ORDER IS PART OF THE ALGORITHM, NOT A DISPLAY CHOICE.
     # The canonical Oldenbourg 5-frame scheme (LOCI courseware
@@ -161,7 +182,7 @@ modalities:
     # -----------------------------------------------------------------
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 50
+      exposure_ms: 50          # confirmed: ~50 ms at 20x
       mm_setup_presets:
       - group: Channel
         preset: State0
@@ -178,7 +199,7 @@ modalities:
       settle_ms: 50
     - id: State1
       display_name: State1
-      exposure_ms: 50
+      exposure_ms: 50          # confirmed: ~50 ms at 20x
       mm_setup_presets:
       - group: Channel
         preset: State1
@@ -192,7 +213,7 @@ modalities:
       settle_ms: 50
     - id: State2
       display_name: State2
-      exposure_ms: 50
+      exposure_ms: 50          # confirmed: ~50 ms at 20x
       mm_setup_presets:
       - group: Channel
         preset: State2
@@ -206,7 +227,7 @@ modalities:
       settle_ms: 50
     - id: State3
       display_name: State3
-      exposure_ms: 50
+      exposure_ms: 50          # confirmed: ~50 ms at 20x
       mm_setup_presets:
       - group: Channel
         preset: State3
@@ -220,7 +241,7 @@ modalities:
       settle_ms: 50
     - id: State4
       display_name: State4
-      exposure_ms: 50
+      exposure_ms: 50          # confirmed: ~50 ms at 20x
       mm_setup_presets:
       - group: Channel
         preset: State4
@@ -276,9 +297,23 @@ hardware:
     pixel_size_xy_um:
       LCPS_DETECTOR_FLIR_ORYX_001: 0.345    # TODO(bench): nominal, verify
     pixel_size_z_um: null
+  # ObjectiveA on the scope: 20x, 0.4 NA (confirmed 2026-08-19). Whether it is
+  # strain-free / polarization-rated is still unanswered.
+  #
+  # *** UNRESOLVED: WHICH CAMERA, AND THEREFORE WHICH PIXEL SIZE? ***
+  # Two incompatible figures are in play as of 2026-08-19:
+  #   - This MM config declares ONE camera, the FLIR Oryx (3.45 um pixels).
+  #     20x with a 1.0x relay would give 0.1725 um.
+  #   - The bench notes say "HAM Orca Flash 0.32 um at 20x". 0.32 um at 20x
+  #     implies a ~6.5 um sensor, which is an Orca Flash, not the Oryx.
+  # Either there is a second camera not in this MM config, or that figure
+  # came from a different instrument, or there is a relay. Do NOT pick one:
+  # the wrong pixel size gives the wrong field of view and wrong tiling.
+  # Resolve, then set the value against whichever detector id is real and add
+  # the matching MicroManager pixel-size preset.
   - id: LCPS_OBJECTIVE_20X_POL_001
     pixel_size_xy_um:
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725   # TODO(bench): nominal, verify
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725   # TODO(bench): UNRESOLVED, see above
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_40X_POL_001
     pixel_size_xy_um:
