@@ -252,6 +252,50 @@ arbitrary label -- it has to literally appear in the id to match.
 
 If a Fluorescence profile has **no `channels:` list** AND the modality has **no channel library**, the system falls back to the original single-snap path. This is how brightfield-only and laser-scanning modalities stay unchanged.
 
+### Retracted safe Z (`stage.safe_z_um`)
+
+The Z autofocus retracts to before approaching the sample. **Safety-critical**:
+it must be clear of the SHORTEST working distance among objectives that can be
+mounted for the insert and modality in question.
+
+Declaring it also declares the approach **direction** -- the scan runs from here
+toward wherever focus lies -- so nothing downstream has to infer upright vs
+inverted or stage polarity. Those are easy to get backwards, and getting them
+backwards is a collision, which is why this is measured at the scope rather than
+derived.
+
+There is no default. An unset value disables approach-from-safe-Z rather than
+guessing, because a guessed retraction could be on the wrong side of the sample.
+The value must also lie inside `stage.limits.z_um`, or every scan window that
+tried to reach it would be refused.
+
+```yaml
+stage:
+  safe_z_um: -500                    # scope-level fallback
+  inserts:
+    configurations:
+      quad_v:
+        safe_z_um: -520              # per insert
+        safe_z_um_by_modality:
+          ppm: -520                  # per insert AND modality
+          bf: -495
+```
+
+Resolution is most-specific-first: insert+modality, then the modality FAMILY
+(`ppm_20x` falls back to a `ppm` key, so magnifications need not be enumerated),
+then the insert's own value, then the scope-level one.
+
+**Why three levels.** Sample-plane height differs per insert -- a 35 mm dish, a
+96-well plate and a slide are not interchangeable -- and per modality;
+fluorescence and brightfield sit at consistent offsets on OWS3.
+
+**These numbers drift.** Slide thickness varies, inserts get re-seated,
+coverslips change batch. QPSC therefore checks every run's achieved focus
+positions against the declared value and warns at the end of the run if focus
+came within 50 um of it, or fell on both sides of it (which means the retraction
+point sits inside the range of sample planes and is no longer a retraction).
+Re-measure when that warning appears.
+
 ### Streaming-autofocus speed (`stage.streaming_af`, schema v3)
 
 Streaming AF drives the focus stage at a slow velocity while streaming
