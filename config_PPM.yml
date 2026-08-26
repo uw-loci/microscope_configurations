@@ -66,6 +66,20 @@ stage:
   #
   # The end-of-run clearance check warns if a future run's focus comes within 50 um of this
   # value or crosses it.
+  # Sign of Z that INCREASES objective-sample separation, i.e. which way retracts.
+  # Measured once at the scope. The MECHANISM is deliberately not modelled: PPM drives the
+  # stage, the Nikon Eclipse on LC-PolScope drives the objective, and the separation is the
+  # same physical quantity either way -- an infinity-corrected system makes objective-move
+  # and sample-move optically equivalent.
+  #
+  # Declared rather than derived from (scope_type x which-element-moves). That would be a
+  # two-factor sign composition, and this project's sign bugs have almost all been two-factor
+  # compositions XOR'd the wrong way (flip vs invert, stage polarity vs camera orientation).
+  # One measured fact beats two composed ones, especially when the failure mode is a collision.
+  #
+  # PPM, measured 2026-08-26: increasing Z moves the stage DOWN, away from the objective.
+  focus:
+    retract_sign: positive
   safe_z_um: 0
   limits:
     x_um:
