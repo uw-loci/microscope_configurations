@@ -266,6 +266,14 @@ derived.
 
 There is no default. An unset value disables approach-from-safe-Z rather than
 guessing, because a guessed retraction could be on the wrong side of the sample.
+
+**Measure the direction; do not infer it.** Which sign retracts differs per rig
+and is not recorded anywhere else in the config. On PPM (measured 2026-08-26)
+INCREASING Z moves the stage DOWN, away from the objective, so with samples near
+-250 um the retracted position is ~0 um. A first attempt at -500 -- reasoned from
+"focus is near -400, so retract further" -- was on the WRONG SIDE, toward the
+objective, and `stage.limits.z_um` did not catch it because a wrong-side value is
+usually still well inside the envelope. The limits are a backstop, not the check.
 The value must also lie inside `stage.limits.z_um`, or every scan window that
 tried to reach it would be refused.
 
