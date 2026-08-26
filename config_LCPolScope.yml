@@ -111,6 +111,29 @@ modalities:
                                 #   scheme also exists. Must match the
                                 #   calibration that produced the presets.
 
+      # Order in which the acquired states are fed to the inversion, which
+      # consumes them positionally as (extinction, +S1, +S2, -S1, -S2).
+      #
+      # WHICH STATE PLAYS WHICH ROLE IS A PROPERTY OF THE ACQUISITION
+      # SOFTWARE, NOT OF THE MICROSCOPE. Get it wrong and the orientation map
+      # comes out rotated or mirrored, with no error and no visible symptom --
+      # retardance is unaffected, so the images still look right.
+      #
+      #   OpenPolScope 3.20  Oldenbourg order, pairs (1,4) and (2,3)
+      #                      -> State3 and State4 must swap, as set below.
+      #   recOrder           ext, I0, I45, I90, I135 = pairs (1,3) and (2,4),
+      #                      already correct -> DELETE this key entirely.
+      #
+      # Measured 2026-08-25 from OtherDocuments/polscope/2026_08_25: this
+      # permutation reproduces OpenPolScope's own orientation channel to a
+      # median 0.07 deg; all 23 others land 17-90 deg away. Independently
+      # confirmed against the sunburst reference target, whose slow axis is
+      # radial to 2.66 deg under this order.
+      #
+      # Re-check with `polscope-scheme-check` after ANY change of acquisition
+      # software or recalibration.
+      state_order: [State0, State1, State2, State4, State3]
+
     background_correction:
       # Raw-tile flat-field division is WRONG for this modality. QLIPP
       # background correction operates on the reconstructed Stokes vectors

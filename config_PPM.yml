@@ -49,19 +49,24 @@ stage:
   stage_id: LOCI_STAGE_PRIOR_001
   # Retracted ("safe") Z that autofocus approaches the sample from. Declaring it also
   # declares the approach DIRECTION -- the scan runs from here toward wherever focus lies --
-  # so nothing has to infer upright/inverted or stage polarity.
+  # so nothing has to infer which way retracts.
+  #
+  # MEASURED ON THE RIG 2026-08-26: on this scope INCREASING Z moves the stage DOWN, away
+  # from the objective. Samples focus around -250 um, so ~0 um is retracted with roughly
+  # 250 um of clearance. An earlier value of -500 was WRONG-SIDE -- below the whole focus
+  # range, i.e. toward the objective -- and would have driven the sample into it. That value
+  # was inferred from "focus is near -400, so retract further" without the sign ever being
+  # established; do not re-derive this number that way.
   #
   # Scope-level fallback. Sample-plane height differs per INSERT (a 35 mm dish, a 96-well
-  # plate and a slide are not interchangeable) and per MODALITY (fluorescence and brightfield
-  # sit at consistent offsets, measured on OWS3), so override per insert as those are
-  # measured:
+  # plate and a slide are not interchangeable) and per MODALITY, so override per insert as
+  # those are measured:
   #   inserts.configurations.<id>.safe_z_um
   #   inserts.configurations.<id>.safe_z_um_by_modality.<modality-or-family>
   #
-  # Observed focus range on this scope: -421 to -185 um (2026-08-14, 8 slides), so -500
-  # leaves ~80 um of clearance at the closest. The end-of-run clearance check warns if a
-  # future run's focus comes within 50 um of this value or crosses it.
-  safe_z_um: -500
+  # The end-of-run clearance check warns if a future run's focus comes within 50 um of this
+  # value or crosses it.
+  safe_z_um: 0
   limits:
     x_um:
       low: -56723 #-36000
