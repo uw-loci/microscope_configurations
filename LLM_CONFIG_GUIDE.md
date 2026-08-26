@@ -267,6 +267,31 @@ derived.
 There is no default. An unset value disables approach-from-safe-Z rather than
 guessing, because a guessed retraction could be on the wrong side of the sample.
 
+```yaml
+stage:
+  focus:
+    # Sign of Z that INCREASES objective-sample separation.
+    retract_sign: positive     # or: negative
+```
+
+**Declare `stage.focus.retract_sign`, and let everything derive from it.** The
+quantity that matters is the objective-sample GAP -- is this position clear,
+which way do I approach, is focus drifting toward the retraction point. The
+mechanism is irrelevant and deliberately unmodelled: PPM drives the stage, the
+Nikon Eclipse on LC-PolScope drives the objective, and in an infinity-corrected
+system those are optically equivalent. One declared sign covers both.
+
+Do NOT derive it from `light_path.scope_type` crossed with which element moves.
+That is a two-factor sign composition, and this project's sign defects have
+almost all been that shape (flip XOR invert; stage polarity XOR camera
+orientation). One measured fact beats two composed ones when the failure mode is
+a collision.
+
+With it declared, QPSC can PROVE a wrong-side safe Z before anything moves: given
+any position where the sample is in focus, `sign(safe_z - focus_z)` must equal
+`retract_sign`. Without it, the only guard is a human reading a confirmation
+dialog.
+
 **Measure the direction; do not infer it.** Which sign retracts differs per rig
 and is not recorded anywhere else in the config. On PPM (measured 2026-08-26)
 INCREASING Z moves the stage DOWN, away from the objective, so with samples near
