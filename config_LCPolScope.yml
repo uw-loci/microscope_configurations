@@ -96,7 +96,26 @@ modalities:
     # they come from the recOrder calibration and must be kept current with it.
     reconstruction:
       # All confirmed 2026-08-19.
-      wavelength_nm: 549        # installed interference filter
+      # JUDGEMENT UNDER UNCERTAINTY, not a measurement (decided 2026-08-27).
+      # Nobody is certain which interference filter is fitted; it is part of
+      # the LC-PolScope rather than something separately specified. 549 nm is
+      # the commoner filter and was set on the rig for the 2026-08-25 session,
+      # but 546 is what the Meadowlark palette file encodes and what the
+      # earlier data was taken at, so the bulk of what we can check is at 546.
+      #
+      # What the choice actually affects, measured rather than assumed:
+      #   orientation  -- nothing at all. It comes from arctan2 of the Stokes
+      #                   parameters and carries no wavelength.
+      #   retardance   -- a pure scale of 546/549 = 0.994536, i.e. 0.55%
+      #                   lower, constant across the image.
+      # So this is reversible, and reversing it rescales retardance by 0.55%.
+      #
+      # 546 also happens to be an exact calibration point of the Meadowlark
+      # curve (490 / 546 / 630), so no wavelength interpolation is needed --
+      # which avoids a class of bug recOrder has in exactly that code.
+      #
+      # Settle it by identifying the filter, then set this from the part.
+      wavelength_nm: 546        # TODO(bench): confirm the fitted filter
       swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
       condenser_na: 0.5
       # Refractive index of the objective immersion medium. Reported as
