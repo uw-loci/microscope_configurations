@@ -102,21 +102,26 @@ autofocus_settings:
   n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
-  # 2026-08-28: briefly switched to brenner_gradient and REVERTED the same day.
-  # The switch was argued from a live-preview trace LABELLED brenner_gradient -- a
-  # label on a different image path, not a measurement of this metric on the AF crop.
-  # On the rig brenner_gradient reads FLAT here, and the server's own dual-metric
-  # diagnostic said so on every attempt:
-  #   "primary metric 'brenner_gradient' flat (range 0.82%) but 'p98_p2' fit shows
-  #    mu=-156.8 amplitude=14.93% R^2=0.97 -- consider switching score_metric to
-  #    'p98_p2' for this modality+objective"
-  # brenner ranges were 0.7-1.2% (noise); p98_p2 fitted at R^2=0.97-0.99.
+  # 2026-08-28. Settled after two reversals; the deciding evidence is below, because
+  # the two metrics fail in OPPOSITE and easily-confused ways.
   #
-  # p98_p2's bad behaviour was specific to the 358 um APPROACH traverse, where a broad
-  # illumination trend outweighs the focus peak. Over the 30-120 um walk scans this
-  # objective normally uses it fits cleanly. The approach traverse is what to avoid
-  # here, not this metric.
-  score_metric: p98_p2
+  # Focus-approach validation over real tissue, brenner_gradient:
+  #   focus peak Z=-212.7, FWHM 5.9 um, and the NO-TISSUE scan flat at 1% of the
+  #   tissue scan's amplitude. A narrow peak in the right place, and nothing where
+  #   there is nothing.
+  #
+  # The case that briefly argued for p98_p2 was autofocus at a tile that turned out to
+  # be over near-blank field (camera mean RGB 207/201/198). There brenner read flat --
+  # 0.7-1.2%, correctly, because there was no structure to measure -- while p98_p2 fit
+  # at R^2=0.97-0.99 with a plausible-looking mu. That is not p98_p2 doing better. It
+  # is p98_p2 being unfalsifiable: it measures histogram spread, which keeps varying
+  # with defocus on an empty field, so it returns a confident peak for tissue that is
+  # not there. That false positive is how the approach committed Z=-119 and Z=-9.7.
+  #
+  # A metric that reports 'flat' on an empty field is telling the truth, and the fix
+  # for a flat reading is a better tile, not a metric that invents a peak.
+  # p98_p2 remains the FALLBACK below, which is its documented role.
+  score_metric: brenner_gradient
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 30.0
