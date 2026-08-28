@@ -102,18 +102,21 @@ autofocus_settings:
   n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
-  # 2026-08-28: was p98_p2, which this file's own notes say to avoid as a PRIMARY
-  # metric -- it is a histogram-spread fallback, not a sharpness measure. It was
-  # selected here because tenengrad read flat on the bright PPM background, but
-  # brenner_gradient is a different gradient metric and is what the 10x already
-  # uses. Measured on one FNA slide at 20x, over the same 350 um traverse:
-  #   p98_p2          broad hump at Z=-113 (FWHM 177 um), tiny bump at the sample
-  #   brenner_gradient  one strong clean peak at the sample, Z=-320
-  # The p98_p2 profile also came out as a visible staircase, because p98-p2 on
-  # 8-bit pixels is integer-valued and had only ~15-20 distinct levels across the
-  # whole scan. Approach autofocus committed the wrong peak as a result.
-  # p98_p2 stays available as the FALLBACK below, which is its documented role.
-  score_metric: brenner_gradient
+  # 2026-08-28: briefly switched to brenner_gradient and REVERTED the same day.
+  # The switch was argued from a live-preview trace LABELLED brenner_gradient -- a
+  # label on a different image path, not a measurement of this metric on the AF crop.
+  # On the rig brenner_gradient reads FLAT here, and the server's own dual-metric
+  # diagnostic said so on every attempt:
+  #   "primary metric 'brenner_gradient' flat (range 0.82%) but 'p98_p2' fit shows
+  #    mu=-156.8 amplitude=14.93% R^2=0.97 -- consider switching score_metric to
+  #    'p98_p2' for this modality+objective"
+  # brenner ranges were 0.7-1.2% (noise); p98_p2 fitted at R^2=0.97-0.99.
+  #
+  # p98_p2's bad behaviour was specific to the 358 um APPROACH traverse, where a broad
+  # illumination trend outweighs the focus peak. Over the 30-120 um walk scans this
+  # objective normally uses it fits cleanly. The approach traverse is what to avoid
+  # here, not this metric.
+  score_metric: p98_p2
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 30.0
