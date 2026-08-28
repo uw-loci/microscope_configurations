@@ -96,41 +96,37 @@ modalities:
     # they come from the recOrder calibration and must be kept current with it.
     reconstruction:
       # All confirmed 2026-08-19.
-      # 549, reverting the 546 chosen on 2026-08-27 (decided 2026-08-28).
-      # Still a judgement, not a measurement: nobody has identified the
-      # interference filter, and until someone does this stays a TODO.
+      # 546. Reverted to this on 2026-08-28 after seeing OpenPolScope's own
+      # registry; it had been changed to 549 earlier the same day on an
+      # argument that the registry disproves.
       #
-      # What changed the answer is that 546 and 549 turned out to come from
-      # DIFFERENT FIELDS WITH DIFFERENT JOBS, which the earlier decision
-      # treated as one pool of evidence:
-      #   546 = MeadowlarkLC-Wavelength, the DEVICE ADAPTER's setting. It
-      #         drives voltage-to-retardance conversion inside the LC
-      #         controller. Also what the palette CSV rows encode.
-      #   549 = '~ Wavelength (nm)' in the OpenPolScope acquisition summary
-      #         of the 2026-08-25 data. That is the ILLUMINATION wavelength
-      #         used to express sample retardance in nanometres -- the same
-      #         job this field does. Role-matched, so it is the one to copy.
+      # The argument was that 546 came only from the Meadowlark DEVICE
+      # ADAPTER (a different job -- voltage-to-retardance inside the LC
+      # controller) while 549 came from '~ Wavelength (nm)' in the
+      # OpenPolScope acquisition summary, which is role-matched to this
+      # field. The registry breaks that: HKCU\...\JavaSoft\Prefs holds
+      # ps.acq.MeadowlarkLC.wavelength = 546.0, alongside the swing and the
+      # five-state palette. That is OpenPolScope's OWN persisted acquisition
+      # parameter -- the one the plugin restores on launch -- so 546 is not
+      # merely the adapter's opinion after all.
       #
-      # Attempted to settle it from the data and could NOT: the recorded
-      # retardance channel constrains only the product (counts/nm * lambda)
-      # ~= 602474, and the stated 60 nm ceiling is too coarse to separate
-      # them. 1092.25 counts/nm implies 551.6; 1097.5 implies 549.0; 1103.4
-      # implies 546.0. All fit. The one extra hint: if the encoding scale is
-      # exactly 2*lambda then 2*L^2 = 602474 gives L = 548.85, i.e. 549.
+      # Two OpenPolScope fields therefore disagree with each other: the
+      # registry says 546.0 (session 2026_08_27), the 2026-08-25 acquisition
+      # summary says 549. The registry is machine-written and is what the
+      # plugin actually reloads, so it wins. The filter is still unidentified
+      # and this remains a judgement.
       #
-      # What the choice actually affects, measured rather than assumed:
-      #   orientation  -- nothing at all. It comes from arctan2 of the Stokes
-      #                   parameters and carries no wavelength.
-      #   retardance   -- a pure scale, 0.55% per 3 nm, constant across the
-      #                   image. Fully reversible.
+      # Not settleable from the data: the recorded retardance channel
+      # constrains only the product (counts/nm * lambda) ~= 602474, and the
+      # stated 60 nm ceiling is too coarse to separate the two factors.
       #
-      # Cost of 549: it is not an exact calibration point of the Meadowlark
-      # curve (490 / 546 / 630), so the curve interpolates -- the code path
-      # recOrder has a swapped-weights bug in. Ours is fixed and tested, but
-      # it is a real difference from 546, which needs no interpolation.
+      # Effect of the choice: orientation is unaffected (it comes from
+      # arctan2 of Stokes parameters and carries no wavelength); retardance
+      # is a pure scale, 0.55% per 3 nm, fully reversible. 546 is also an
+      # exact Meadowlark curve point (490 / 546 / 630), so no interpolation.
       #
       # Settle it by identifying the filter, then set this from the part.
-      wavelength_nm: 549        # TODO(bench): confirm the fitted filter
+      wavelength_nm: 546        # TODO(bench): confirm the fitted filter
       swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
       condenser_na: 0.5
       # Refractive index of the objective immersion medium. Reported as
