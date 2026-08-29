@@ -443,6 +443,18 @@ strategies:
       min_gradient_energy: 0.002
     on_failure: proceed
 
+  stained_colour:
+    description: >
+      H&E, IHC, PPM on a COLOUR detector. Decides tissue by stain
+      colour rather than spatial structure.
+    score_metric: laplacian_variance
+    validity_check: chroma_deviation
+    validity_params:
+      min_chroma: 28.0
+      chroma_area_threshold: 0.15
+      saturation_ceiling: 250.0
+    on_failure: defer
+
   manual_only:
     description: >
       Skip auto entirely; always prompts user.
@@ -450,6 +462,36 @@ strategies:
     validity_check: always_false
     validity_params: {}
     on_failure: manual
+
+# WHICH TISSUE TEST TO PICK -- structure or colour?
+#
+# texture_and_area normalises per frame, so its verdict depends on the
+# frame's own histogram rather than on what is in the frame. On PPM
+# (measured 2026-08-28) it fails in BOTH directions: bare glass passes
+# it, because a featureless field's sensor noise stretches to the full
+# range and reads as texture ~0.06 against a 0.005 threshold; and a
+# tile straddling a tissue edge fails it, because a two-level field
+# puts every pixel outside tissue_mask_range and the area term reads
+# 0.000. No threshold setting fixes either.
+#
+# chroma_deviation has neither failure -- it is absolute rather than
+# per-frame, and defocus-invariant, so it is the right check wherever
+# the decision must be made from an out-of-focus frame (the focus
+# approach's tissue gate, FINDTISS, per-tile AF near a section edge).
+#
+# But it REQUIRES A COLOUR DETECTOR and returns False on every
+# monochrome frame. Colour is a property of the DETECTOR, not the
+# modality, so before binding stained_colour check what the scope's
+# detector actually is:
+#
+#   colour -> JAI AP-3200T (3-CCD prism), Teledyne MicroPublisher 6
+#             (requires_debayering: true)   -- both on PPM
+#   mono   -> Hamamatsu DCAM (OWS3), FLIR Oryx (LC-PolScope)
+#
+# Those two scopes stay on dense_texture for that reason. Re-measure
+# min_chroma per rig with a Focus Approach Validation pair: samples.csv
+# carries chroma_median / chroma_p95 / chroma_frac, and the bar belongs
+# above the blank scan's p95 and below the tissue scan's median.
 
 # Per-modality BINDINGS: which strategy each modality uses. Modality
 # keys are matched against the modality name via longest-prefix-wins,
