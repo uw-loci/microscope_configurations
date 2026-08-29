@@ -162,6 +162,40 @@ strategies:
       median_floor: 15.0
       saturation_threshold: 0.1
     on_failure: defer
+  stained_colour:
+    # Same score metric and on_failure as dense_texture -- only the tissue TEST differs.
+    #
+    # WHY NOT texture_and_area here. It normalises per frame, and that makes its verdict a
+    # property of the frame's histogram rather than of what is in the frame. Measured both
+    # ways on 2026-08-28: bare glass PASSES it (its own sensor noise stretches to full range
+    # and reads as texture ~0.06 against this scope's 0.005 threshold, with area 1.000), and
+    # a two-level tile straddling a tissue edge FAILS it (nothing lands inside the mask
+    # range, so the area term reads 0.000). Both directions are wrong, and no threshold
+    # fixes either, so the approach's tissue gate could not do the one job it exists for --
+    # rejecting a coverslip -- which is how a focus landed 200 um off the sample and logged
+    # a success.
+    #
+    # Colour does not have that failure. It is absolute, not per-frame, and it is
+    # defocus-invariant: measured on this scope, blank glass holds a median chroma of 11-13
+    # while stained tissue holds 36, flat across a 256 um traverse over which the focus
+    # metric swings 2.4x. Glass cannot produce chroma, so it cannot pass.
+    #
+    # REQUIRES A COLOUR DETECTOR. Both PPM detectors are colour (the JAI is a 3-CCD prism,
+    # the Teledyne debayers). Do NOT copy this binding to a mono scope -- OWS3's Hamamatsu
+    # and LC-PolScope's Oryx are monochrome, and chroma_deviation rejects every frame there.
+    description: H&E, IHC, PPM on a COLOUR detector. Decides tissue by stain colour, which
+      survives defocus, instead of by spatial structure, which does not.
+    score_metric: laplacian_variance
+    validity_check: chroma_deviation
+    validity_params:
+      # Sits between the measured blank (11-13) and tissue (36). Re-measure with a Focus
+      # Approach Validation pair if the stain or illumination changes -- samples.csv carries
+      # chroma_median / chroma_p95 / chroma_frac for exactly that.
+      min_chroma: 28.0
+      # 15% of the field must be stained, so a tile at the edge of a section still passes.
+      chroma_area_threshold: 0.15
+      saturation_ceiling: 250.0
+    on_failure: defer
   manual_only:
     description: Skip auto entirely. Always prompts the user.
     score_metric: none
@@ -171,14 +205,8 @@ strategies:
     on_failure: manual
 modalities:
   ppm:
-    strategy: dense_texture
-    overrides:
-      validity_params:
-        tissue_mask_range:
-        - 0.05
-        - 0.95
-        texture_threshold: 0.005
+    strategy: stained_colour
   brightfield:
-    strategy: dense_texture
+    strategy: stained_colour
   bf:
-    strategy: dense_texture
+    strategy: stained_colour
