@@ -493,6 +493,26 @@ id_detector:
 stage:
   stage_id: LOCI_STAGE_OWS3
   z_stage: ZDrive
+  # Sign of Z that INCREASES objective-sample separation, i.e. which way retracts.
+  # Measured once at the scope; see the same block in config_PPM.yml for why this is a
+  # DECLARED fact rather than something composed from (scope type x which element moves).
+  #
+  # OWS3, checked on the rig 2026-09-01: HIGHER Z places the sample CLOSER to the
+  # objective. Retracting is therefore the NEGATIVE direction -- the OPPOSITE of PPM,
+  # where increasing Z moves the stage down and away. Do not copy one scope's sign to
+  # the other; that is the mistake this field exists to prevent, and the failure mode is
+  # driving the objective into the slide.
+  #
+  # Consistent with the Z limits below: the range is [0, 2800] and entirely positive, so
+  # the retracted end is the LOW end, near 0.
+  focus:
+    retract_sign: negative
+  # NOTE: no safe_z_um is declared here, deliberately. The retract DIRECTION has been
+  # measured; the retracted Z VALUE has not. Approach-from-safe-Z stays unavailable on
+  # this scope until a value is measured at the rig -- which is the correct state, since
+  # streaming AF is disabled here anyway (see streaming_af below). Guessing a safe Z from
+  # the limit would be exactly the "inferred without establishing the sign" mistake that
+  # shipped a wrong-side -500 on PPM.
   limits:
     x_um:
       low: -49500.0
