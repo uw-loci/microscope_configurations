@@ -1,6 +1,23 @@
 calibration_targets:
+  # Mean intensity each polarizer state is calibrated TO. These are ceilings imposed by the
+  # illumination profile, not aspirations -- this scope is not flat-fielded, so the centre of
+  # the field is materially brighter than the mean and saturates first.
+  #
+  # uncrossed was 245.0 and is 220.0 as of 2026-09-07, measured at the rig: at 245 the middle
+  # of the frame saturates. That is worse than losing range, because the background image IS
+  # the flat-field reference -- correction is img * (bg_mean / bg_pixel), so a bg_pixel
+  # truncated at 255 makes the divisor too small and the centre of every corrected tile comes
+  # out too bright. A clipped background bakes a bright blob into every acquisition.
+  #
+  # 220 is what background collection has actually been achieving (see background_exposures
+  # below), so this only changes the FALLBACK used when no prior collection exists -- which
+  # was pointing at a value known to clip.
+  #
+  # The real fix for the ~14% of range this costs is optical: flatten the illumination
+  # (Kohler alignment / diffuser). Then the mean can rise without the centre clipping, and
+  # the flat-field correction has less work to do as well.
   target_intensities:
-    uncrossed: 245.0
+    uncrossed: 220.0
     positive: 160.0
     negative: 160.0
     crossed: 125.0
