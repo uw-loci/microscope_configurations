@@ -6,27 +6,27 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-08-11T13:44:16.859471'
+    last_calibrated: '2026-09-08T15:50:53.497402'
     modality: ppm
     objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 8.95
-        achieved_intensity: 129.0
+        exposure_ms: 11.2
+        achieved_intensity: 130.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 3.66
-        achieved_intensity: 131.0
+        exposure_ms: 3.62
+        achieved_intensity: 130.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 10.17
-        achieved_intensity: 132.0
+        exposure_ms: 10.09
+        achieved_intensity: 129.0
       uncrossed:
         angle_degrees: 90.0
-        exposure_ms: 0.2
-        achieved_intensity: 221.0
+        exposure_ms: 0.21
+        achieved_intensity: 220.0
 background_correction:
   ppm:
     enabled: true
@@ -240,29 +240,29 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           uncrossed:
-            all: 0.2
+            all: 0.21
             r: 0.1
-            g: 0.2
-            b: 0.58
+            g: 0.21
+            b: 0.59
           negative:
-            all: 3.66
-            r: 1.67
-            g: 3.66
-            b: 7.52
+            all: 3.62
+            r: 1.73
+            g: 3.62
+            b: 8.29
           crossed:
-            all: 10.17
-            r: 4.29
-            g: 10.17
-            b: 12.71
+            all: 10.09
+            r: 4.63
+            g: 10.09
+            b: 15.4
           positive:
-            all: 8.95
-            r: 6.01
-            g: 8.95
-            b: 18.31
+            all: 11.2
+            r: 7.19
+            g: 11.2
+            b: 20.15
         gains:
           uncrossed:
             unified_gain: 1.0
-            analog_red: 0.969
+            analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
           negative:
@@ -280,14 +280,14 @@ imaging_profiles:
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
-        wb_last_modified: '2026-08-11T13:42:19.360142'
+        wb_last_modified: '2026-09-08T15:47:58.556293'
         simple_wb:
-          last_calibrated: '2026-08-06T19:07:51.896778'
+          last_calibrated: '2026-09-07T11:15:14.589616'
           base_angle: uncrossed
           base_exposures_ms:
-            r: 0.12
-            g: 0.25
-            b: 0.75
+            r: 0.11
+            g: 0.22
+            b: 0.67
           base_gains:
             unified_gain: 1.0
             analog_red: 1.0
@@ -297,27 +297,27 @@ imaging_profiles:
             uncrossed:
               scale: 1.0
               unified_gain: 1.0
-              r: 0.12
-              g: 0.25
-              b: 0.75
+              r: 0.11
+              g: 0.22
+              b: 0.67
             negative:
-              scale: 9.517
+              scale: 14.438
               unified_gain: 1.0
-              r: 2.41
-              g: 2.41
-              b: 2.41
+              r: 3.23
+              g: 3.23
+              b: 3.23
             crossed:
-              scale: 46.79
+              scale: 70.967
               unified_gain: 1.0
-              r: 11.86
-              g: 11.86
-              b: 11.86
+              r: 15.89
+              g: 15.89
+              b: 15.89
             positive:
-              scale: 60.343
+              scale: 89.872
               unified_gain: 1.0
-              r: 15.3
-              g: 15.3
-              b: 15.3
+              r: 20.12
+              g: 20.12
+              b: 20.12
     LOCI_OBJECTIVE_OLYMPUS_40X_POL_001:
       LOCI_DETECTOR_TELEDYNE_001:
         white_balance:
