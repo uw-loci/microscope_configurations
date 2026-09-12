@@ -122,6 +122,30 @@ autofocus_settings:
   # for a flat reading is a better tile, not a metric that invents a peak.
   # p98_p2 remains the FALLBACK below, which is its documented role.
   score_metric: brenner_gradient
+  # 2026-09-12. Score the green plane only, instead of the equal-weighted mean of
+  # all three. A fibre or a dust speck is achromatic and carries its contrast in
+  # every channel; stained tissue carries most of its contrast where the stain
+  # absorbs. Averaging the channels keeps all of the debris signal and dilutes the
+  # tissue's, so on a field holding both, the debris wins.
+  #
+  # Measured on the four 2026-09-04 traverses, scoring with the same metric the
+  # server runs (recomputation verified against the recorded values, corr=1.000):
+  #
+  #   field              equal-mean           green
+  #   fibre + tissue     -219.2  WRONG        -327.6  right (hand focus -332)
+  #   dust only          -284.5  9.8% amp     -284.5  6.9% amp
+  #   clean tissue       -349.0  right 58.6%  -350.2  right 66.1%
+  #   flat rescan        nothing found        nothing found
+  #
+  # Better or equal on all four. Green was tried and rejected once before (see
+  # to_gray's docstring, pre-2026-05-04, "flat illumination across Z"); that does
+  # not reproduce on the current per-angle white balance -- amplitude is 27.8% and
+  # 66.1% on the two tissue fields.
+  #
+  # Scoped to this objective on purpose: equal-mean is also what makes streaming AF
+  # agree with standard AF, so it stays the default everywhere else until this has
+  # run on the scope.
+  channel_reduction: green
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
   sweep_range_um: 30.0
