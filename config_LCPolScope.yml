@@ -107,11 +107,22 @@ modalities:
       # Solving pixel-wise for the wavelength gives median 548.999 nm.
       # So the 2026-08-25 data WAS processed at 549.
       #
-      # The registry's 546.0 is not a contradiction: that entry is from
-      # session 2026_08_27, two days later. This is a USER SETTING in the
-      # acquisition plugin, and it demonstrably changed between sessions.
-      # It is not an instrument constant, and nothing enforces agreement
-      # between the value used to acquire and the value used to reconstruct.
+      # The registry's 546.0 is from session 2026_08_27, two days later, and
+      # is NOT independent evidence -- a user typed it, quite possibly
+      # prompted by our own 546-vs-549 discussion on the 26th and 27th. An
+      # earlier revision of this file cited it as authoritative; that was
+      # circular and is withdrawn.
+      #
+      # The hardware settles the shape of the problem: ONE filter, never
+      # changed. The physical wavelength cannot have moved. Only the number
+      # someone typed did -- and 549 was typed too (it 'appears in the
+      # 08-25 summary once it had been set'). So NEITHER value has ever been
+      # measured on this rig; both are user input, and nothing enforces that
+      # the value used to acquire matches the one used to reconstruct.
+      #
+      # 549 is therefore chosen for consistency with the reference data our
+      # reconstruction is validated against. It is not a claim about the
+      # filter.
       #
       # Consequence: retardance in nm is only as trustworthy as this field.
       # Orientation is unaffected (arctan2 of a and b, no wavelength).
