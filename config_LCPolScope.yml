@@ -96,37 +96,27 @@ modalities:
     # they come from the recOrder calibration and must be kept current with it.
     reconstruction:
       # All confirmed 2026-08-19.
-      # 546. Reverted to this on 2026-08-28 after seeing OpenPolScope's own
-      # registry; it had been changed to 549 earlier the same day on an
-      # argument that the registry disproves.
+      # 549. PROVEN, not inferred (2026-09-18). This value changed twice on
+      # 2026-08-28 on weaker evidence; this time it is measured.
       #
-      # The argument was that 546 came only from the Meadowlark DEVICE
-      # ADAPTER (a different job -- voltage-to-retardance inside the LC
-      # controller) while 549 came from '~ Wavelength (nm)' in the
-      # OpenPolScope acquisition summary, which is role-matched to this
-      # field. The registry breaks that: HKCU\...\JavaSoft\Prefs holds
-      # ps.acq.MeadowlarkLC.wavelength = 546.0, alongside the swing and the
-      # five-state palette. That is OpenPolScope's OWN persisted acquisition
-      # parameter -- the one the plugin restores on launch -- so 546 is not
-      # merely the adapter's opinion after all.
+      # Decompiled OpenPolScope 3.20b (Proc_Birefringence_, the plugin that
+      # produced our reference data) and reimplemented its 5-frame algorithm
+      # exactly. Re-encoding its retardance channel from the raw states:
+      #     at 549 nm -- 99.99% of pixels bit-exact, max error 1 count
+      #     at 546 nm -- 16% exact, max error 172 counts
+      # Solving pixel-wise for the wavelength gives median 548.999 nm.
+      # So the 2026-08-25 data WAS processed at 549.
       #
-      # Two OpenPolScope fields therefore disagree with each other: the
-      # registry says 546.0 (session 2026_08_27), the 2026-08-25 acquisition
-      # summary says 549. The registry is machine-written and is what the
-      # plugin actually reloads, so it wins. The filter is still unidentified
-      # and this remains a judgement.
+      # The registry's 546.0 is not a contradiction: that entry is from
+      # session 2026_08_27, two days later. This is a USER SETTING in the
+      # acquisition plugin, and it demonstrably changed between sessions.
+      # It is not an instrument constant, and nothing enforces agreement
+      # between the value used to acquire and the value used to reconstruct.
       #
-      # Not settleable from the data: the recorded retardance channel
-      # constrains only the product (counts/nm * lambda) ~= 602474, and the
-      # stated 60 nm ceiling is too coarse to separate the two factors.
-      #
-      # Effect of the choice: orientation is unaffected (it comes from
-      # arctan2 of Stokes parameters and carries no wavelength); retardance
-      # is a pure scale, 0.55% per 3 nm, fully reversible. 546 is also an
-      # exact Meadowlark curve point (490 / 546 / 630), so no interpolation.
-      #
-      # Settle it by identifying the filter, then set this from the part.
-      wavelength_nm: 546        # TODO(bench): confirm the fitted filter
+      # Consequence: retardance in nm is only as trustworthy as this field.
+      # Orientation is unaffected (arctan2 of a and b, no wavelength).
+      # Confirm it at the bench per session until the filter is identified.
+      wavelength_nm: 549        # TODO(bench): identify the interference filter
       swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
       condenser_na: 0.5
       # Refractive index of the objective immersion medium. Reported as
