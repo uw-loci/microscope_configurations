@@ -1,21 +1,4 @@
 calibration_targets:
-  # Mean intensity each polarizer state is calibrated TO. These are ceilings imposed by the
-  # illumination profile, not aspirations -- this scope is not flat-fielded, so the centre of
-  # the field is materially brighter than the mean and saturates first.
-  #
-  # uncrossed was 245.0 and is 220.0 as of 2026-09-07, measured at the rig: at 245 the middle
-  # of the frame saturates. That is worse than losing range, because the background image IS
-  # the flat-field reference -- correction is img * (bg_mean / bg_pixel), so a bg_pixel
-  # truncated at 255 makes the divisor too small and the centre of every corrected tile comes
-  # out too bright. A clipped background bakes a bright blob into every acquisition.
-  #
-  # 220 is what background collection has actually been achieving (see background_exposures
-  # below), so this only changes the FALLBACK used when no prior collection exists -- which
-  # was pointing at a value known to clip.
-  #
-  # The real fix for the ~14% of range this costs is optical: flatten the illumination
-  # (Kohler alignment / diffuser). Then the mean can rise without the centre clipping, and
-  # the flat-field correction has less work to do as well.
   target_intensities:
     uncrossed: 220.0
     positive: 160.0
@@ -23,27 +6,27 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-09-08T15:50:53.497402'
+    last_calibrated: '2026-09-16T18:28:33.418333'
     modality: ppm
     objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 11.2
+        exposure_ms: 3.61
         achieved_intensity: 130.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 3.62
+        exposure_ms: 7.86
         achieved_intensity: 130.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 10.09
-        achieved_intensity: 129.0
+        exposure_ms: 18.08
+        achieved_intensity: 131.0
       uncrossed:
         angle_degrees: 90.0
-        exposure_ms: 0.21
-        achieved_intensity: 220.0
+        exposure_ms: 0.22
+        achieved_intensity: 222.0
 background_correction:
   ppm:
     enabled: true
@@ -257,25 +240,25 @@ imaging_profiles:
           calibrate_black_level: true
         exposures_ms:
           uncrossed:
-            all: 0.21
-            r: 0.1
-            g: 0.21
-            b: 0.59
+            all: 0.22
+            r: 0.11
+            g: 0.22
+            b: 0.64
           negative:
-            all: 3.62
-            r: 1.73
-            g: 3.62
-            b: 8.29
+            all: 7.86
+            r: 3.49
+            g: 7.86
+            b: 13.56
           crossed:
-            all: 10.09
-            r: 4.63
-            g: 10.09
-            b: 15.4
+            all: 18.08
+            r: 9.91
+            g: 18.08
+            b: 20.19
           positive:
-            all: 11.2
-            r: 7.19
-            g: 11.2
-            b: 20.15
+            all: 3.61
+            r: 2.2
+            g: 3.61
+            b: 9.88
         gains:
           uncrossed:
             unified_gain: 1.0
@@ -297,7 +280,7 @@ imaging_profiles:
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
-        wb_last_modified: '2026-09-08T15:47:58.556293'
+        wb_last_modified: '2026-09-16T18:28:01.654627'
         simple_wb:
           last_calibrated: '2026-09-07T11:15:14.589616'
           base_angle: uncrossed

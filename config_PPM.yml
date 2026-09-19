@@ -98,14 +98,14 @@ stage:
       single_h:
         name: Single Slide (Horizontal)
         description: Standard single slide holder with horizontal orientation
-        aperture_left_x_um: 34873
+        aperture_left_x_um: 31508
         aperture_right_x_um: -35085
-        aperture_top_y_um: 23007
+        aperture_top_y_um: 12588
         aperture_bottom_y_um: -48114
-        slide_left_x_um: 35400
-        slide_right_x_um: -40000
-        slide_top_y_um: 4807
-        slide_bottom_y_um: -23241
+        slide_left_x_um: 31506
+        slide_right_x_um: -43908
+        slide_top_y_um: 12393
+        slide_bottom_y_um: -12975
         aperture_height_mm: 60.0
         slide_width_mm: 75
         slide_height_mm: 25
@@ -131,23 +131,23 @@ stage:
         #    these take precedence over the fixed pitch. Use per-slot when the
         #    holder's slide placement is not trusted to match a fixed pitch.
         # The aperture values below are placeholders -- recapture on the scope.
-        aperture_left_x_um: 51571
-        aperture_right_x_um: -56723
-        slide_top_y_um: 25826
-        slide_bottom_y_um: -50072
+        aperture_left_x_um: 47796
+        aperture_right_x_um: -60207
+        slide_top_y_um: 32441
+        slide_bottom_y_um: -40207
         aperture_height_mm: 55.0
         slide_width_mm: 25
         slide_height_mm: 75
         slide_spacing_mm: 30.0
         num_slides: 4
-        slide1_center_x_um: 37978.5
-        slide1_center_y_um: -12011.5
-        slide2_center_x_um: 10598.5
-        slide2_center_y_um: -12592
-        slide3_center_x_um: -16933.5
-        slide3_center_y_um: -12553.5
-        slide4_center_x_um: -44259.5
-        slide4_center_y_um: -12446
+        slide1_center_x_um: 35661
+        slide1_center_y_um: -3883
+        slide2_center_x_um: 7520.5
+        slide2_center_y_um: -3883
+        slide3_center_x_um: -20416.5
+        slide3_center_y_um: -3883
+        slide4_center_x_um: -48255
+        slide4_center_y_um: -3883
   streaming_af:
     enabled: true
     speed_property: MaxSpeed

@@ -206,5 +206,42 @@
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
+  },
+  "PPM_Transform_20260917": {
+    "name": "PPM_Transform_20260917",
+    "microscope": "PPM",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -44153.5182275,
+      "m12": -12740.847339250002
+    },
+    "createdDate": "Sep 17, 2026, 3:40:10 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": true,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 643.0,
+    "greenBoxDisplayCenterY": 156.0,
+    "stageAnchorX": 7929.481772499999,
+    "stageAnchorY": -104.84733925000182,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }
