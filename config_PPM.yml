@@ -47,37 +47,15 @@ hardware:
   - LOCI_DETECTOR_JAI_001
 stage:
   stage_id: LOCI_STAGE_PRIOR_001
-  # Retracted ("safe") Z that autofocus approaches the sample from. Declaring it also
-  # declares the approach DIRECTION -- the scan runs from here toward wherever focus lies --
-  # so nothing has to infer which way retracts.
+  # Retracted ("safe") Z autofocus approaches the sample from; declaring it also declares the
+  # approach direction. Per-insert overrides (inserts.configurations.<id>.safe_z_um, or
+  # .safe_z_um_by_modality.<modality>) win over this scope-level fallback -- a dish and a slide
+  # do not sit at the same height. Set them from Stage Map > Calibrate.
   #
-  # MEASURED ON THE RIG 2026-08-26: on this scope INCREASING Z moves the stage DOWN, away
-  # from the objective. Samples focus around -250 um, so ~0 um is retracted with roughly
-  # 250 um of clearance. An earlier value of -500 was WRONG-SIDE -- below the whole focus
-  # range, i.e. toward the objective -- and would have driven the sample into it. That value
-  # was inferred from "focus is near -400, so retract further" without the sign ever being
-  # established; do not re-derive this number that way.
-  #
-  # Scope-level fallback. Sample-plane height differs per INSERT (a 35 mm dish, a 96-well
-  # plate and a slide are not interchangeable) and per MODALITY, so override per insert as
-  # those are measured:
-  #   inserts.configurations.<id>.safe_z_um
-  #   inserts.configurations.<id>.safe_z_um_by_modality.<modality-or-family>
-  #
-  # The end-of-run clearance check warns if a future run's focus comes within 50 um of this
-  # value or crosses it.
-  # Sign of Z that INCREASES objective-sample separation, i.e. which way retracts.
-  # Measured once at the scope. The MECHANISM is deliberately not modelled: PPM drives the
-  # stage, the Nikon Eclipse on LC-PolScope drives the objective, and the separation is the
-  # same physical quantity either way -- an infinity-corrected system makes objective-move
-  # and sample-move optically equivalent.
-  #
-  # Declared rather than derived from (scope_type x which-element-moves). That would be a
-  # two-factor sign composition, and this project's sign bugs have almost all been two-factor
-  # compositions XOR'd the wrong way (flip vs invert, stage polarity vs camera orientation).
-  # One measured fact beats two composed ones, especially when the failure mode is a collision.
-  #
-  # PPM, measured 2026-08-26: increasing Z moves the stage DOWN, away from the objective.
+  # PPM, measured 2026-08-26: increasing Z moves the stage DOWN, away from the objective, so
+  # retract_sign is positive and ~0 is retracted (samples focus near -250). An earlier -500 was
+  # WRONG-SIDE, inferred from "focus is near -400, so retract further" without establishing the
+  # sign; measure it, never derive it.
   focus:
     retract_sign: positive
   safe_z_um: 0
@@ -91,6 +69,38 @@ stage:
     z_um:
       low: -720
       high: 1000
+  # XY motion profile: the values the Prior XYStage is held at all session.
+  #
+  # The adapter comes up at MaxSpeed=100 and Acceleration=100 -- each its own
+  # maximum -- and the one thing a multi-slide run does that a single-slide run
+  # never does is a 28-85 mm slot-to-slot traverse at that full rate. Capping
+  # both is cheap: per-tile steps are ~300 um and dominated by settling, not
+  # slew, so only the rare long traverse gets slower (sub-second either way).
+  #
+  # Holding them BELOW the controller's own defaults is also the only cheap
+  # detector we have. A ProScan III has no absolute reference and nothing to
+  # home to, so a controller that restarts resumes with position 0,0 wherever
+  # it is standing -- it then goes exactly where commanded and reports exactly
+  # that, which is why no arrival check can see it. But a restart also restores
+  # ITS defaults, so a readback of 100 is evidence the frame moved. See
+  # microscope_control/hardware/xy_motion.py.
+  #
+  # 50/50 is a starting point chosen to be clearly below the default, not a
+  # measured optimum -- tune it against the 4-slide run that motivated it
+  # (2026-10-02, MH_FNA: slot 1 correct, slots 2-4 progressively offset in Y).
+  # Do NOT add SCurve here without first establishing which direction smooths
+  # the motion on this controller; MaxSpeed and Acceleration are 1-100 percent
+  # scales where lower is unambiguously gentler, and SCurve is not.
+  xy_motion:
+    properties:
+      MaxSpeed: '50'
+      Acceleration: '50'
+    # Long moves only: a readback per tile step would add a serial round trip
+    # for information that the next long move reports anyway.
+    verify_after_move_um: 5000
+    # A Prior step is 1 um and positions are reported in whole steps, so single
+    # microns are granularity. 100 um is a third of a 20x field.
+    drift_tolerance_um: 100
   inserts:
     slide_margin_um: 2000
     default: single_h
