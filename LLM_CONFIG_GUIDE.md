@@ -373,6 +373,63 @@ one-time UI dialog prompts you to verify with **Re-probe Stage AF**.
 
 ---
 
+### XY motion profile (`stage.xy_motion`)
+
+Optional, and about the XY stage rather than the focus stage. It caps how
+hard XY is driven, and the cap doubles as the only cheap detector we have
+for the stage's origin moving.
+
+```yaml
+stage:
+  limits: { ... }
+  xy_motion:                          # omit entirely to leave XY alone
+    properties:                       # MM property -> value held all session
+      MaxSpeed: '50'
+      Acceleration: '50'
+    verify_after_move_um: 5000        # read the profile back after long moves
+    drift_tolerance_um: 100           # commanded-vs-reported disagreement
+```
+
+**Why cap it.** The Prior XYStage adapter comes up at `MaxSpeed=100` and
+`Acceleration=100`, each its own maximum, and a multi-slide run makes
+28-85 mm slot-to-slot traverses at that rate -- the one thing a
+single-slide run never does. Capping costs almost nothing, because
+per-tile steps are ~300 um and dominated by settling, not slew.
+
+**Why it is also the detector.** A Prior controller has no absolute
+reference and nothing to home to, so one that restarts resumes with
+position 0,0 wherever it happens to be standing. From then on it moves
+exactly where commanded and reports exactly that, which is why no
+arrival check can see it. Two things can:
+
+- a **readback**: we hold these properties below the controller's own
+  defaults for the whole session, so a default back in place is evidence
+  of a restart. This is what `verify_after_move_um` triggers.
+- a **cross-time comparison**: the position reported before the next
+  move must match the position last commanded, since nothing moved in
+  between. `drift_tolerance_um` is the threshold, and the check is armed
+  only during an acquisition -- outside one, a joystick nudge is a
+  legitimate disagreement.
+
+Either one stops the acquisition in progress. Neither corrects anything:
+once the origin has moved, the holder calibration, every per-slide
+alignment and the stage `TileConfiguration` of data already on disk all
+describe a place the sample is not, and recovery is the documented
+fiducial procedure.
+
+**Choosing values.** Only cap a property whose direction you have
+established. On Prior, `MaxSpeed` and `Acceleration` are 1-100 percent
+scales where lower is unambiguously gentler. `SCurve` is NOT -- do not
+add it here without measuring which way smooths the motion on your
+controller. Pick values clearly below the adapter's defaults, or the
+readback has nothing to say.
+
+**Omitting the block** leaves the stage at whatever the adapter came up
+with and disables both checks, which is the honest default: with no
+declared cap there is no value for a readback to be compared against.
+
+---
+
 ## 2. autofocus_\<SCOPE\>.yml (schema v2)
 
 Three top-level sections:
