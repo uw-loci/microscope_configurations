@@ -165,6 +165,29 @@ modalities:
       # software or recalibration.
       state_order: [State0, State1, State2, State4, State3]
 
+      # Reconstruction algorithm. Both live in polscope_library; its README
+      # has the comparison.
+      #   qlipp        -- default. The QLIPP Stokes inversion (waveorder /
+      #                   recOrder). Background removed by a Mueller-matrix
+      #                   inversion. Retardance capped at a quarter wave.
+      #   openpolscope -- reproduces OpenPolScope 3.20b bit-for-bit (verified
+      #                   per pixel on the 2026-08-25 reference data).
+      #                   Background is a subtraction in its normalised
+      #                   difference space; retardance folds correctly past a
+      #                   quarter wave, up to a half wave. 5-State only.
+      # Without a background the two agree to machine precision. With one
+      # they differ by ~0.5% on the reference slide (the background step is
+      # the ONLY difference). Pick openpolscope to match data that was, or
+      # will be, processed in OpenPolScope.
+      method: qlipp
+      # Camera black level in counts, subtracted from every state (sample and
+      # background) and clamped at zero before reconstruction, by either
+      # method. Retardance and orientation are invariant to a uniform offset
+      # except through that clamp, so this is safe to set; it is REQUIRED for
+      # an exact OpenPolScope match. 103 is OpenPolScope's own stored value
+      # for this camera (registry, ps.acq.blacklevel). 0 disables.
+      black_level: 103
+
     background_correction:
       # Raw-tile flat-field division is WRONG for this modality. QLIPP
       # background correction operates on the reconstructed Stokes vectors
