@@ -10,19 +10,17 @@
 # depolarization are computed downstream. See
 #   claude-reports/design/2026-08-15_lc-polscope-qpsc-support-plan.md
 #
-# STATUS: NOT YET RUNNABLE. Two classes of gap remain --
-#   (A) UNKNOWN VALUES, marked "TODO(bench)" below. As of 2026-08-19 the
-#       calibration values (swing 0.03, 5-State, 549 nm, condenser NA 0.5,
-#       MM-Voltage), the orientation, and the 20x pixel size (0.1715 um,
-#       measured) are CONFIRMED. Still open: pixel size for every objective
-#       other than 20x, stage travel, and LC settle time. Do not trust a
-#       placeholder because it parses.
-#   (B) MISSING CODE. The 'lcpolscope' modality name matches no registered
-#       ModalityHandler (Java) or ModalityConfig (Python), so it currently
-#       resolves to the no-op handler: no channel picker, no 5-state loop.
-#       The 'brightfield' modality below works today. Phase 1 of the plan
-#       doc registers the handler; until then this file is a
-#       specification, not a working config.
+# STATUS: RUNNABLE, with open bench values. The 'lcpolscope' modality is
+#   registered on both sides (Java LCPolScopeModalityHandler, Python
+#   modality/lcpolscope.py), so the 5-state loop and LC calibration work.
+#   What is still unmeasured is marked "TODO(bench)" below:
+#   - pixel size for every objective other than 20x (only 20x is calibrated)
+#   - stage travel (x/y/z limits are placeholders; read them from the ASI)
+#   - LC settle time, slide_insertion A/B, brightfield exposure
+#   - the interference filter wavelength (549 matches the 2026-08-25 data;
+#     it has never been measured on the rig)
+#   Confirmed 2026-08-19: swing 0.03, 5-State, condenser NA 0.5, MM-Voltage,
+#   orientation, and the 20x pixel size (0.1715 um, measured).
 # ============================================================================
 
 microscope:
