@@ -131,11 +131,16 @@ modalities:
       # Refractive index of the objective immersion medium. Reported as
       # "1.3 maybe" -- confirm before it is used for anything quantitative.
       objective_medium_ri: 1.3  # TODO(bench): confirm
-      # recOrder LC control mode. MM-Voltage writes LC voltages directly (what
-      # the MM ConfigGroup presets in this file do); MM-Retardance asks the
-      # MicroManager LC adapter for a retardance and lets it pick the voltage.
-      # Default to MM-Voltage.
-      lc_control_mode: MM-Voltage
+      # How the LC CALIBRATION drives the crystals. Read only by the calibration;
+      # acquisition applies the MM ConfigGroup presets and never reads it.
+      # MM-Retardance writes 'Retardance LC-x [in waves]' (writable, ~0-1 wave on
+      # this rig, confirmed 2026-08-28) and lets the MeadowlarkLC adapter pick the
+      # voltage. MM-Voltage would write volts directly and needs a
+      # retardance/voltage curve that is not wired up, so the microscope server
+      # refuses it. It was MM-Voltage until 2026-10-12, which made every
+      # calibration fail; OpenPolScope's own presets are voltage-based, which is
+      # where that value came from.
+      lc_control_mode: MM-Retardance
       scheme: 5-State           # 5 MM presets are declared; the 4-State
                                 #   scheme also exists. Must match the
                                 #   calibration that produced the presets.
