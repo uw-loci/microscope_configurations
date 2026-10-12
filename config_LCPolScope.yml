@@ -166,6 +166,13 @@ modalities:
       #
       # Re-check with `polscope-scheme-check` after ANY change of acquisition
       # software or recalibration.
+      #
+      # WHEN QPSC'S OWN LC CALIBRATION IS APPLIED (Calibrate Liquid Crystals ->
+      # Apply to acquisition) this line is rewritten to the identity order
+      # [State0 .. State4]: polscope_library names its palette so that State0
+      # is extinction, State1 = I0, State2 = I45, State3 = I90, State4 = I135,
+      # which is already the order reconstruct() consumes. The permutation
+      # below belongs to OpenPolScope's presets only.
       state_order: [State0, State1, State2, State4, State3]
 
       # Reconstruction algorithm. Both live in polscope_library; its README
@@ -203,6 +210,16 @@ modalities:
 
     channels:
     # -----------------------------------------------------------------
+    # WHERE THE LC SETTINGS COME FROM. As shipped, each state applies the
+    # MM 'Channel' preset (OpenPolScope's calibration, stored as VOLTS)
+    # and then writes the same volts explicitly. Running QPSC's own LC
+    # calibration and choosing 'Apply to acquisition' REPLACES each state's
+    # device_properties with 'Retardance LC-A/B [in waves]' entries from the
+    # new palette, REMOVES the mm_setup_presets (so the stale voltage preset
+    # is not applied first), resets reconstruction.state_order, and records
+    # the calibration file under reconstruction. The MeadowlarkLC adapter
+    # converts waves to volts, so no retardance/voltage curve is needed.
+    #
     # EXPOSURE MUST BE IDENTICAL ACROSS ALL FIVE STATES.
     # The Stokes inversion treats the five intensities as samples of one
     # radiometric scale. Per-state exposure or gain differences silently
