@@ -119,13 +119,21 @@ modalities:
       # the value used to acquire matches the one used to reconstruct.
       #
       # 549 is therefore chosen for consistency with the reference data our
-      # reconstruction is validated against. It is not a claim about the
-      # filter.
+      # reconstruction is validated against.
       #
-      # Consequence: retardance in nm is only as trustworthy as this field.
-      # Orientation is unaffected (arctan2 of a and b, no wavelength).
-      # Confirm it at the bench per session until the filter is identified.
-      wavelength_nm: 549        # TODO(bench): identify the interference filter
+      # FILTER IDENTIFIED 2026-10-13 (read off the lamp housing by Yuming):
+      # Semrock FF01-549/15, a fluorescence emission bandpass -- 549 nm
+      # centre, 15 nm bandwidth -- on the transmission lamp. So 549 is the
+      # physical wavelength as well as the reconstruction one. What is still
+      # off is the MeadowlarkLC adapter's own 'Wavelength' property, 546
+      # (OpenPolScope's registry value): the adapter converts the palette's
+      # waves to volts at THAT wavelength, so a 0.03-wave swing is applied as
+      # 0.02984 waves at 549, a 0.55% retardance scale error the calibration
+      # warns about. Setting the adapter to 549 and recalibrating removes it.
+      #
+      # Consequence: retardance in nm scales with this field. Orientation is
+      # unaffected (arctan2 of a and b, no wavelength).
+      wavelength_nm: 549        # Semrock FF01-549/15 on the transmission lamp
       swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
       condenser_na: 0.5
       # Refractive index of the objective immersion medium. Reported as
@@ -196,6 +204,16 @@ modalities:
       # except through that clamp, so this is safe to set; it is REQUIRED for
       # an exact OpenPolScope match. 103 is OpenPolScope's own stored value
       # for this camera (registry, ps.acq.blacklevel). 0 disables.
+      #
+      # UNITS: counts in the camera's CURRENT pixel format. 103 was recorded
+      # in OpenPolScope's format; the same Oryx in 8-bit, or with a different
+      # offset setting, has a different one. The 2026-10-13 LC calibration
+      # measured frame means of 9 to 17 counts against this 103, which is
+      # impossible if both are in the same units -- the calibration now
+      # records the pixel format with every run and warns when the black
+      # level sits above the darkest frame. TODO(bench): measure the offset
+      # in the pixel format acquisition uses (lamp blocked, same exposure)
+      # and set it here.
       black_level: 103
 
     background_correction:
