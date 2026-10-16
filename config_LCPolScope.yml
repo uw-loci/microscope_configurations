@@ -181,7 +181,7 @@ modalities:
       # is extinction, State1 = I0, State2 = I45, State3 = I90, State4 = I135,
       # which is already the order reconstruct() consumes. The permutation
       # below belongs to OpenPolScope's presets only.
-      state_order: [State0, State1, State2, State4, State3]
+      state_order: [State0, State1, State2, State3, State4]
 
       # Reconstruction algorithm. Both live in polscope_library; its README
       # has the comparison.
@@ -215,6 +215,9 @@ modalities:
       # in the pixel format acquisition uses (lamp blocked, same exposure)
       # and set it here.
       black_level: 103
+      lc_calibrated_at: '2026-10-16T15:01:27'
+      lc_extinction_ratio: 258.5
+      lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
 
     background_correction:
       # Raw-tile flat-field division is WRONG for this modality. QLIPP
@@ -298,16 +301,15 @@ modalities:
     - id: State0
       display_name: State0 (extinction)
       exposure_ms: 50          # confirmed: ~50 ms at 20x
-      mm_setup_presets:
-      - group: Channel
-        preset: State0
+      # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
+      # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
       - device: MeadowlarkLC
-        property: Voltage (V) LC-A
-        value: 6.4280
+        property: Retardance LC-A [in waves]
+        value: 0.2578
       - device: MeadowlarkLC
-        property: Voltage (V) LC-B
-        value: 4.0370
+        property: Retardance LC-B [in waves]
+        value: 0.447
       # LC relaxation is slower than the driver reports busy. TODO(bench):
       # measure the settle time (step the LC, snap a burst, find where the
       # mean stops drifting) and set it here. 50 ms is a guess.
@@ -315,58 +317,54 @@ modalities:
     - id: State1
       display_name: State1
       exposure_ms: 50          # confirmed: ~50 ms at 20x
-      mm_setup_presets:
-      - group: Channel
-        preset: State1
+      # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
+      # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
       - device: MeadowlarkLC
-        property: Voltage (V) LC-A
-        value: 1.1400
+        property: Retardance LC-A [in waves]
+        value: 0.2278
       - device: MeadowlarkLC
-        property: Voltage (V) LC-B
-        value: 1.7000
+        property: Retardance LC-B [in waves]
+        value: 0.447
       settle_ms: 50
     - id: State2
       display_name: State2
       exposure_ms: 50          # confirmed: ~50 ms at 20x
-      mm_setup_presets:
-      - group: Channel
-        preset: State2
+      # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
+      # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
       - device: MeadowlarkLC
-        property: Voltage (V) LC-A
-        value: 2.8400
+        property: Retardance LC-A [in waves]
+        value: 0.2578
       - device: MeadowlarkLC
-        property: Voltage (V) LC-B
-        value: 4.0370
+        property: Retardance LC-B [in waves]
+        value: 0.477
       settle_ms: 50
     - id: State3
       display_name: State3
       exposure_ms: 50          # confirmed: ~50 ms at 20x
-      mm_setup_presets:
-      - group: Channel
-        preset: State3
+      # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
+      # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
       - device: MeadowlarkLC
-        property: Voltage (V) LC-A
-        value: 1.7000
+        property: Retardance LC-A [in waves]
+        value: 0.2887
       - device: MeadowlarkLC
-        property: Voltage (V) LC-B
-        value: 4.0370
+        property: Retardance LC-B [in waves]
+        value: 0.447
       settle_ms: 50
     - id: State4
       display_name: State4
       exposure_ms: 50          # confirmed: ~50 ms at 20x
-      mm_setup_presets:
-      - group: Channel
-        preset: State4
+      # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
+      # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
       - device: MeadowlarkLC
-        property: Voltage (V) LC-A
-        value: 0.9400
+        property: Retardance LC-A [in waves]
+        value: 0.2578
       - device: MeadowlarkLC
-        property: Voltage (V) LC-B
-        value: 4.0370
+        property: Retardance LC-B [in waves]
+        value: 0.4286
       settle_ms: 50
 
   # -------------------------------------------------------------------------
