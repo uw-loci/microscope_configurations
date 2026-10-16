@@ -204,6 +204,28 @@ id_detector:
         flip_y: false
         description: 'Teledyne FLIR Oryx 10GigE mono, S/N 20236320, LC-PolScope'
 
+    LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        name: 'Hamamatsu ORCA-Flash4.0 V2'
+        manufacturer: 'Hamamatsu'
+        camera_type: 'generic'
+        # MM device label from MM2_rec04_HamMead_12132024.cfg (HamamatsuHam adapter).
+        device: 'HamamatsuHam_DCAM'
+        # C11440-22CU = ORCA-Flash4.0 V2 (USB 3.0), S/N 003254, read from
+        # OpenPolScope's acquisition metadata of 2026-10-16. Scientific CMOS,
+        # 2048x2048, 6.5 um pixels, 16-bit output (DCAM PixelType '16bit'),
+        # monochrome. This is the camera OpenPolScope drives on the LC-PolScope;
+        # its black level of 103 (ps.acq.blacklevel) is this camera's offset.
+        width_px: 2048
+        height_px: 2048
+        sensor_pixel_width_um: 6.5
+        sensor_pixel_height_um: 6.5
+        requires_debayering: false
+        # TODO(bench): orientation relative to the Oryx on the other port is
+        # unknown; confirm with a slide with a known asymmetric feature.
+        flip_x: false
+        flip_y: false
+        description: 'Hamamatsu ORCA-Flash4.0 V2 sCMOS, S/N 003254, LC-PolScope (OpenPolScope camera)'
+
 id_objective_lens:
     LOCI_OBJECTIVE_NIKON_20X_001:
         name: '20x Nikon' 
