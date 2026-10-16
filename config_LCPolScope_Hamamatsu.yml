@@ -1,0 +1,543 @@
+# ============================================================================
+# LC-PolScope, HAMAMATSU port (Meadowlark universal compensator + ORCA-Flash4.0 V2)
+#
+# The same microscope as config_LCPolScope.yml -- stage, LCs, objectives, filter
+# -- seen through the OTHER camera: the Hamamatsu C11440-22CU (S/N 003254) that
+# OpenPolScope drives. Choose it with Utilities > Switch Microscope, after
+# loading _MM2/config_LCPolScope_Hamamatsu.cfg in Micro-Manager.
+#
+# Kept as its own config rather than a second detector in config_LCPolScope.yml
+# because QPSC picks an acquisition profile by modality + objective only, and
+# the two cameras need their own LC palette (the beam path to each port
+# differs: OpenPolScope's Hamamatsu palette and QPSC's Oryx palette are ~0.007
+# waves apart), black level, backgrounds, exposures and pixel sizes. A
+# calibration Applied here is written here and nowhere else.
+#
+# STATUS (2026-10-16): created from config_LCPolScope.yml. Differences:
+#   - detector LCPS_DETECTOR_HAMAMATSU_FLASH_001 everywhere
+#   - pixel sizes ESTIMATED from the Oryx measurements (see hardware.objectives)
+#   - LC states start from OpenPolScope's palette of 2026-10-16 16:29 (its
+#     calibration check read an extinction ratio of 190.9), in OpenPolScope's
+#     state numbering, so state_order carries OpenPolScope's permutation. Run
+#     Calibrate Liquid Crystals + Apply on this config to replace it.
+#   - exposure 33 ms and black level 103: OpenPolScope's values for this camera
+#   - microscope.name LCPolScope_Hamamatsu, so slide alignments are separate
+#     from the Oryx config's (different field of view, orientation unconfirmed)
+# Still TODO(bench): measure the 20x pixel size on a stage micrometer, confirm
+# the camera orientation, and everything config_LCPolScope.yml lists as open.
+# ============================================================================
+
+microscope:
+  name: LCPolScope_Hamamatsu
+  # Free-text category. Upright vs inverted is NOT recorded here -- the
+  # authoritative value is light_path.scope_type below.
+  type: Multimodal
+  detector_in_use: null
+  objective_in_use: null
+  modality: null
+
+# ---------------------------------------------------------------------------
+# Orientation single source of truth (LightPathModel).
+# TODO(bench): all three are unverifiable from the MM config. Set them from
+# the Stage Map physical drop-downs / setup wizard once the scope is up, then
+# confirm against a slide with a known asymmetric feature.
+# ---------------------------------------------------------------------------
+light_path:
+  # Confirmed 2026-08-19: inverted scope, slide face DOWN, label on the right.
+  # Camera view matches the eyepiece view.
+  scope_type: inverted
+  # Slide insertion A/B is the in-plane 180 (which side the label sits on).
+  # "Label on the right" is recorded; which of A/B that corresponds to has to
+  # be settled against the Stage Map once, then left alone.
+  slide_insertion: A         # A | B   TODO(bench): confirm against Stage Map
+  # Camera matches the eyepiece, so there is no extra optical parity between
+  # what the operator sees and what the camera records.
+  optical_flip: none
+  # Stage sense, confirmed 2026-08-19: in MicroManager, +/-Y moves away from /
+  # towards the operator; X left/right matches the Stage View (i.e. it is
+  # mirrored from the sample's own perspective, as expected on an inverted
+  # scope). Recorded here as prose; the authoritative polarity is the
+  # auto-detected stage-polarity preference, not this comment.
+
+modalities:
+
+  # -------------------------------------------------------------------------
+  # LC-PolScope: 5 liquid-crystal states per tile, one snap each.
+  #
+  # The states are expressed through the generic channel library rather than
+  # the PPM rotation-stage mechanism: there is no rotation stage on this
+  # scope, the polarization state is set electrically by the Meadowlark
+  # D5020 driving two LCs. Each channel applies the MM "Channel" ConfigGroup
+  # preset AND writes both LC voltages explicitly, so a state is always fully
+  # established rather than a delta from whatever ran last (see LLM_CONFIG_GUIDE
+  # section 5).
+  #
+  # type: polarized is deliberate. It is an existing, recognized modality
+  # type and it selects the right sample-physics defaults downstream (relaxed
+  # saturation tolerance, wider tissue mask). Rotation-stage behaviour is
+  # gated on the modality NAME "ppm", not on this type, so nothing here will
+  # go looking for a PIZ stage.
+  # -------------------------------------------------------------------------
+  lcpolscope:
+    type: polarized
+
+    # No illumination block: this MM config declares no lamp, shutter or
+    # LED device. Kohler illumination on this scope is set by hand and is
+    # not under MicroManager control, so there is no state_property /
+    # intensity_property to name. AutoShutter is on in MM with no shutter
+    # device, which is a no-op.
+    #
+    # The LC-PolScope is nonetheless a MONOCHROMATIC technique: the standard
+    # configuration uses a green interference filter (549 nm here), and the
+    # wavelength enters the reconstruction directly -- retardance comes out
+    # as R = (lambda / 2pi) * arctan(sqrt(A^2 + B^2)), so lambda sets the
+    # physical units. The filter is not MM-controllable here, which is
+    # exactly why it has to be recorded as data instead.
+    #
+    # None of these is derivable from the MM config or from the LC voltages;
+    # they come from the recOrder calibration and must be kept current with it.
+    reconstruction:
+      # All confirmed 2026-08-19.
+      # 549. PROVEN, not inferred (2026-09-18). This value changed twice on
+      # 2026-08-28 on weaker evidence; this time it is measured.
+      #
+      # Decompiled OpenPolScope 3.20b (Proc_Birefringence_, the plugin that
+      # produced our reference data) and reimplemented its 5-frame algorithm
+      # exactly. Re-encoding its retardance channel from the raw states:
+      #     at 549 nm -- 99.99% of pixels bit-exact, max error 1 count
+      #     at 546 nm -- 16% exact, max error 172 counts
+      # Solving pixel-wise for the wavelength gives median 548.999 nm.
+      # So the 2026-08-25 data WAS processed at 549.
+      #
+      # The registry's 546.0 is from session 2026_08_27, two days later, and
+      # is NOT independent evidence -- a user typed it, quite possibly
+      # prompted by our own 546-vs-549 discussion on the 26th and 27th. An
+      # earlier revision of this file cited it as authoritative; that was
+      # circular and is withdrawn.
+      #
+      # The hardware settles the shape of the problem: ONE filter, never
+      # changed. The physical wavelength cannot have moved. Only the number
+      # someone typed did -- and 549 was typed too (it 'appears in the
+      # 08-25 summary once it had been set'). So NEITHER value has ever been
+      # measured on this rig; both are user input, and nothing enforces that
+      # the value used to acquire matches the one used to reconstruct.
+      #
+      # 549 is therefore chosen for consistency with the reference data our
+      # reconstruction is validated against.
+      #
+      # FILTER IDENTIFIED 2026-10-13 (read off the lamp housing by Yuming):
+      # Semrock FF01-549/15, a fluorescence emission bandpass -- 549 nm
+      # centre, 15 nm bandwidth -- on the transmission lamp. So 549 is the
+      # physical wavelength as well as the reconstruction one. What is still
+      # off is the MeadowlarkLC adapter's own 'Wavelength' property, 546
+      # (OpenPolScope's registry value): the adapter converts the palette's
+      # waves to volts at THAT wavelength, so a 0.03-wave swing is applied as
+      # 0.02984 waves at 549, a 0.55% retardance scale error the calibration
+      # warns about. Setting the adapter to 549 and recalibrating removes it.
+      #
+      # Consequence: retardance in nm scales with this field. Orientation is
+      # unaffected (arctan2 of a and b, no wavelength).
+      wavelength_nm: 549        # Semrock FF01-549/15 on the transmission lamp
+      swing_waves: 0.03         # swing (chi) in waves, from the LC calibration
+      condenser_na: 0.5
+      # Refractive index of the objective immersion medium. Reported as
+      # "1.3 maybe" -- confirm before it is used for anything quantitative.
+      objective_medium_ri: 1.3  # TODO(bench): confirm
+      # How the LC CALIBRATION drives the crystals. Read only by the calibration;
+      # acquisition applies the MM ConfigGroup presets and never reads it.
+      # MM-Retardance writes 'Retardance LC-x [in waves]' (writable, ~0-1 wave on
+      # this rig, confirmed 2026-08-28) and lets the MeadowlarkLC adapter pick the
+      # voltage. MM-Voltage would write volts directly and needs a
+      # retardance/voltage curve that is not wired up, so the microscope server
+      # refuses it. It was MM-Voltage until 2026-10-12, which made every
+      # calibration fail; OpenPolScope's own presets are voltage-based, which is
+      # where that value came from.
+      lc_control_mode: MM-Retardance
+      scheme: 5-State           # 5 MM presets are declared; the 4-State
+                                #   scheme also exists. Must match the
+                                #   calibration that produced the presets.
+
+      # Order in which the acquired states are fed to the inversion, which
+      # consumes them positionally as (extinction, +S1, +S2, -S1, -S2).
+      #
+      # WHICH STATE PLAYS WHICH ROLE IS A PROPERTY OF THE ACQUISITION
+      # SOFTWARE, NOT OF THE MICROSCOPE. Get it wrong and the orientation map
+      # comes out rotated or mirrored, with no error and no visible symptom --
+      # retardance is unaffected, so the images still look right.
+      #
+      #   OpenPolScope 3.20  Oldenbourg order, pairs (1,4) and (2,3)
+      #                      -> State3 and State4 must swap, as set below.
+      #   recOrder           ext, I0, I45, I90, I135 = pairs (1,3) and (2,4),
+      #                      already correct -> DELETE this key entirely.
+      #
+      # Measured 2026-08-25 from OtherDocuments/polscope/2026_08_25: this
+      # permutation reproduces OpenPolScope's own orientation channel to a
+      # median 0.07 deg; all 23 others land 17-90 deg away. Independently
+      # confirmed against the sunburst reference target, whose slow axis is
+      # radial to 2.66 deg under this order.
+      #
+      # Re-check with `polscope-scheme-check` after ANY change of acquisition
+      # software or recalibration.
+      #
+      # WHEN QPSC'S OWN LC CALIBRATION IS APPLIED (Calibrate Liquid Crystals ->
+      # Apply to acquisition) this line is rewritten to the identity order
+      # [State0 .. State4]: polscope_library names its palette so that State0
+      # is extinction, State1 = I0, State2 = I45, State3 = I90, State4 = I135,
+      # which is already the order reconstruct() consumes. The permutation
+      # below belongs to OpenPolScope's presets only.
+      # OpenPolScope's palette below (its State3/State4 are swapped relative
+      # to polscope_library's), so its permutation until a QPSC calibration
+      # is Applied here, which resets this to the identity.
+      state_order: [State0, State1, State2, State4, State3]
+
+      # Reconstruction algorithm. Both live in polscope_library; its README
+      # has the comparison.
+      #   qlipp        -- default. The QLIPP Stokes inversion (waveorder /
+      #                   recOrder). Background removed by a Mueller-matrix
+      #                   inversion. Retardance capped at a quarter wave.
+      #   openpolscope -- reproduces OpenPolScope 3.20b bit-for-bit (verified
+      #                   per pixel on the 2026-08-25 reference data).
+      #                   Background is a subtraction in its normalised
+      #                   difference space; retardance folds correctly past a
+      #                   quarter wave, up to a half wave. 5-State only.
+      # Without a background the two agree to machine precision. With one
+      # they differ by ~0.5% on the reference slide (the background step is
+      # the ONLY difference). Pick openpolscope to match data that was, or
+      # will be, processed in OpenPolScope.
+      #
+      # openpolscope since 2026-10-16: background correction is to be done
+      # the way OpenPolScope does it. Verified that day on a second,
+      # independent OpenPolScope session (sample + 8-frame background):
+      # 99.93% of 4.2 M retardance pixels bit-exact, max 1 count, orientation
+      # exact. QLIPP with the same background read 0.7% lower.
+      method: openpolscope
+      # Camera black level in counts, subtracted from every state (sample and
+      # background) and clamped at zero before reconstruction, by either
+      # method. Retardance and orientation are invariant to a uniform offset
+      # except through that clamp, so this is safe to set; it is REQUIRED for
+      # an exact OpenPolScope match. 103 is OpenPolScope's own stored value
+      # for this camera (registry, ps.acq.blacklevel). 0 disables.
+      #
+      # 103 IS THIS CAMERA's black level: OpenPolScope drives this Hamamatsu
+      # (C11440-22CU, 16-bit DCAM output; its metadata of 2026-10-16) and
+      # stores 103 for it. The Oryx config needs its own value. Reproducing
+      # OpenPolScope's own images from that session bit-exact used 103, which
+      # is the evidence it is right for this camera in this pixel format.
+      # TODO(bench): confirm with a lamp-blocked frame at the working exposure.
+      black_level: 103
+
+    background_correction:
+      # Raw-tile flat-field division is WRONG for this modality. QLIPP
+      # background correction operates on the reconstructed Stokes vectors
+      # using a separately acquired empty-field 5-state stack, not by
+      # dividing each raw state by a brightfield reference. Keep this off
+      # and handle background in the reconstruction step.
+      enabled: false
+      method: divide
+      base_folder: ''
+
+    channels:
+    # -----------------------------------------------------------------
+    # WHERE THE LC SETTINGS COME FROM. As shipped, each state applies the
+    # MM 'Channel' preset (OpenPolScope's calibration, stored as VOLTS)
+    # and then writes the same volts explicitly. Running QPSC's own LC
+    # calibration and choosing 'Apply to acquisition' REPLACES each state's
+    # device_properties with 'Retardance LC-A/B [in waves]' entries from the
+    # new palette, REMOVES the mm_setup_presets (so the stale voltage preset
+    # is not applied first), resets reconstruction.state_order, and records
+    # the calibration file under reconstruction. The MeadowlarkLC adapter
+    # converts waves to volts, so no retardance/voltage curve is needed.
+    #
+    # EXPOSURE MUST BE IDENTICAL ACROSS ALL FIVE STATES.
+    # The Stokes inversion treats the five intensities as samples of one
+    # radiometric scale. Per-state exposure or gain differences silently
+    # bias retardance and orientation. Do NOT add per-channel exposure
+    # overrides in the acquisition profiles below, and do not let adaptive
+    # exposure run on this modality.
+    #
+    # 33 ms is OpenPolScope's working exposure on this camera (its metadata,
+    # 2026-10-16); the Oryx runs ~50 ms. Calibration prefills it from here.
+    # Still worth confirming on the rig that it is set from the BRIGHTEST
+    # state so nothing clips, and that extinction stays above the noise
+    # floor at that same exposure.
+    #
+    # STATE ORDER IS PART OF THE ALGORITHM, NOT A DISPLAY CHOICE.
+    # The canonical Oldenbourg 5-frame scheme (LOCI courseware
+    # uw-loci/interactive-microscopy-courseware, lc-polscope/app.js) is:
+    #   Setting 1 = extinction   (LC-A nominal pi/2, LC-B nominal pi)
+    #   Setting 2 = LC-A + swing, LC-B nominal
+    #   Setting 3 = LC-A nominal, LC-B + swing
+    #   Setting 4 = LC-A nominal, LC-B - swing
+    #   Setting 5 = LC-A - swing, LC-B nominal
+    # i.e. exactly TWO settings swing LC-A with LC-B held at extinction, and
+    # exactly TWO swing LC-B with LC-A held at extinction. Reconstruction
+    # indexes the states positionally, so State0..State4 must be fed in the
+    # order the calibration defined.
+    #
+    # THE SHIPPED PRESETS DO NOT FIT THAT PATTERN -- but note up front that
+    # this scope is already producing good collagen birefringence images
+    # (compared against PPM and SHG), so the calibration works. The open
+    # question is WHICH scheme these implement, not whether they are valid.
+    # Voltages are transcribed verbatim from the MM ConfigGroup "Channel":
+    #   State0  LC-A 6.4280  LC-B 4.0370
+    #   State1  LC-A 1.1400  LC-B 1.7000
+    #   State2  LC-A 2.8400  LC-B 4.0370
+    #   State3  LC-A 1.7000  LC-B 4.0370
+    #   State4  LC-A 0.9400  LC-B 4.0370
+    # Four of the five share LC-B = 4.0370, and NO two states share a common
+    # LC-A value -- the symmetric scheme needs the extinction LC-A to reappear
+    # in exactly two other settings. That holds whichever state you call
+    # extinction, so it is not a labelling artifact.
+    #
+    # The symmetric scheme is only one parameterisation. recOrder's own
+    # 5-state calibration walks the elliptical analyzer through a sequence
+    # and produces exactly this shape (one LC largely fixed while the other
+    # sweeps, one state moving both). Given the scope images well, a valid
+    # calibration in a scheme we have not identified is the likely reading.
+    #
+    # Why it still matters: the intensity-to-Stokes matrix is scheme-specific
+    # (waveorder: calculate_intensity_to_stokes_matrix(swing, scheme)). A
+    # scheme mismatch yields a wrong retardance scale and possibly rotated
+    # orientation, while qualitative birefringence contrast stays perfectly
+    # good -- contrast only needs one dark state and some brighter ones, so
+    # it is not evidence either way about the inversion.
+    #
+    # TODO(bench): identify the calibration tool and the scheme selected. If
+    # the answer is "recOrder, 5-state", `scheme: 5-State` below is already
+    # correct and nothing changes.
+    # -----------------------------------------------------------------
+    - id: State0
+      display_name: State0 (extinction)
+      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
+      # 549 nm. The adapter wavelength is written first so the waves convert
+      # to the volts OpenPolScope used.
+      device_properties:
+      - device: MeadowlarkLC
+        property: Wavelength
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.251
+      - device: MeadowlarkLC
+        property: Retardance LC-B [in waves]
+        value: 0.441
+      # LC relaxation is slower than the driver reports busy. TODO(bench):
+      # measure the settle time (step the LC, snap a burst, find where the
+      # mean stops drifting) and set it here. 50 ms is a guess.
+      settle_ms: 50
+    - id: State1
+      display_name: State1
+      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
+      # 549 nm. The adapter wavelength is written first so the waves convert
+      # to the volts OpenPolScope used.
+      device_properties:
+      - device: MeadowlarkLC
+        property: Wavelength
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.281
+      - device: MeadowlarkLC
+        property: Retardance LC-B [in waves]
+        value: 0.441
+      settle_ms: 50
+    - id: State2
+      display_name: State2
+      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
+      # 549 nm. The adapter wavelength is written first so the waves convert
+      # to the volts OpenPolScope used.
+      device_properties:
+      - device: MeadowlarkLC
+        property: Wavelength
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.251
+      - device: MeadowlarkLC
+        property: Retardance LC-B [in waves]
+        value: 0.459
+      settle_ms: 50
+    - id: State3
+      display_name: State3
+      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
+      # 549 nm. The adapter wavelength is written first so the waves convert
+      # to the volts OpenPolScope used.
+      device_properties:
+      - device: MeadowlarkLC
+        property: Wavelength
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.251
+      - device: MeadowlarkLC
+        property: Retardance LC-B [in waves]
+        value: 0.418
+      settle_ms: 50
+    - id: State4
+      display_name: State4
+      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
+      # 549 nm. The adapter wavelength is written first so the waves convert
+      # to the volts OpenPolScope used.
+      device_properties:
+      - device: MeadowlarkLC
+        property: Wavelength
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.221
+      - device: MeadowlarkLC
+        property: Retardance LC-B [in waves]
+        value: 0.441
+      settle_ms: 50
+
+  # -------------------------------------------------------------------------
+  # Plain transmitted-light brightfield. Needed for macro / overview capture,
+  # slide alignment and Live-View navigation before any polarization run.
+  # This modality DOES work today (the "brightfield" prefix has registered
+  # handlers on both the Java and Python sides).
+  #
+  # No mm_setup_presets: getting a bright, polarization-neutral field on an
+  # LC-PolScope means backing the analyzer out of the light path (or parking
+  # the LC at maximum transmission), and neither is under MM control here.
+  # Which LC state is brightest is not derivable from the voltages -- it
+  # depends on the compensator's retardance calibration. TODO(bench): decide
+  # the operator procedure, and if a "brightest" LC state exists, add it here
+  # as an explicit Channel preset so the state is established rather than
+  # inherited from the previous acquisition.
+  # -------------------------------------------------------------------------
+  brightfield:
+    type: brightfield
+    background_correction:
+      enabled: false
+      method: divide
+      base_folder: ''
+
+hardware:
+  objectives:
+  # Objectives, from the MM config's "Objective Lens" ConfigGroup: a DemoCamera
+  # DObjective labelling device. The nosepiece is turned BY HAND and the
+  # operator must set the matching preset; QPSC setting it moves nothing.
+  #
+  # PIXEL SIZES ARE ESTIMATES, not measurements. Each is the Oryx's measured
+  # value scaled by the sensor pixel ratio (6.5 / 3.45 um):
+  #   20x  0.1715 -> 0.3231 um    10x  0.3469 -> 0.6536 um    4x  0.856 -> 1.6128 um
+  # That holds only if both camera ports see the same total magnification
+  # (no relay lens on either). OpenPolScope's metadata records 0.32 um at 20x,
+  # 1.0% below the estimate, but with an identity affine -- it looks typed in,
+  # not measured. The camera's rotation relative to the stage is unknown (the
+  # Oryx is rotated ~2.2 deg); a stage-micrometer measurement gives both.
+  # TODO(bench): measure 20x, put the result in this block and in the MM
+  # pixel-size preset, and rescale 4x / 10x from it.
+  - id: LCPS_OBJECTIVE_20X_POL_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.3231   # ESTIMATE, see above
+    pixel_size_z_um: null
+  - id: LCPS_OBJECTIVE_4X_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.6128   # ESTIMATE, see above
+    pixel_size_z_um: null
+  - id: LCPS_OBJECTIVE_10X_001
+    pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.6536   # ESTIMATE, see above
+    pixel_size_z_um: null
+  # - id: LCPS_OBJECTIVE_40X_001   # uncalibrated on both cameras
+  detectors:
+  - LCPS_DETECTOR_HAMAMATSU_FLASH_001
+
+stage:
+  stage_id: LCPS_STAGE_ASI_001
+  # MM device label for the focus drive (Core-Focus role in the MM config).
+  z_stage: ZStage
+  limits:
+    # TODO(bench): placeholders. These MUST be MicroManager stage coordinates,
+    # not the ASI controller's own readout. Read the real travel from the ASI
+    # controller (or drive to each physical limit in Live View and record the
+    # MM position) before the first acquisition -- QPSC bounds-checks every
+    # move against these and will happily clip a real region to a fake limit.
+    x_um:
+      low: -50000
+      high: 50000
+    y_um:
+      low: -25000
+      high: 25000
+    z_um:
+      low: 0
+      high: 5000
+  streaming_af:
+    # DISABLED pending measurement. The ASIStage adapter's speed property and
+    # its behaviour on NON-blocking continuous moves are both unverified on
+    # this hardware, and that exact gap is what made streaming AF unusable on
+    # OWS3 (the Prior ZDrive honours Speed on blocking moves only). With
+    # enabled:false, autofocus routes through Brent and none of the values
+    # below are used.
+    #
+    # Do not hand-tune these: run the QPSC "Re-probe Stage AF" workflow and
+    # let the server write measured values. The four numeric keys are required
+    # by the config schema, so they carry legacy defaults as placeholders.
+    enabled: false
+    speed_property: null      # TODO(bench): probe for a writable speed property
+    slow_speed_value: '1'
+    slow_speed_um_per_s: 11.5
+    normal_speed_value: '100'
+  # No 'inserts' block: the standard single-slide insert is synthesized from
+  # stage.limits + slide_size_um. Add entries here only for special carriers
+  # (multi-slide holders, petri dishes) once they exist on this scope.
+
+slide_size_um:
+  x: 75000
+  y: 25000
+
+acquisition_profiles:
+  # Profile keys resolve as <Modality>_<suffix> where <suffix> is a
+  # case-insensitive substring of the objective id, longest match wins.
+  # "20x" matches LCPS_OBJECTIVE_20X_POL_001, and so on.
+  #
+  # No illumination_intensity on any profile: nothing on this scope's light
+  # path is MM-controllable (see the modality notes above).
+
+  # 4x, 10x and 20x profiles, one per calibrated objective. Add 40x once it is
+  # measured and in hardware.objectives -- a profile whose objective does not
+  # exist is a validation failure, not a harmless stub.
+
+  lcpolscope_20x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    channels: [State0, State1, State2, State3, State4]
+    # Deliberately NO channel_overrides -- see the equal-exposure note in the
+    # channel library. Changing one state's exposure breaks the Stokes math.
+
+  brightfield_20x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    exposure_ms: 20          # TODO(bench)
+
+  lcpolscope_10x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_10X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  lcpolscope_4x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_4X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  brightfield_10x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_10X_001
+    exposure_ms: 20          # TODO(bench)
+
+  brightfield_4x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_4X_001
+    exposure_ms: 20          # TODO(bench)
