@@ -197,13 +197,23 @@ modalities:
       # they differ by ~0.5% on the reference slide (the background step is
       # the ONLY difference). Pick openpolscope to match data that was, or
       # will be, processed in OpenPolScope.
-      method: qlipp
+      #
+      # openpolscope since 2026-10-16: background correction is to be done
+      # the way OpenPolScope does it. Verified that day on a second,
+      # independent OpenPolScope session (sample + 8-frame background):
+      # 99.93% of 4.2 M retardance pixels bit-exact, max 1 count, orientation
+      # exact. QLIPP with the same background read 0.7% lower.
+      method: openpolscope
       # Camera black level in counts, subtracted from every state (sample and
       # background) and clamped at zero before reconstruction, by either
       # method. Retardance and orientation are invariant to a uniform offset
       # except through that clamp, so this is safe to set; it is REQUIRED for
       # an exact OpenPolScope match. 103 is OpenPolScope's own stored value
       # for this camera (registry, ps.acq.blacklevel). 0 disables.
+      #
+      # 103 IS NOT THE ORYX's OFFSET. OpenPolScope on this instrument runs a
+      # Hamamatsu DCAM (2048x2048, 16-bit; its metadata, 2026-10-16), and 103
+      # is that camera's black level. Measure the Oryx's in Mono12p.
       #
       # UNITS: counts in the camera's CURRENT pixel format. 103 was recorded
       # in OpenPolScope's format; the same Oryx in 8-bit, or with a different
