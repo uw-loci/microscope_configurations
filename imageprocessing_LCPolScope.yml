@@ -10,10 +10,13 @@
 # ============================================================================
 
 background_correction:
-  # Off for both modalities. The LC-PolScope reconstruction takes its own
-  # specimen-free background states (polscope_library), and a per-state
-  # divide here would be applied before the Stokes inversion. Turn on for
-  # brightfield only after a background has actually been collected.
+  # lcpolscope: the background is the five states on a specimen-free,
+  # defocused field, applied per tile INSIDE the reconstruction (the server
+  # never divides raw LC-PolScope states, whatever `method` says). QPSC's
+  # Background Collection sets enabled and base_folder here when it runs.
+  # Collect after calibrating; the acquisition refuses a background taken
+  # under a different LC calibration (background_provenance.json).
+  # brightfield: turn on only after a background has been collected.
   lcpolscope:
     enabled: false
     method: none
