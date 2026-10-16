@@ -39,6 +39,22 @@ imaging_profiles:
           single: 50
         gains:
           single: 1.0
+    LCPS_OBJECTIVE_10X_001:
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        white_balance:
+          enabled: false
+        exposures_ms:
+          single: 50                # TODO(bench): set from the brightest state at 10x
+        gains:
+          single: 1.0
+    LCPS_OBJECTIVE_4X_001:
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        white_balance:
+          enabled: false
+        exposures_ms:
+          single: 50                # TODO(bench): set from the brightest state at 4x
+        gains:
+          single: 1.0
   brightfield:
     LCPS_OBJECTIVE_20X_POL_001:
       LCPS_DETECTOR_FLIR_ORYX_001:
@@ -46,5 +62,21 @@ imaging_profiles:
           enabled: false
         exposures_ms:
           single: 20                # TODO(bench): placeholder, matches config_LCPolScope.yml
+        gains:
+          single: 1.0
+    LCPS_OBJECTIVE_10X_001:
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        white_balance:
+          enabled: false
+        exposures_ms:
+          single: 20                # TODO(bench)
+        gains:
+          single: 1.0
+    LCPS_OBJECTIVE_4X_001:
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        white_balance:
+          enabled: false
+        exposures_ms:
+          single: 20                # TODO(bench)
         gains:
           single: 1.0
