@@ -225,6 +225,11 @@ modalities:
       # is the evidence it is right for this camera in this pixel format.
       # TODO(bench): confirm with a lamp-blocked frame at the working exposure.
       black_level: 103
+      # Retardance shown at full brightness in the orientation colour image
+      # (hue = orientation, brightness = retardance), and the top of the
+      # retardance image's display range when QPSC imports it. Display only;
+      # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
+      display_retardance_ceiling_nm: 20
 
     background_correction:
       # Raw-tile flat-field division is WRONG for this modality. QLIPP

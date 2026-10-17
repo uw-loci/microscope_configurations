@@ -225,6 +225,11 @@ modalities:
       # in the pixel format acquisition uses (lamp blocked, same exposure)
       # and set it here.
       black_level: 103
+      # Retardance shown at full brightness in the orientation colour image
+      # (hue = orientation, brightness = retardance), and the top of the
+      # retardance image's display range when QPSC imports it. Display only;
+      # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
+      display_retardance_ceiling_nm: 20
       lc_calibrated_at: '2026-10-16T15:01:27'
       lc_extinction_ratio: 258.5
       lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
