@@ -230,6 +230,20 @@ modalities:
       # retardance image's display range when QPSC imports it. Display only;
       # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
       display_retardance_ceiling_nm: 20
+      # Estimated background: fit and remove, per tile, a smooth residual the
+      # measured background missed (strain elsewhere on the slide, focus,
+      # drift), which shows as a few-nm ramp differing between tiles and a
+      # step at the seams. recOrder's "estimated background"; see
+      # polscope_library/background_fit.py. It cannot tell a smooth residual
+      # from smooth specimen retardance: blocks above max_block_retardance_nm
+      # are left out, and a tile with fewer than min_background_fraction of
+      # background blocks is left uncorrected. Off until enabled.
+      estimated_background:
+        enabled: false
+        order: 2
+        block_size: 32
+        max_block_retardance_nm: 5
+        min_background_fraction: 0.25
 
     background_correction:
       # Raw-tile flat-field division is WRONG for this modality. QLIPP
