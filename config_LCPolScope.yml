@@ -249,15 +249,10 @@ modalities:
       lc_extinction_ratio: 258.5
       lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
 
-    background_correction:
-      # Raw-tile flat-field division is WRONG for this modality. QLIPP
-      # background correction operates on the reconstructed Stokes vectors
-      # using a separately acquired empty-field 5-state stack, not by
-      # dividing each raw state by a brightfield reference. Keep this off
-      # and handle background in the reconstruction step.
-      enabled: false
-      method: divide
-      base_folder: ''
+    # Backgrounds are NOT configured here. Background Collection records the
+    # folder in imageprocessing_<scope>.yml (background_correction.lcpolscope),
+    # which is the only place QPSC and the server read it from; the five-state
+    # background is applied inside the reconstruction, not as a flat-field.
 
     channels:
     # -----------------------------------------------------------------
@@ -414,10 +409,6 @@ modalities:
   # -------------------------------------------------------------------------
   brightfield:
     type: brightfield
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
 
 hardware:
   objectives:
