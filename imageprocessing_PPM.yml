@@ -6,27 +6,27 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-09-16T18:28:33.418333'
+    last_calibrated: '2026-10-16T13:57:27.265780'
     modality: ppm
     objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 3.61
-        achieved_intensity: 130.0
+        exposure_ms: 3.78
+        achieved_intensity: 131.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 7.86
-        achieved_intensity: 130.0
+        exposure_ms: 8.52
+        achieved_intensity: 128.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 18.08
-        achieved_intensity: 131.0
+        exposure_ms: 16.29
+        achieved_intensity: 159.0
       uncrossed:
         angle_degrees: 90.0
         exposure_ms: 0.22
-        achieved_intensity: 222.0
+        achieved_intensity: 213.0
 background_correction:
   ppm:
     enabled: true
@@ -243,22 +243,22 @@ imaging_profiles:
             all: 0.22
             r: 0.11
             g: 0.22
-            b: 0.64
+            b: 0.66
           negative:
-            all: 7.86
-            r: 3.49
-            g: 7.86
-            b: 13.56
+            all: 8.52
+            r: 3.68
+            g: 8.52
+            b: 15.61
           crossed:
-            all: 18.08
-            r: 9.91
-            g: 18.08
-            b: 20.19
+            all: 16.29
+            r: 9.22
+            g: 16.29
+            b: 16.52
           positive:
-            all: 3.61
-            r: 2.2
-            g: 3.61
-            b: 9.88
+            all: 3.78
+            r: 2.3
+            g: 3.78
+            b: 10.25
         gains:
           uncrossed:
             unified_gain: 1.0
@@ -271,7 +271,7 @@ imaging_profiles:
             analog_blue: 4.0
             wb_method: manual_ppm
           crossed:
-            unified_gain: 2.0
+            unified_gain: 3.0
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
@@ -280,7 +280,7 @@ imaging_profiles:
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
-        wb_last_modified: '2026-09-16T18:28:01.654627'
+        wb_last_modified: '2026-10-13T12:55:12.835040'
         simple_wb:
           last_calibrated: '2026-09-07T11:15:14.589616'
           base_angle: uncrossed

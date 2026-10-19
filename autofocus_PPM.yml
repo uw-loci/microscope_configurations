@@ -97,9 +97,9 @@ autofocus_settings:
   p98_p2_fallback_enabled: true
 - objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
   calibrated: true
-  n_steps: 100
-  search_range_um: 100.0
-  n_tiles: 1
+  n_steps: 40
+  search_range_um: 40.0
+  n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
   # 2026-08-28. Settled after two reversals; the deciding evidence is below, because
