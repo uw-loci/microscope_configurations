@@ -25,6 +25,9 @@
 !config_LCPolScope.yml
 !autofocus_LCPolScope.yml
 !imageprocessing_LCPolScope.yml
+!config_LCPolScope_Hamamatsu.yml
+!autofocus_LCPolScope_Hamamatsu.yml
+!imageprocessing_LCPolScope_Hamamatsu.yml
 # Mock configs for CI-adjacent testing against the MM Demo adapter
 !config_mock.yml
 !autofocus_mock.yml
@@ -90,6 +93,12 @@ ppm_reference_slide/
 # Archive directories
 archive/
 _*/
+# ...except the LC-PolScope's Micro-Manager configs, which its QPSC configs are
+# built from and which the rig needs alongside them (one per camera).
+!_MM2/
+_MM2/*
+!_MM2/config_LCPolScope.cfg
+!_MM2/config_LCPolScope_Hamamatsu.cfg
 
 # Testing files
 testing*

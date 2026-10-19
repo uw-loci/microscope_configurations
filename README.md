@@ -24,6 +24,8 @@ Located in the `templates/` folder:
 Located in the root directory:
 
 - **`config_PPM.yml`** - PPM (Polarized light) microscope example configuration
+- **`config_LCPolScope.yml`** - LC-PolScope (Meadowlark universal compensator) through the Teledyne FLIR Oryx; 4x, 10x and 20x. Micro-Manager config: `_MM2/config_LCPolScope.cfg`
+- **`config_LCPolScope_Hamamatsu.yml`** - the same LC-PolScope through its other camera, the Hamamatsu ORCA-Flash4.0 V2 that OpenPolScope drives. A separate config because QPSC picks profiles by modality and objective only, and each camera needs its own LC palette, black level, backgrounds, exposures and pixel sizes. Switch between the two with Utilities > Switch Microscope after loading the matching Micro-Manager config (`_MM2/config_LCPolScope_Hamamatsu.cfg`). Its pixel sizes are estimates scaled from the Oryx until measured
 - **`config_CAMM.yml`** - CAMM (Multi-modal) microscope example configuration
 
 ### Resources

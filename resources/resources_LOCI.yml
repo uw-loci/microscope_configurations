@@ -204,6 +204,28 @@ id_detector:
         flip_y: false
         description: 'Teledyne FLIR Oryx 10GigE mono, S/N 20236320, LC-PolScope'
 
+    LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        name: 'Hamamatsu ORCA-Flash4.0 V2'
+        manufacturer: 'Hamamatsu'
+        camera_type: 'generic'
+        # MM device label from MM2_rec04_HamMead_12132024.cfg (HamamatsuHam adapter).
+        device: 'HamamatsuHam_DCAM'
+        # C11440-22CU = ORCA-Flash4.0 V2 (USB 3.0), S/N 003254, read from
+        # OpenPolScope's acquisition metadata of 2026-10-16. Scientific CMOS,
+        # 2048x2048, 6.5 um pixels, 16-bit output (DCAM PixelType '16bit'),
+        # monochrome. This is the camera OpenPolScope drives on the LC-PolScope;
+        # its black level of 103 (ps.acq.blacklevel) is this camera's offset.
+        width_px: 2048
+        height_px: 2048
+        sensor_pixel_width_um: 6.5
+        sensor_pixel_height_um: 6.5
+        requires_debayering: false
+        # TODO(bench): orientation relative to the Oryx on the other port is
+        # unknown; confirm with a slide with a known asymmetric feature.
+        flip_x: false
+        flip_y: false
+        description: 'Hamamatsu ORCA-Flash4.0 V2 sCMOS, S/N 003254, LC-PolScope (OpenPolScope camera)'
+
 id_objective_lens:
     LOCI_OBJECTIVE_NIKON_20X_001:
         name: '20x Nikon' 
@@ -334,5 +356,23 @@ id_objective_lens:
         na: 0.4
         wd_um: null
         description: 'ObjectiveA on the LC-PolScope. MM pixel-size preset "20x 0.4 ORYX" = 0.1715 um. Strain-free / pol rating NOT yet confirmed.'
+        manufacturer_id: null
+        on_scope: 'LCPolScope'
+
+    LCPS_OBJECTIVE_4X_001:
+        name: '4x 0.13 Nikon (LC-PolScope)'
+        magnification: 4.0
+        na: 0.13
+        wd_um: null
+        description: 'Nikon 4x 0.13 on the LC-PolScope, no phase mask. Oryx pixel size 0.856 um (MM preset "Nikon_4x_0.13_noPhaseMask" in Laura_LCM.cfg, same Oryx S/N 20236320, same 2.2 deg camera rotation as the 20x). Strain-free / pol rating NOT confirmed.'
+        manufacturer_id: null
+        on_scope: 'LCPolScope'
+
+    LCPS_OBJECTIVE_10X_001:
+        name: '10x 0.5 Nikon (LC-PolScope)'
+        magnification: 10.0
+        na: 0.5
+        wd_um: null
+        description: 'Nikon 10x 0.5 on the LC-PolScope, no phase-contrast mask. Oryx pixel size 0.3469 um (MM preset "Nikon_10x_0.5_noPCmask" in Laura_LCM.cfg, same Oryx, same 2.2 deg rotation). Strain-free / pol rating NOT confirmed.'
         manufacturer_id: null
         on_scope: 'LCPolScope'

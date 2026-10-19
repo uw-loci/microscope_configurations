@@ -14,7 +14,7 @@
 #   registered on both sides (Java LCPolScopeModalityHandler, Python
 #   modality/lcpolscope.py), so the 5-state loop and LC calibration work.
 #   What is still unmeasured is marked "TODO(bench)" below:
-#   - pixel size for every objective other than 20x (only 20x is calibrated)
+#   - pixel size at 40x (4x, 10x and 20x are measured on the Oryx)
 #   - stage travel (x/y/z limits are placeholders; read them from the ASI)
 #   - LC settle time, slide_insertion A/B, brightfield exposure
 #   - the interference filter wavelength (549 matches the 2026-08-25 data;
@@ -197,13 +197,23 @@ modalities:
       # they differ by ~0.5% on the reference slide (the background step is
       # the ONLY difference). Pick openpolscope to match data that was, or
       # will be, processed in OpenPolScope.
-      method: qlipp
+      #
+      # openpolscope since 2026-10-16: background correction is to be done
+      # the way OpenPolScope does it. Verified that day on a second,
+      # independent OpenPolScope session (sample + 8-frame background):
+      # 99.93% of 4.2 M retardance pixels bit-exact, max 1 count, orientation
+      # exact. QLIPP with the same background read 0.7% lower.
+      method: openpolscope
       # Camera black level in counts, subtracted from every state (sample and
       # background) and clamped at zero before reconstruction, by either
       # method. Retardance and orientation are invariant to a uniform offset
       # except through that clamp, so this is safe to set; it is REQUIRED for
       # an exact OpenPolScope match. 103 is OpenPolScope's own stored value
       # for this camera (registry, ps.acq.blacklevel). 0 disables.
+      #
+      # 103 IS NOT THE ORYX's OFFSET. OpenPolScope on this instrument runs a
+      # Hamamatsu DCAM (2048x2048, 16-bit; its metadata, 2026-10-16), and 103
+      # is that camera's black level. Measure the Oryx's in Mono12p.
       #
       # UNITS: counts in the camera's CURRENT pixel format. 103 was recorded
       # in OpenPolScope's format; the same Oryx in 8-bit, or with a different
@@ -214,7 +224,27 @@ modalities:
       # level sits above the darkest frame. TODO(bench): measure the offset
       # in the pixel format acquisition uses (lamp blocked, same exposure)
       # and set it here.
+
       black_level: 5
+      # Retardance shown at full brightness in the orientation colour image
+      # (hue = orientation, brightness = retardance), and the top of the
+      # retardance image's display range when QPSC imports it. Display only;
+      # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
+      display_retardance_ceiling_nm: 20
+      # Estimated background: fit and remove, per tile, a smooth residual the
+      # measured background missed (strain elsewhere on the slide, focus,
+      # drift), which shows as a few-nm ramp differing between tiles and a
+      # step at the seams. recOrder's "estimated background"; see
+      # polscope_library/background_fit.py. It cannot tell a smooth residual
+      # from smooth specimen retardance: blocks above max_block_retardance_nm
+      # are left out, and a tile with fewer than min_background_fraction of
+      # background blocks is left uncorrected. Off until enabled.
+      estimated_background:
+        enabled: false
+        order: 2
+        block_size: 32
+        max_block_retardance_nm: 5
+        min_background_fraction: 0.25
       lc_calibrated_at: '2026-10-16T15:01:27'
       lc_extinction_ratio: 258.5
       lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
@@ -398,10 +428,14 @@ hardware:
   # matching preset. QPSC can read and set the preset, but doing so moves
   # nothing -- never treat it as a motorized turret.
   #
-  # Only 20x is calibrated so far. The MM config carries exactly one
-  # pixel-size preset ("20x 0.4 ORYX" -> 0.1715 um). The other labels exist
-  # but have no calibration, so acquiring on them would fall back to a zero
-  # or wrong pixel size.
+  # 4x, 10x and 20x are calibrated on the Oryx. 20x is the "20x 0.4 ORYX"
+  # MM preset (0.1715 um). 4x (0.856 um) and 10x (0.3469 um) are the Nikon
+  # objectives measured in Laura_LCM.cfg, a config for this same Oryx (S/N
+  # 20236320) on this stage: all three presets decompose to the same ~2.2 deg
+  # camera rotation, which is what says they were measured on this camera
+  # mounting. _MM2/config_LCPolScope.cfg now carries all three presets
+  # (added 2026-10-16); load it on the rig, or QPSC's objective detection by
+  # MM pixel size cannot tell the objectives apart. 40x is uncalibrated.
   #
   # CAMERA-TO-STAGE ROTATION -- read before tiling. The MM PixelSizeAffine for
   # this preset decomposes to a +2.2 deg rotation with 0.17151 / 0.17141 um
@@ -418,13 +452,22 @@ hardware:
       # close to the nominal 3.45/20 = 0.1725, so the relay is ~1.0x.
       LCPS_DETECTOR_FLIR_ORYX_001: 0.1715
     pixel_size_z_um: null
-  # The remaining nosepiece positions are declared in MM but NOT calibrated.
-  # Uncomment and fill in as each gets a stage-micrometer measurement and a
-  # matching MM pixel-size preset. Nominal values (3.45 um / magnification)
-  # are given only as a sanity check, never as a substitute for measuring.
-  # - id: LCPS_OBJECTIVE_4X_001     # nominal 0.8625
-  # - id: LCPS_OBJECTIVE_10X_001    # nominal 0.345
-  # - id: LCPS_OBJECTIVE_40X_001    # nominal 0.08625
+  - id: LCPS_OBJECTIVE_4X_001
+    pixel_size_xy_um:
+      # Measured: MM preset "Nikon_4x_0.13_noPhaseMask" (Laura_LCM.cfg),
+      # affine rotation 2.16 deg. Nominal 3.45/4 = 0.8625.
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.856
+    pixel_size_z_um: null
+  - id: LCPS_OBJECTIVE_10X_001
+    pixel_size_xy_um:
+      # Measured: MM preset "Nikon_10x_0.5_noPCmask" (Laura_LCM.cfg),
+      # affine rotation 2.21 deg. Nominal 3.45/10 = 0.345.
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.3469
+    pixel_size_z_um: null
+  # 40x is declared in MM but NOT calibrated. Add it with a stage-micrometer
+  # measurement and a matching MM pixel-size preset; nominal 3.45/40 = 0.08625
+  # is a sanity check, never a substitute.
+  # - id: LCPS_OBJECTIVE_40X_001
   detectors:
   - LCPS_DETECTOR_FLIR_ORYX_001
 
@@ -479,10 +522,9 @@ acquisition_profiles:
   # No illumination_intensity on any profile: nothing on this scope's light
   # path is MM-controllable (see the modality notes above).
 
-  # Only the 20x profiles are declared, because 20x is the only objective with
-  # a pixel-size calibration. Add 4x / 10x / 40x profiles as those objectives
-  # get measured and added to hardware.objectives above -- a profile whose
-  # objective does not exist is a validation failure, not a harmless stub.
+  # 4x, 10x and 20x profiles, one per calibrated objective. Add 40x once it is
+  # measured and in hardware.objectives -- a profile whose objective does not
+  # exist is a validation failure, not a harmless stub.
 
   lcpolscope_20x:
     modality: lcpolscope
@@ -496,4 +538,28 @@ acquisition_profiles:
     modality: brightfield
     detector: LCPS_DETECTOR_FLIR_ORYX_001
     objective: LCPS_OBJECTIVE_20X_POL_001
+    exposure_ms: 20          # TODO(bench)
+
+  lcpolscope_10x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  lcpolscope_4x:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_4X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  brightfield_10x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    exposure_ms: 20          # TODO(bench)
+
+  brightfield_4x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_4X_001
     exposure_ms: 20          # TODO(bench)
