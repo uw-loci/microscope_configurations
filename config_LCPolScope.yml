@@ -330,7 +330,7 @@ modalities:
     # -----------------------------------------------------------------
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -346,7 +346,7 @@ modalities:
       settle_ms: 50
     - id: State1
       display_name: State1
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -359,7 +359,7 @@ modalities:
       settle_ms: 50
     - id: State2
       display_name: State2
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -372,7 +372,7 @@ modalities:
       settle_ms: 50
     - id: State3
       display_name: State3
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -385,7 +385,7 @@ modalities:
       settle_ms: 50
     - id: State4
       display_name: State4
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -450,7 +450,7 @@ hardware:
     pixel_size_xy_um:
       # Measured, from the MM "20x 0.4 ORYX" pixel-size preset. Reassuringly
       # close to the nominal 3.45/20 = 0.1725, so the relay is ~1.0x.
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.1715
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_4X_001
     pixel_size_xy_um:
