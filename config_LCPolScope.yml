@@ -214,7 +214,7 @@ modalities:
       # level sits above the darkest frame. TODO(bench): measure the offset
       # in the pixel format acquisition uses (lamp blocked, same exposure)
       # and set it here.
-      black_level: 103
+      black_level: 5
       lc_calibrated_at: '2026-10-16T15:01:27'
       lc_extinction_ratio: 258.5
       lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
@@ -445,7 +445,7 @@ stage:
       low: -25000
       high: 25000
     z_um:
-      low: 0
+      low: -150
       high: 5000
   streaming_af:
     # DISABLED pending measurement. The ASIStage adapter's speed property and
