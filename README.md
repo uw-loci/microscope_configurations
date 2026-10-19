@@ -91,6 +91,34 @@ hardware:
         LOCI_CAMERA_001: 1.105
 ```
 
+### Objectives can select their Micro-Manager preset (optional)
+
+Micro-Manager picks its pixel size from the pixel-size preset that matches the
+current hardware state, including the objective. If choosing an objective in
+QPSC should also select it in Micro-Manager, give the objective an
+`mm_preset` entry naming the ConfigGroup and preset exactly as your
+Micro-Manager configuration calls them (the names differ between labs, so
+nothing is assumed without it):
+
+```yaml
+hardware:
+  objectives:
+    - id: "LCPS_OBJECTIVE_20X_POL_001"
+      mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
+```
+
+- `motorized: false` -- a labelling device that moves nothing (a hand-turned
+  nosepiece tracked by a DemoCamera `DObjective`). QPSC applies it silently
+  when the objective is chosen and whenever it connects to the server.
+- `motorized: true`, or the key left out -- a motorized turret. QPSC asks in a
+  confirmation dialog before every move ("Don't move" is the default), and
+  never moves it just because a connection came up.
+
+Nothing is applied while an acquisition runs, nothing happens when Micro-Manager
+is already on that preset, and a group or preset that does not exist produces
+a warning listing the ones that do. Without `mm_preset`, QPSC leaves
+Micro-Manager's objective alone.
+
 ### Stage inserts are optional
 
 The `stage.inserts` block (inside `stage:`) is optional. When it is absent,

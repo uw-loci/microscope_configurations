@@ -444,14 +444,20 @@ hardware:
   # TODO(bench): measure 20x, put the result in this block and in the MM
   # pixel-size preset, and rescale 4x / 10x from it.
   - id: LCPS_OBJECTIVE_20X_POL_001
+    # QPSC selects this in Micro-Manager when the objective is chosen, so the
+    # matching pixel-size preset applies. DObjective is a labelling device
+    # (the nosepiece turns by hand), so applying it moves nothing.
+    mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
     pixel_size_xy_um:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.3231   # ESTIMATE, see above
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_4X_001
+    mm_preset: {group: Objective Lens, preset: 4x, motorized: false}
     pixel_size_xy_um:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.6128   # ESTIMATE, see above
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_10X_001
+    mm_preset: {group: Objective Lens, preset: 10x, motorized: false}
     pixel_size_xy_um:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.6536   # ESTIMATE, see above
     pixel_size_z_um: null
