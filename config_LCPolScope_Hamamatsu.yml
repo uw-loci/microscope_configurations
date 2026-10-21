@@ -439,8 +439,10 @@ hardware:
   # estimate (0.3231, the Oryx value scaled by 6.5 / 3.45 um) was 20% high: this
   # port has ~1.2x more magnification than the Oryx port. 10x and 4x are still
   # ESTIMATES, the old ones scaled by 0.2695 / 0.3231.
-  # TODO(bench): measure 10x and 4x; record the 20x rotation the Pixel Calibrator
-  # reports (the Oryx was ~2.2 deg before it was rotated).
+  # ROTATION: the Pixel Calibrator reported -0.07 deg at 20x (2026-10-21), about
+  # 2.5 px across a 2048 px tile -- far inside the stitcher's ~45 px registration
+  # window, so no correction is needed (the Oryx was -2.2 deg before it was turned).
+  # TODO(bench): measure 10x and 4x.
   - id: LCPS_OBJECTIVE_20X_POL_001
     # QPSC selects this in Micro-Manager when the objective is chosen, so the
     # matching pixel-size preset applies. A labelling device: applying it moves nothing.
