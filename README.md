@@ -344,6 +344,30 @@ just catches the mistake a few seconds earlier. To bypass the local
 hook for a single commit (rare), use `git commit --no-verify`. Bypassing
 CI is not possible without admin override.
 
+## Config consistency checks
+
+`checks/config_checks.py` runs in CI on every push (workflow `config-checks.yml`) and
+locally with `python checks/config_checks.py` or `pytest tests`. It reads files only, no
+hardware, and fails on errors; warnings are listed but pass.
+
+1. **Structure and references.** Each `config_*.yml` parses, has `microscope.name` and a
+   `stage` section, and every detector, objective and acquisition profile it uses
+   resolves (in the config, or in `resources/resources_LOCI.yml`). Its `autofocus_` and
+   `imageprocessing_` files only name objectives and detectors the config has. Unread
+   top-level keys are warnings.
+2. **The YAML against its Micro-Manager config.** For each pair in `MM_CONFIGS`: the
+   `.cfg`'s Core camera must be some detector's `device` (the server finds the camera by
+   that exact label), each objective's `mm_preset` group and preset must exist, and the
+   objective's pixel size must agree with the matching Micro-Manager pixel-size preset to
+   within 1%. A missing pixel-size preset is an error: Micro-Manager would report 0.
+3. **Siblings do not drift.** Pairs in `SIBLINGS` (today the Oryx and Hamamatsu
+   LC-PolScope files) must be identical apart from the paths listed as allowed to differ
+   per camera.
+
+When a check fails: fix the file, or, if the difference is intended, say so in the
+script (`allowed` for a sibling, `DRAFTS` for a config not yet in service). The checks
+only see the `_MM2/` copy, so save the rig's `.cfg` here whenever it changes.
+
 ## Configuration Guide
 
 For detailed configuration instructions, see the [QPSC Configuration Guide](https://github.com/uw-loci/QPSC/blob/main/docs/configuration.md).

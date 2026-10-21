@@ -108,3 +108,9 @@ test_*
 CLAUDE.md
 TOC.md
 claude-reports/
+
+# The config consistency checks and their tests (checks/config_checks.py)
+!checks/
+!checks/*.py
+!tests/
+!tests/*.py

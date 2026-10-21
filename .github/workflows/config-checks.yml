@@ -1,0 +1,31 @@
+name: Config consistency checks
+
+# Structure and references, YAML against its Micro-Manager config in _MM2/, and
+# sibling configs (one microscope, two cameras) that must not drift.
+# See checks/config_checks.py for the rules and README.md for what to do when
+# one fails.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  config-checks:
+    name: Config consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install pyyaml pytest
+      - name: Report (errors fail, warnings listed)
+        run: python checks/config_checks.py
+      - name: Tests
+        run: python -m pytest -q tests
