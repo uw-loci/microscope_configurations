@@ -482,7 +482,9 @@ stage:
       low: -25000
       high: 25000
     z_um:
-      low: 0
+      # -150 as in config_LCPolScope.yml (2026-10-19): focus on this stage sits
+      # around -50 to -75 um, so a low limit of 0 refused every focus move.
+      low: -150
       high: 5000
   streaming_af:
     # DISABLED pending measurement. The ASIStage adapter's speed property and

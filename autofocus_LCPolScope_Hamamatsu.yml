@@ -5,7 +5,8 @@
 # The metric / strategy / validity-check vocabulary comes from
 # focus_metrics_manifest.yml.
 #
-# NOTHING HERE IS CALIBRATED. Every row is calibrated: false and carries
+# Only the 20x row is calibrated (on the Oryx port, 2026-10-19; copied here
+# 2026-10-21). The other rows are calibrated: false and carry
 # starting values borrowed from the PPM scope, which is the closest analogue
 # we have (transmitted polarized light, tissue-like dense samples). Search
 # ranges depend on the objective depth of field and the ASI Z drive's backlash,
@@ -24,14 +25,14 @@ schema_version: 2
 
 autofocus_settings:
 - objective: LCPS_OBJECTIVE_20X_POL_001
-  calibrated: false
-  # Starting values copied from the PPM scope's current 20x polarized
-  # objective (LOCI_OBJECTIVE_OLYMPUS_20X_POL_001), not measured here.
-  # Search range is deliberately wide: nothing is known yet about where
-  # focus sits on this ASI Z drive. Narrow it after the first good run.
-  n_steps: 100
-  search_range_um: 100.0
-  n_tiles: 1
+  calibrated: true
+  # Copied 2026-10-21 from autofocus_LCPolScope.yml, calibrated on the Oryx
+  # port 2026-10-19. Autofocus depends on the objective, not the camera, but
+  # this port may not be parfocal with the Oryx: if focus here sits more than
+  # ~15 um from where the Oryx focuses, widen search_range_um for the first run.
+  n_steps: 30
+  search_range_um: 30.0
+  n_tiles: 3
   interp_strength: 100
   interp_kind: quadratic
   # brenner_gradient, not tenengrad: tenengrad read flat on PPM 20x because a
