@@ -15,7 +15,9 @@
 #
 # STATUS (2026-10-16): created from config_LCPolScope.yml. Differences:
 #   - detector LCPS_DETECTOR_HAMAMATSU_FLASH_001 everywhere
-#   - pixel sizes ESTIMATED from the Oryx measurements (see hardware.objectives)
+#   - pixel sizes: 20x measured 2026-10-21 (0.2695); 10x / 4x estimated
+#   - Micro-Manager config MM2-Flash4-20261021.cfg (repo copy
+#     _MM2/config_LCPolScope_Hamamatsu.cfg): camera "Flash4", group "Objective"
 #   - LC states start from OpenPolScope's palette of 2026-10-16 16:29 (its
 #     calibration check read an extinction ratio of 190.9), in OpenPolScope's
 #     state numbering, so state_order carries OpenPolScope's permutation. Run
@@ -23,8 +25,8 @@
 #   - exposure 33 ms and black level 103: OpenPolScope's values for this camera
 #   - microscope.name LCPolScope_Hamamatsu, so slide alignments are separate
 #     from the Oryx config's (different field of view, orientation unconfirmed)
-# Still TODO(bench): measure the 20x pixel size on a stage micrometer, confirm
-# the camera orientation, and everything config_LCPolScope.yml lists as open.
+# Still TODO(bench): measure 10x / 4x, confirm the camera orientation and
+# rotation, and everything config_LCPolScope.yml lists as open.
 # ============================================================================
 
 microscope:
@@ -429,37 +431,32 @@ modalities:
 
 hardware:
   objectives:
-  # Objectives, from the MM config's "Objective Lens" ConfigGroup: a DemoCamera
-  # DObjective labelling device. The nosepiece is turned BY HAND and the
-  # operator must set the matching preset; QPSC setting it moves nothing.
+  # Objectives, from the MM config's "Objective" ConfigGroup: a DemoCamera
+  # labelling device (device label "Objective" in MM2-Flash4-20261021.cfg). The
+  # nosepiece is turned BY HAND; QPSC selecting the preset moves nothing.
   #
-  # PIXEL SIZES ARE ESTIMATES, not measurements. Each is the Oryx's measured
-  # value scaled by the sensor pixel ratio (6.5 / 3.45 um):
-  #   20x  0.1715 -> 0.3231 um    10x  0.3469 -> 0.6536 um    4x  0.856 -> 1.6128 um
-  # That holds only if both camera ports see the same total magnification
-  # (no relay lens on either). OpenPolScope's metadata records 0.32 um at 20x,
-  # 1.0% below the estimate, but with an identity affine -- it looks typed in,
-  # not measured. The camera's rotation relative to the stage is unknown (the
-  # Oryx is rotated ~2.2 deg); a stage-micrometer measurement gives both.
-  # TODO(bench): measure 20x, put the result in this block and in the MM
-  # pixel-size preset, and rescale 4x / 10x from it.
+  # PIXEL SIZES: 20x MEASURED on the rig 2026-10-21, 0.2695 um/px. The earlier
+  # estimate (0.3231, the Oryx value scaled by 6.5 / 3.45 um) was 20% high: this
+  # port has ~1.2x more magnification than the Oryx port. 10x and 4x are still
+  # ESTIMATES, the old ones scaled by 0.2695 / 0.3231.
+  # TODO(bench): measure 10x and 4x; record the 20x rotation the Pixel Calibrator
+  # reports (the Oryx was ~2.2 deg before it was rotated).
   - id: LCPS_OBJECTIVE_20X_POL_001
     # QPSC selects this in Micro-Manager when the objective is chosen, so the
-    # matching pixel-size preset applies. DObjective is a labelling device
-    # (the nosepiece turns by hand), so applying it moves nothing.
-    mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
+    # matching pixel-size preset applies. A labelling device: applying it moves nothing.
+    mm_preset: {group: Objective, preset: 20x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.3231   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.2695   # measured 2026-10-21
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_4X_001
-    mm_preset: {group: Objective Lens, preset: 4x, motorized: false}
+    mm_preset: {group: Objective, preset: 4x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.6128   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.3452   # ESTIMATE, see above
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_10X_001
-    mm_preset: {group: Objective Lens, preset: 10x, motorized: false}
+    mm_preset: {group: Objective, preset: 10x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.6536   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.5452   # ESTIMATE, see above
     pixel_size_z_um: null
   # - id: LCPS_OBJECTIVE_40X_001   # uncalibrated on both cameras
   detectors:

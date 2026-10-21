@@ -208,8 +208,11 @@ id_detector:
         name: 'Hamamatsu ORCA-Flash4.0 V2'
         manufacturer: 'Hamamatsu'
         camera_type: 'generic'
-        # MM device label from MM2_rec04_HamMead_12132024.cfg (HamamatsuHam adapter).
-        device: 'HamamatsuHam_DCAM'
+        # MM device LABEL, matched exactly against Core-Camera: "Flash4" in the rig's
+        # MM2-Flash4-20261021.cfg (HamamatsuHam adapter, HamamatsuHam_DCAM device).
+        # The older MM2_rec04_HamMead_12132024.cfg used the label 'HamamatsuHam_DCAM';
+        # with a label that matches no detector, the server cannot find this camera.
+        device: 'Flash4'
         # C11440-22CU = ORCA-Flash4.0 V2 (USB 3.0), S/N 003254, read from
         # OpenPolScope's acquisition metadata of 2026-10-16. Scientific CMOS,
         # 2048x2048, 6.5 um pixels, 16-bit output (DCAM PixelType '16bit'),
