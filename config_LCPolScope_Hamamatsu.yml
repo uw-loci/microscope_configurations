@@ -324,7 +324,7 @@ modalities:
     # -----------------------------------------------------------------
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -344,7 +344,7 @@ modalities:
       settle_ms: 50
     - id: State1
       display_name: State1
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -361,7 +361,7 @@ modalities:
       settle_ms: 50
     - id: State2
       display_name: State2
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -378,7 +378,7 @@ modalities:
       settle_ms: 50
     - id: State3
       display_name: State3
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -395,7 +395,7 @@ modalities:
       settle_ms: 50
     - id: State4
       display_name: State4
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
