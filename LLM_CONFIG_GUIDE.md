@@ -701,3 +701,32 @@ YAML" reasons.
 
 - Java-side channel types: `qupath-extension-qpsc/src/main/java/qupath/ext/qpsc/modality/Channel.java`
 - Python-side strategy types: `microscope_control/microscope_control/autofocus/strategies.py`
+
+## 3. imageprocessing_\<SCOPE\>.yml: background correction
+
+One base folder per scope, and an enabled/method pair per modality. QPSC files flat-field
+backgrounds by **background profile** (one set per sample setup: slide carrier, slide source,
+orientation, mounting medium), then by hardware:
+
+```yaml
+background_correction:
+  base_folder: D:/2025QPSC/data/background_tiles   # profiles live under <base_folder>/profiles/<id>/
+  brightfield:
+    enabled: true
+    method: divide          # divide | subtract | none
+  ppm:
+    enabled: true
+    method: divide
+  lcpolscope:
+    enabled: true
+    method: none            # the five states are applied inside the reconstruction, never divided
+```
+
+On disk: `{base_folder}/profiles/{profile id}/{detector}/{modality family}/{magnification}/[{wb mode} | {acquisition profile}]/`,
+with `{angle}.tif` or `background.tif` for angle modalities, `{channel id}.tif` for channel
+modalities, a `background_settings.yml` in each folder and a `profile.yml` in the profile
+folder. Background Collection writes `base_folder` and the modality's `enabled` the first time
+it runs, so a new scope may leave `base_folder` empty. Folders directly under `base_folder`
+(the layout from before profiles) are not read; QPSC's Background Profiles dialog moves them
+into a profile. A `background_correction` block inside `config_<SCOPE>.yml`'s modalities is
+not read by anything.

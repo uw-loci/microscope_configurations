@@ -14,10 +14,6 @@ modalities:
       intensity_property: Intensity
       max_intensity: 2100.0
       label: DiaLamp
-    background_correction:
-      enabled: true
-      method: divide
-      base_folder: C:/QPSC/Data/background_tiles
   Fluorescence:
     type: widefield
     illumination:
@@ -27,10 +23,6 @@ modalities:
       intensity_property: State
       max_intensity: 1.0
       label: Epi LED
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
     channels:
     - id: DAPI
       display_name: DAPI (385 nm)
@@ -225,10 +217,6 @@ modalities:
       intensity_property: State
       max_intensity: 1.0
       label: Epi LED
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
     channels:
     - id: BF
       display_name: Brightfield

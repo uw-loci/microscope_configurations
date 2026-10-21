@@ -28,14 +28,17 @@ calibration_targets:
         exposure_ms: 0.22
         achieved_intensity: 213.0
 background_correction:
+  # One base folder for the scope. Background profiles (one set of backgrounds per sample
+  # setup: carrier, slide source, orientation, medium) live under <base_folder>/profiles/<id>/.
+  # Folders directly under base_folder, from before profiles, are not read: move them into a
+  # profile with Utilities > Image Quality > Background Profiles... > Adopt old folders.
+  base_folder: D:/2025QPSC/data/background_tiles
   ppm:
     enabled: true
     method: divide
-    base_folder: D:/2025QPSC/data/background_tiles/
   brightfield:
     enabled: true
     method: divide
-    base_folder: D:/2025QPSC/data/background_tiles
 imaging_profiles:
   ppm:
     LOCI_OBJECTIVE_OLYMPUS_10X_001:

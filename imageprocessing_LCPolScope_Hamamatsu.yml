@@ -17,18 +17,18 @@ background_correction:
   # lcpolscope: the background is the five states on a specimen-free,
   # defocused field, applied per tile INSIDE the reconstruction (the server
   # never divides raw LC-PolScope states, whatever `method` says). QPSC's
-  # Background Collection sets enabled and base_folder here when it runs.
+  # Background Collection sets base_folder (one per scope; background profiles live under
+  # <base_folder>/profiles/<id>/) and the modality's enabled flag here when it runs.
   # Collect after calibrating; the acquisition refuses a background taken
   # under a different LC calibration (background_provenance.json).
   # brightfield: turn on only after a background has been collected.
+  base_folder: null
   lcpolscope:
     enabled: false
     method: none
-    base_folder: null
   brightfield:
     enabled: false
     method: none
-    base_folder: null
 
 imaging_profiles:
   lcpolscope:

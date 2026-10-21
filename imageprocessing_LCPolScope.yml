@@ -1,12 +1,12 @@
 background_correction:
+  # One base folder for the scope; background profiles live under <base_folder>/profiles/<id>/.
+  base_folder: C:/qpsc-extension/data/background_tiles
   lcpolscope:
     enabled: true
     method: none
-    base_folder: C:/qpsc-extension/data/background_tiles
   brightfield:
     enabled: false
     method: none
-    base_folder: null
 imaging_profiles:
   lcpolscope:
     LCPS_OBJECTIVE_20X_POL_001:
