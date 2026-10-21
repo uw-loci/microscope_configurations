@@ -63,7 +63,9 @@ def test_allowed_sibling_difference_passes(repo):
 def test_autofocus_drift_is_caught(repo):
     af = repo / "autofocus_LCPolScope_Hamamatsu.yml"
     text = af.read_text(encoding="utf-8")
-    af.write_text(text.replace("search_range_um: 30.0", "search_range_um: 100.0", 1), encoding="utf-8")
+    af.write_text(
+        text.replace("search_range_um: 30.0", "search_range_um: 100.0", 1), encoding="utf-8"
+    )
     found = errors(repo)
     assert any("search_range_um" in e for e in found), found
 
@@ -83,7 +85,9 @@ def test_missing_pixel_size_presets_are_caught(repo):
 
 def test_camera_label_matching_no_detector_is_caught(repo):
     # 10-21: the Flash4 config renamed the camera; resources still said HamamatsuHam_DCAM.
-    edit(repo / "resources" / "resources_LOCI.yml", "device: 'Flash4'", "device: 'HamamatsuHam_DCAM'")
+    edit(
+        repo / "resources" / "resources_LOCI.yml", "device: 'Flash4'", "device: 'HamamatsuHam_DCAM'"
+    )
     found = errors(repo)
     assert any("'Flash4' matches no detector" in e for e in found), found
 
@@ -91,13 +95,15 @@ def test_camera_label_matching_no_detector_is_caught(repo):
 def test_missing_mm_preset_group_is_caught(repo):
     # 10-21: the YAML said "Objective Lens"; the Flash4 config calls the group "Objective".
     text = (repo / LC_HAM).read_text(encoding="utf-8")
-    (repo / LC_HAM).write_text(text.replace("group: Objective,", "group: Objective Lens,"), encoding="utf-8")
+    (repo / LC_HAM).write_text(
+        text.replace("group: Objective,", "group: Objective Lens,"), encoding="utf-8"
+    )
     found = errors(repo)
     assert any("no such group" in e for e in found), found
 
 
 def test_pixel_size_disagreement_is_caught(repo):
-    edit(repo / HAM_CFG, "PixelSize_um,20x 0.4 HAMAMATSU,0.2695", "PixelSize_um,20x 0.4 HAMAMATSU,0.3231")
+    edit(repo / HAM_CFG, "PixelSize_um,20x,0.2695", "PixelSize_um,20x,0.3231")
     found = errors(repo)
     assert any("disagrees" in e and "0.3231" in e for e in found), found
 
@@ -122,4 +128,4 @@ def test_mmcfg_parses_groups_and_pixel_presets():
     mm = mmcfg.parse(REPO / HAM_CFG)
     assert mm.core_camera == "Flash4"
     assert mm.preset("Objective", "20x") == [("Objective", "Label", "20x")]
-    assert mm.pixel_size_for(mm.preset("Objective", "20x")) == [("20x 0.4 HAMAMATSU", 0.2695)]
+    assert mm.pixel_size_for(mm.preset("Objective", "20x")) == [("20x", 0.2695)]
