@@ -231,6 +231,24 @@ modalities:
       # retardance image's display range when QPSC imports it. Display only;
       # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
       display_retardance_ceiling_nm: 20
+      # Colours of the orientation colour image (display only): 'uniform'
+      # (constant-lightness OKLCH wheel, the server default), 'hsv'
+      # (OpenPolScope's look) or 'ppm' (the hue PPM's camera image shows for
+      # the angle, from the PPM sunburst calibration below). See
+      # claude-reports/design/2026-10-22_orientation-colormaps.md.
+      display_colormap: ppm
+      # PPM -7 deg calibration, 2026-10-16 (Negative_7_Oct2026.npz, R^2 0.998),
+      # copied from the .npz: hue = slope * angle + intercept + hue_offset, mod 1.
+      display_hue_calibration:
+        source: Negative_7_Oct2026.npz
+        slope: -0.005541962395299577
+        intercept: 0.9860845130836212
+        hue_offset: 0.28
+      # Registration of this instrument's angles to PPM's: angle * sign + offset.
+      # TODO(bench): measure both on the PPM sunburst reference slide; until
+      # then the colours are PPM's hues but the angle frame is not verified.
+      display_orientation_sign: 1
+      display_orientation_offset_deg: 0
       # Estimated background: fit and remove, per tile, a smooth residual the
       # measured background missed (strain elsewhere on the slide, focus,
       # drift), which shows as a few-nm ramp differing between tiles and a
