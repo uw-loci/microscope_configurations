@@ -280,5 +280,42 @@
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
+  },
+  "LCPolScope_Transform_20261019": {
+    "name": "LCPolScope_Transform_20261019",
+    "microscope": "LCPolScope",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -24573.009486625,
+      "m12": -13373.01173434375
+    },
+    "createdDate": "Oct 19, 2026, 7:46:22 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": false,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 295.0,
+    "greenBoxDisplayCenterY": 155.0,
+    "stageAnchorX": -678.0094866250001,
+    "stageAnchorY": -818.0117343437505,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }
