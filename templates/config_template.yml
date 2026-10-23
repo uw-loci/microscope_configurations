@@ -40,12 +40,8 @@ modalities:
       # type: 'analog_voltage'
       # max_voltage: 5.0
 
-    # Background correction settings
-    background_correction:
-      enabled: true                 # Enable/disable background correction
-      method: 'divide'              # Options: 'divide', 'subtract', 'none'
-      base_folder: "D:/path/to/backgrounds"
-      # Path pattern: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
+    # Background correction is configured in imageprocessing_<microscope>.yml
+    # (background_correction: base_folder + per-modality enabled/method); a block here is not read.
 
   # Example: Polarized light microscopy (PPM)
   ppm:
@@ -77,11 +73,7 @@ modalities:
       - name: 'uncrossed'
         tick: 90
 
-    background_correction:
-      enabled: true
-      method: 'divide'
-      base_folder: "D:/path/to/backgrounds"
-      # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
+    # Background correction: see imageprocessing_<microscope>.yml.
 
   # ========================================================================
   # Example: Widefield multi-channel immunofluorescence (IF)

@@ -243,5 +243,42 @@
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
+  },
+  "Ocus40_Transform_20261019": {
+    "name": "Ocus40_Transform_20261019",
+    "microscope": "LCPolScope_Hamamatsu",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -24560.3092913125,
+      "m12": -9396.740632000001
+    },
+    "createdDate": "Oct 21, 2026, 6:52:24 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": false,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 295.0,
+    "greenBoxDisplayCenterY": 156.0,
+    "stageAnchorX": -665.3092913125001,
+    "stageAnchorY": 3239.259367999999,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }

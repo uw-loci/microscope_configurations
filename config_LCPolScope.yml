@@ -231,6 +231,24 @@ modalities:
       # retardance image's display range when QPSC imports it. Display only;
       # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
       display_retardance_ceiling_nm: 20
+      # Colours of the orientation colour image (display only): 'uniform'
+      # (constant-lightness OKLCH wheel, the server default), 'hsv'
+      # (OpenPolScope's look) or 'ppm' (the hue PPM's camera image shows for
+      # the angle, from the PPM sunburst calibration below). See
+      # claude-reports/design/2026-10-22_orientation-colormaps.md.
+      display_colormap: ppm
+      # PPM -7 deg calibration, 2026-10-16 (Negative_7_Oct2026.npz, R^2 0.998),
+      # copied from the .npz: hue = slope * angle + intercept + hue_offset, mod 1.
+      display_hue_calibration:
+        source: Negative_7_Oct2026.npz
+        slope: -0.005541962395299577
+        intercept: 0.9860845130836212
+        hue_offset: 0.28
+      # Registration of this instrument's angles to PPM's: angle * sign + offset.
+      # TODO(bench): measure both on the PPM sunburst reference slide; until
+      # then the colours are PPM's hues but the angle frame is not verified.
+      display_orientation_sign: 1
+      display_orientation_offset_deg: 0
       # Estimated background: fit and remove, per tile, a smooth residual the
       # measured background missed (strain elsewhere on the slide, focus,
       # drift), which shows as a few-nm ramp differing between tiles and a
@@ -249,15 +267,10 @@ modalities:
       lc_extinction_ratio: 258.5
       lc_calibration_file: 'C:\qpsc-extension\data\PolScopeTest\calibrations\lcpolscope\lc_calibration_20261016_150127.json'
 
-    background_correction:
-      # Raw-tile flat-field division is WRONG for this modality. QLIPP
-      # background correction operates on the reconstructed Stokes vectors
-      # using a separately acquired empty-field 5-state stack, not by
-      # dividing each raw state by a brightfield reference. Keep this off
-      # and handle background in the reconstruction step.
-      enabled: false
-      method: divide
-      base_folder: ''
+    # Backgrounds are NOT configured here. Background Collection records the
+    # folder in imageprocessing_<scope>.yml (background_correction.lcpolscope),
+    # which is the only place QPSC and the server read it from; the five-state
+    # background is applied inside the reconstruction, not as a flat-field.
 
     channels:
     # -----------------------------------------------------------------
@@ -330,7 +343,7 @@ modalities:
     # -----------------------------------------------------------------
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -346,7 +359,7 @@ modalities:
       settle_ms: 50
     - id: State1
       display_name: State1
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -359,7 +372,7 @@ modalities:
       settle_ms: 50
     - id: State2
       display_name: State2
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -372,7 +385,7 @@ modalities:
       settle_ms: 50
     - id: State3
       display_name: State3
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -385,7 +398,7 @@ modalities:
       settle_ms: 50
     - id: State4
       display_name: State4
-      exposure_ms: 50          # confirmed: ~50 ms at 20x
+      exposure_ms: 30
       # [config-editor] LC calibration 2026-10-16T15:01:27, extinction ratio 258.5.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts. Written by QPSC.
       device_properties:
@@ -414,10 +427,6 @@ modalities:
   # -------------------------------------------------------------------------
   brightfield:
     type: brightfield
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
 
 hardware:
   objectives:
@@ -447,18 +456,24 @@ hardware:
   # position. Confirm how it behaves on a multi-tile acquisition before
   # trusting a big montage.
   - id: LCPS_OBJECTIVE_20X_POL_001
+    # QPSC selects this in Micro-Manager when the objective is chosen, so the
+    # matching pixel-size preset applies. DObjective is a labelling device
+    # (the nosepiece turns by hand), so applying it moves nothing.
+    mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
     pixel_size_xy_um:
       # Measured, from the MM "20x 0.4 ORYX" pixel-size preset. Reassuringly
       # close to the nominal 3.45/20 = 0.1725, so the relay is ~1.0x.
-      LCPS_DETECTOR_FLIR_ORYX_001: 0.1715
+      LCPS_DETECTOR_FLIR_ORYX_001: 0.1725
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_4X_001
+    mm_preset: {group: Objective Lens, preset: 4x, motorized: false}
     pixel_size_xy_um:
       # Measured: MM preset "Nikon_4x_0.13_noPhaseMask" (Laura_LCM.cfg),
       # affine rotation 2.16 deg. Nominal 3.45/4 = 0.8625.
       LCPS_DETECTOR_FLIR_ORYX_001: 0.856
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_10X_001
+    mm_preset: {group: Objective Lens, preset: 10x, motorized: false}
     pixel_size_xy_um:
       # Measured: MM preset "Nikon_10x_0.5_noPCmask" (Laura_LCM.cfg),
       # affine rotation 2.21 deg. Nominal 3.45/10 = 0.345.

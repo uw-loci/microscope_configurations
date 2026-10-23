@@ -9,34 +9,33 @@
 # Hardware configuration is in config_<microscope>.yml.
 
 # ========== BACKGROUND CORRECTION ==========
-# Define background correction method and paths for each modality.
-# Background images are stored in the base_folder using modality-specific patterns.
+# One base folder per microscope, and an enabled/method pair per modality.
+# Backgrounds are filed by background profile (one set per sample setup: slide carrier,
+# slide source, orientation, medium), then by hardware:
+#   {base_folder}/profiles/{profile id}/{detector}/{modality family}/{magnification}/[{wb mode} | {acquisition profile}]/
+#   angle modalities: {angle}.tif or background.tif; channel modalities: {channel id}.tif;
+#   each folder holds a background_settings.yml. The profile folder holds profile.yml.
+# Background Collection writes base_folder and the modality's enabled flag when it runs.
+# Folders directly under base_folder (the layout from before profiles) are not read.
 
 background_correction:
+  base_folder: "D:/2025QPSC/data/background_tiles"
   # Modality name must match the modality definition in config_<microscope>.yml
   brightfield:
     enabled: true                       # Enable/disable background correction
     method: 'divide'                    # Options: 'divide', 'subtract', 'none'
-    base_folder: "D:/2025QPSC/data/background_tiles"
-    # Path pattern: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
 
   ppm:
     enabled: true
     method: 'divide'
-    base_folder: "D:/2025QPSC/data/background_tiles"
-    # Path pattern: {base_folder}/polarized/{angle_name}_background.tif
-    # Where angle_name is from rotation_angles in config file (e.g., 'crossed', 'uncrossed')
 
   fluorescence:
     enabled: true
-    method: 'subtract'                  # Dark subtraction typical for fluorescence
-    base_folder: "D:/2025QPSC/data/background_tiles"
-    # Path pattern: {base_folder}/{microscope}/fluorescence/{filter_name}/{magnification}x/{detector}/background.tif
+    method: 'divide'                    # flat-field divide, one background per in-use channel
 
   shg:
     enabled: false                      # Multiphoton typically doesn't use background correction
     method: 'none'
-    base_folder: null
 
 # ========== IMAGING PROFILES ==========
 # Settings for each modality/objective/detector combination.

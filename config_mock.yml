@@ -36,11 +36,6 @@ modalities:
       intensity_property: Intensity
       max_intensity: 100.0
       label: Demo lamp
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
-
   Fluorescence:
     type: widefield
     illumination:

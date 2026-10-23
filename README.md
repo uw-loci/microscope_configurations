@@ -91,6 +91,34 @@ hardware:
         LOCI_CAMERA_001: 1.105
 ```
 
+### Objectives can select their Micro-Manager preset (optional)
+
+Micro-Manager picks its pixel size from the pixel-size preset that matches the
+current hardware state, including the objective. If choosing an objective in
+QPSC should also select it in Micro-Manager, give the objective an
+`mm_preset` entry naming the ConfigGroup and preset exactly as your
+Micro-Manager configuration calls them (the names differ between labs, so
+nothing is assumed without it):
+
+```yaml
+hardware:
+  objectives:
+    - id: "LCPS_OBJECTIVE_20X_POL_001"
+      mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
+```
+
+- `motorized: false` -- a labelling device that moves nothing (a hand-turned
+  nosepiece tracked by a DemoCamera `DObjective`). QPSC applies it silently
+  when the objective is chosen and whenever it connects to the server.
+- `motorized: true`, or the key left out -- a motorized turret. QPSC asks in a
+  confirmation dialog before every move ("Don't move" is the default), and
+  never moves it just because a connection came up.
+
+Nothing is applied while an acquisition runs, nothing happens when Micro-Manager
+is already on that preset, and a group or preset that does not exist produces
+a warning listing the ones that do. Without `mm_preset`, QPSC leaves
+Micro-Manager's objective alone.
+
 ### Stage inserts are optional
 
 The `stage.inserts` block (inside `stage:`) is optional. When it is absent,
@@ -315,6 +343,30 @@ The CI workflow is the line that actually blocks merges; the local hook
 just catches the mistake a few seconds earlier. To bypass the local
 hook for a single commit (rare), use `git commit --no-verify`. Bypassing
 CI is not possible without admin override.
+
+## Config consistency checks
+
+`checks/config_checks.py` runs in CI on every push (workflow `config-checks.yml`) and
+locally with `python checks/config_checks.py` or `pytest tests`. It reads files only, no
+hardware, and fails on errors; warnings are listed but pass.
+
+1. **Structure and references.** Each `config_*.yml` parses, has `microscope.name` and a
+   `stage` section, and every detector, objective and acquisition profile it uses
+   resolves (in the config, or in `resources/resources_LOCI.yml`). Its `autofocus_` and
+   `imageprocessing_` files only name objectives and detectors the config has. Unread
+   top-level keys are warnings.
+2. **The YAML against its Micro-Manager config.** For each pair in `MM_CONFIGS`: the
+   `.cfg`'s Core camera must be some detector's `device` (the server finds the camera by
+   that exact label), each objective's `mm_preset` group and preset must exist, and the
+   objective's pixel size must agree with the matching Micro-Manager pixel-size preset to
+   within 1%. A missing pixel-size preset is an error: Micro-Manager would report 0.
+3. **Siblings do not drift.** Pairs in `SIBLINGS` (today the Oryx and Hamamatsu
+   LC-PolScope files) must be identical apart from the paths listed as allowed to differ
+   per camera.
+
+When a check fails: fix the file, or, if the difference is intended, say so in the
+script (`allowed` for a sibling, `DRAFTS` for a config not yet in service). The checks
+only see the `_MM2/` copy, so save the rig's `.cfg` here whenever it changes.
 
 ## Configuration Guide
 

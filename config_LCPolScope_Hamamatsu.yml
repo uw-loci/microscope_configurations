@@ -15,7 +15,9 @@
 #
 # STATUS (2026-10-16): created from config_LCPolScope.yml. Differences:
 #   - detector LCPS_DETECTOR_HAMAMATSU_FLASH_001 everywhere
-#   - pixel sizes ESTIMATED from the Oryx measurements (see hardware.objectives)
+#   - pixel sizes: 20x measured 2026-10-21 (0.2695); 10x / 4x estimated
+#   - Micro-Manager config MM2-Flash4-20261021.cfg (repo copy
+#     _MM2/config_LCPolScope_Hamamatsu.cfg): camera "Flash4", group "Objective"
 #   - LC states start from OpenPolScope's palette of 2026-10-16 16:29 (its
 #     calibration check read an extinction ratio of 190.9), in OpenPolScope's
 #     state numbering, so state_order carries OpenPolScope's permutation. Run
@@ -23,8 +25,8 @@
 #   - exposure 33 ms and black level 103: OpenPolScope's values for this camera
 #   - microscope.name LCPolScope_Hamamatsu, so slide alignments are separate
 #     from the Oryx config's (different field of view, orientation unconfirmed)
-# Still TODO(bench): measure the 20x pixel size on a stage micrometer, confirm
-# the camera orientation, and everything config_LCPolScope.yml lists as open.
+# Still TODO(bench): measure 10x / 4x, confirm the camera orientation and
+# rotation, and everything config_LCPolScope.yml lists as open.
 # ============================================================================
 
 microscope:
@@ -230,6 +232,24 @@ modalities:
       # retardance image's display range when QPSC imports it. Display only;
       # never affects the numbers. 20 nm is OpenPolScope's ceiling here.
       display_retardance_ceiling_nm: 20
+      # Colours of the orientation colour image (display only): 'uniform'
+      # (constant-lightness OKLCH wheel, the server default), 'hsv'
+      # (OpenPolScope's look) or 'ppm' (the hue PPM's camera image shows for
+      # the angle, from the PPM sunburst calibration below). See
+      # claude-reports/design/2026-10-22_orientation-colormaps.md.
+      display_colormap: ppm
+      # PPM -7 deg calibration, 2026-10-16 (Negative_7_Oct2026.npz, R^2 0.998),
+      # copied from the .npz: hue = slope * angle + intercept + hue_offset, mod 1.
+      display_hue_calibration:
+        source: Negative_7_Oct2026.npz
+        slope: -0.005541962395299577
+        intercept: 0.9860845130836212
+        hue_offset: 0.28
+      # Registration of this instrument's angles to PPM's: angle * sign + offset.
+      # TODO(bench): measure both on the PPM sunburst reference slide; until
+      # then the colours are PPM's hues but the angle frame is not verified.
+      display_orientation_sign: 1
+      display_orientation_offset_deg: 0
       # Estimated background: fit and remove, per tile, a smooth residual the
       # measured background missed (strain elsewhere on the slide, focus,
       # drift), which shows as a few-nm ramp differing between tiles and a
@@ -245,15 +265,10 @@ modalities:
         max_block_retardance_nm: 5
         min_background_fraction: 0.25
 
-    background_correction:
-      # Raw-tile flat-field division is WRONG for this modality. QLIPP
-      # background correction operates on the reconstructed Stokes vectors
-      # using a separately acquired empty-field 5-state stack, not by
-      # dividing each raw state by a brightfield reference. Keep this off
-      # and handle background in the reconstruction step.
-      enabled: false
-      method: divide
-      base_folder: ''
+    # Backgrounds are NOT configured here. Background Collection records the
+    # folder in imageprocessing_<scope>.yml (background_correction.lcpolscope),
+    # which is the only place QPSC and the server read it from; the five-state
+    # background is applied inside the reconstruction, not as a flat-field.
 
     channels:
     # -----------------------------------------------------------------
@@ -327,7 +342,7 @@ modalities:
     # -----------------------------------------------------------------
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -347,7 +362,7 @@ modalities:
       settle_ms: 50
     - id: State1
       display_name: State1
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -364,7 +379,7 @@ modalities:
       settle_ms: 50
     - id: State2
       display_name: State2
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -381,7 +396,7 @@ modalities:
       settle_ms: 50
     - id: State3
       display_name: State3
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -398,7 +413,7 @@ modalities:
       settle_ms: 50
     - id: State4
       display_name: State4
-      exposure_ms: 33          # OpenPolScope's exposure on this camera, 2026-10-16
+      exposure_ms: 300
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
@@ -431,38 +446,37 @@ modalities:
   # -------------------------------------------------------------------------
   brightfield:
     type: brightfield
-    background_correction:
-      enabled: false
-      method: divide
-      base_folder: ''
 
 hardware:
   objectives:
-  # Objectives, from the MM config's "Objective Lens" ConfigGroup: a DemoCamera
-  # DObjective labelling device. The nosepiece is turned BY HAND and the
-  # operator must set the matching preset; QPSC setting it moves nothing.
+  # Objectives, from the MM config's "Objective" ConfigGroup: a DemoCamera
+  # labelling device (device label "Objective" in MM2-Flash4-20261021.cfg). The
+  # nosepiece is turned BY HAND; QPSC selecting the preset moves nothing.
   #
-  # PIXEL SIZES ARE ESTIMATES, not measurements. Each is the Oryx's measured
-  # value scaled by the sensor pixel ratio (6.5 / 3.45 um):
-  #   20x  0.1715 -> 0.3231 um    10x  0.3469 -> 0.6536 um    4x  0.856 -> 1.6128 um
-  # That holds only if both camera ports see the same total magnification
-  # (no relay lens on either). OpenPolScope's metadata records 0.32 um at 20x,
-  # 1.0% below the estimate, but with an identity affine -- it looks typed in,
-  # not measured. The camera's rotation relative to the stage is unknown (the
-  # Oryx is rotated ~2.2 deg); a stage-micrometer measurement gives both.
-  # TODO(bench): measure 20x, put the result in this block and in the MM
-  # pixel-size preset, and rescale 4x / 10x from it.
+  # PIXEL SIZES: 20x MEASURED on the rig 2026-10-21, 0.2695 um/px. The earlier
+  # estimate (0.3231, the Oryx value scaled by 6.5 / 3.45 um) was 20% high: this
+  # port has ~1.2x more magnification than the Oryx port. 10x and 4x are still
+  # ESTIMATES, the old ones scaled by 0.2695 / 0.3231.
+  # ROTATION: the Pixel Calibrator reported -0.07 deg at 20x (2026-10-21), about
+  # 2.5 px across a 2048 px tile -- far inside the stitcher's ~45 px registration
+  # window, so no correction is needed (the Oryx was -2.2 deg before it was turned).
+  # TODO(bench): measure 10x and 4x.
   - id: LCPS_OBJECTIVE_20X_POL_001
+    # QPSC selects this in Micro-Manager when the objective is chosen, so the
+    # matching pixel-size preset applies. A labelling device: applying it moves nothing.
+    mm_preset: {group: Objective, preset: 20x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.3231   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.2695   # measured 2026-10-21
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_4X_001
+    mm_preset: {group: Objective, preset: 4x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.6128   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.3452   # ESTIMATE, see above
     pixel_size_z_um: null
   - id: LCPS_OBJECTIVE_10X_001
+    mm_preset: {group: Objective, preset: 10x, motorized: false}
     pixel_size_xy_um:
-      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.6536   # ESTIMATE, see above
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.5452   # ESTIMATE, see above
     pixel_size_z_um: null
   # - id: LCPS_OBJECTIVE_40X_001   # uncalibrated on both cameras
   detectors:
@@ -485,7 +499,9 @@ stage:
       low: -25000
       high: 25000
     z_um:
-      low: 0
+      # -150 as in config_LCPolScope.yml (2026-10-19): focus on this stage sits
+      # around -50 to -75 um, so a low limit of 0 refused every focus move.
+      low: -150
       high: 5000
   streaming_af:
     # DISABLED pending measurement. The ASIStage adapter's speed property and

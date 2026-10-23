@@ -1,41 +1,19 @@
-# ============================================================================
-# Image processing settings for the LC-PolScope (Oryx mono camera).
-# Read by QPSC from the folder holding config_LCPolScope.yml; the file name
-# must stay imageprocessing_LCPolScope.yml.
-#
-# QPSC's configuration validation requires at least one
-# modality/objective/detector combination with an exposures_ms map. Without
-# this file it reports "No valid exposure settings found in imageprocessing
-# config". Only 20x is calibrated on this scope, so only 20x is declared.
-# ============================================================================
-
 background_correction:
-  # lcpolscope: the background is the five states on a specimen-free,
-  # defocused field, applied per tile INSIDE the reconstruction (the server
-  # never divides raw LC-PolScope states, whatever `method` says). QPSC's
-  # Background Collection sets enabled and base_folder here when it runs.
-  # Collect after calibrating; the acquisition refuses a background taken
-  # under a different LC calibration (background_provenance.json).
-  # brightfield: turn on only after a background has been collected.
+  # One base folder for the scope; background profiles live under <base_folder>/profiles/<id>/.
+  base_folder: C:/qpsc-extension/data/background_tiles
   lcpolscope:
-    enabled: false
+    enabled: true
     method: none
-    base_folder: null
   brightfield:
     enabled: false
     method: none
-    base_folder: null
-
 imaging_profiles:
   lcpolscope:
     LCPS_OBJECTIVE_20X_POL_001:
       LCPS_DETECTOR_FLIR_ORYX_001:
         white_balance:
-          enabled: false            # monochrome camera
+          enabled: false
         exposures_ms:
-          # ONE value for all five LC states. Per-state exposure differences
-          # bias retardance and orientation. ~50 ms at 20x is the working
-          # value reported 2026-08-19; set it from the BRIGHTEST state.
           single: 50
         gains:
           single: 1.0
@@ -44,7 +22,7 @@ imaging_profiles:
         white_balance:
           enabled: false
         exposures_ms:
-          single: 50                # TODO(bench): set from the brightest state at 10x
+          single: 50
         gains:
           single: 1.0
     LCPS_OBJECTIVE_4X_001:
@@ -52,7 +30,7 @@ imaging_profiles:
         white_balance:
           enabled: false
         exposures_ms:
-          single: 50                # TODO(bench): set from the brightest state at 4x
+          single: 50
         gains:
           single: 1.0
   brightfield:
@@ -61,7 +39,7 @@ imaging_profiles:
         white_balance:
           enabled: false
         exposures_ms:
-          single: 20                # TODO(bench): placeholder, matches config_LCPolScope.yml
+          single: 20
         gains:
           single: 1.0
     LCPS_OBJECTIVE_10X_001:
@@ -69,7 +47,7 @@ imaging_profiles:
         white_balance:
           enabled: false
         exposures_ms:
-          single: 20                # TODO(bench)
+          single: 20
         gains:
           single: 1.0
     LCPS_OBJECTIVE_4X_001:
@@ -77,6 +55,6 @@ imaging_profiles:
         white_balance:
           enabled: false
         exposures_ms:
-          single: 20                # TODO(bench)
+          single: 20
         gains:
           single: 1.0

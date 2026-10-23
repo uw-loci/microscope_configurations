@@ -17,12 +17,6 @@ modalities:
     lamp:
       device: 'LED-Dev1ao0'
       control_type: 'voltage'
-    background_correction:
-      enabled: true
-      method: 'divide'
-      base_folder: "D:/2025QPSC/data/background_tiles"
-      # Path: {base_folder}/{microscope}/brightfield/{magnification}x/{detector}/background.tif
-
   shg:  # Second Harmonic Generation
     type: 'multiphoton'
     laser:
@@ -33,9 +27,6 @@ modalities:
     magnification_control:
       type: 'zoom'
       range: [0.5, 10.0]  # Available zoom range
-    background_correction:
-      enabled: false  # No background correction for SHG
-
 # ========== AVAILABLE HARDWARE ==========
 # Lists of available hardware components on this microscope.
 hardware:
