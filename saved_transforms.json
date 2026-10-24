@@ -244,8 +244,8 @@
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
   },
-  "Ocus40_Transform_20261019": {
-    "name": "Ocus40_Transform_20261019",
+  "Ocus40_to_LCPolScope_Hamamatsu_20261021": {
+    "name": "Ocus40_to_LCPolScope_Hamamatsu_20261021",
     "microscope": "LCPolScope_Hamamatsu",
     "mountingMethod": "Ocus40",
     "transform": {
@@ -281,8 +281,8 @@
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
   },
-  "LCPolScope_Transform_20261019": {
-    "name": "LCPolScope_Transform_20261019",
+  "Ocus40_to_LCPolScope_20261019": {
+    "name": "Ocus40_to_LCPolScope_20261019",
     "microscope": "LCPolScope",
     "mountingMethod": "Ocus40",
     "transform": {
