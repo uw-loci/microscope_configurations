@@ -6,32 +6,28 @@ calibration_targets:
     crossed: 125.0
     default: 180.0
   background_exposures:
-    last_calibrated: '2026-10-21T14:09:33.129393'
+    last_calibrated: '2026-10-26T18:04:43.106317'
     modality: ppm
     objective: LOCI_OBJECTIVE_OLYMPUS_20X_POL_001
     detector: LOCI_DETECTOR_JAI_001
     angles:
       positive:
         angle_degrees: 7.0
-        exposure_ms: 2.66
-        achieved_intensity: 131.0
+        exposure_ms: 3.85
+        achieved_intensity: 130.0
       negative:
         angle_degrees: -7.0
-        exposure_ms: 12.85
+        exposure_ms: 8.78
         achieved_intensity: 130.0
       crossed:
         angle_degrees: 0.0
-        exposure_ms: 13.83
-        achieved_intensity: 130.0
+        exposure_ms: 14.77
+        achieved_intensity: 132.0
       uncrossed:
         angle_degrees: 90.0
         exposure_ms: 0.24
-        achieved_intensity: 218.0
+        achieved_intensity: 220.0
 background_correction:
-  # One base folder for the scope. Background profiles (one set of backgrounds per sample
-  # setup: carrier, slide source, orientation, medium) live under <base_folder>/profiles/<id>/.
-  # Folders directly under base_folder, from before profiles, are not read: move them into a
-  # profile with Utilities > Image Quality > Background Profiles... > Adopt old folders.
   base_folder: D:/2025QPSC/data/background_tiles
   ppm:
     enabled: true
@@ -248,20 +244,20 @@ imaging_profiles:
             g: 0.24
             b: 0.68
           negative:
-            all: 12.85
-            r: 3.27
-            g: 12.85
-            b: 12.98
+            all: 8.78
+            r: 3.81
+            g: 8.78
+            b: 15.31
           crossed:
-            all: 13.83
-            r: 6.93
-            g: 13.83
-            b: 17.71
+            all: 14.77
+            r: 8.13
+            g: 14.77
+            b: 15.37
           positive:
-            all: 2.66
-            r: 2.23
-            g: 2.66
-            b: 12.02
+            all: 3.85
+            r: 2.34
+            g: 3.85
+            b: 10.28
         gains:
           uncrossed:
             unified_gain: 1.0
@@ -271,10 +267,10 @@ imaging_profiles:
           negative:
             unified_gain: 1.0
             analog_red: 1.0
-            analog_blue: 3.65
+            analog_blue: 4.0
             wb_method: manual_ppm
           crossed:
-            unified_gain: 2.0
+            unified_gain: 3.0
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
@@ -283,7 +279,7 @@ imaging_profiles:
             analog_red: 1.0
             analog_blue: 4.0
             wb_method: manual_ppm
-        wb_last_modified: '2026-10-21T14:07:11.951371'
+        wb_last_modified: '2026-10-26T18:03:40.694297'
         simple_wb:
           last_calibrated: '2026-09-07T11:15:14.589616'
           base_angle: uncrossed
