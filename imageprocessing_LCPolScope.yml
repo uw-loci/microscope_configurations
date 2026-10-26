@@ -1,5 +1,4 @@
 background_correction:
-  # One base folder for the scope; background profiles live under <base_folder>/profiles/<id>/.
   base_folder: C:/qpsc-extension/data/background_tiles
   lcpolscope:
     enabled: true
