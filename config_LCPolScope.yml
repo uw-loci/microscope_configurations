@@ -45,10 +45,18 @@ light_path:
   # Slide insertion A/B is the in-plane 180 (which side the label sits on).
   # "Label on the right" is recorded; which of A/B that corresponds to has to
   # be settled against the Stage Map once, then left alone.
-  slide_insertion: A         # A | B   TODO(bench): confirm against Stage Map
+  # Bench 2026-10-26: with A the Stage Map draws the label on the RIGHT, which is
+  # where it sits on this stage, so A is this rig's normal placement. The Stage
+  # Map names the two options after the drawn side, so the captions say so.
+  slide_insertion: A         # A | B
   # Camera matches the eyepiece, so there is no extra optical parity between
   # what the operator sees and what the camera records.
   optical_flip: none
+  # Mirror added to the Stage View so it shows the slide as seen looking down
+  # at the stage: inverted scope, slide face down, tissue seen through the
+  # glass. Bench 2026-10-26: without it Stage View showed the slide face up
+  # while Camera View (which was right) showed it face down. Display only.
+  stage_view_flip: y         # none | x | y | xy
   # Stage sense, confirmed 2026-08-19: in MicroManager, +/-Y moves away from /
   # towards the operator; X left/right matches the Stage View (i.e. it is
   # mirrored from the sample's own perspective, as expected on an inverted
