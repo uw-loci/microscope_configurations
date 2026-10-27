@@ -62,11 +62,11 @@ light_path:
   # macro was mirrored top/bottom against the Live Viewer, so y. ("Camera matches
   # the eyepiece", 2026-08-19, was about the eyepiece, not this view.)
   optical_flip: y            # none | x | y | xy
-  # Mirror added to the Stage View so it shows the slide as seen looking down
-  # at the stage: inverted scope, slide face down, tissue seen through the
-  # glass. Bench 2026-10-26: without it Stage View showed the slide face up
-  # while Camera View (which was right) showed it face down. Display only.
-  stage_view_flip: y         # none | x | y | xy
+  # Residual Stage View mirror, on top of the slide rotation and the stage
+  # polarity. The Y mirror this rig needed on 2026-10-26 (face down, seen from
+  # above) is the stage polarity's inverted Y, which QPSC now applies to Stage
+  # View itself (2026-10-27), so nothing is left to add here. Display only.
+  stage_view_flip: none      # none | x | y | xy
   # Stage sense, confirmed 2026-08-19: in MicroManager, +/-Y moves away from /
   # towards the operator; X left/right matches the Stage View (i.e. it is
   # mirrored from the sample's own perspective, as expected on an inverted
