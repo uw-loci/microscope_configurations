@@ -312,6 +312,7 @@ stage:
         safe_z_um_by_modality:
           ppm: -520                  # per insert AND modality
           bf: -495
+        z_limit_um: -300             # the OTHER side: closest to the sample, per insert
 ```
 
 Resolution is most-specific-first: insert+modality, then the modality FAMILY
@@ -321,6 +322,17 @@ then the insert's own value, then the scope-level one.
 **Why three levels.** Sample-plane height differs per insert -- a 35 mm dish, a
 96-well plate and a slide are not interchangeable -- and per modality;
 fluorescence and brightfield sit at consistent offsets on OWS3.
+
+**`z_limit_um` is the sample-side bound, per insert only.** `stage.limits.z_um` is the
+hardware's travel envelope -- on PPM about seven times wider than any focus range -- so
+it stops nothing short of the end stop. The insert's `z_limit_um` is the closest the
+stage may come to the sample with that insert mounted, measured on the rig (Stage Map >
+Calibrate) with the thickest sample it carries in focus and the objective slightly closer
+than any focus will need. QPSC refuses Z moves past it and sends it with every streaming
+autofocus request (`--z-limit`), where the server narrows its stage limits for that scan
+on the side `retract_sign` says is toward the sample. No scope-wide fallback, no default:
+an insert without one has no sample-side limit. Added after a 2026-10-26 approach scan
+on PPM ran 450 um past the focus plane with nothing but the -720 end stop ahead of it.
 
 **These numbers drift.** Slide thickness varies, inserts get re-seated,
 coverslips change batch. QPSC therefore checks every run's achieved focus
