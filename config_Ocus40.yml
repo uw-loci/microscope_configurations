@@ -27,6 +27,10 @@ macro:
     y_offset_um: 0         # vertical offset of macro vs slide rect (positive = down)
   flip_x: true
   flip_y: true
+  # Which side of this scanner's macro the label is on. Every Ocus40 scan has
+  # it on the right. The Stage Map uses it to name the "Slide in holder"
+  # options by where the label sits on the stage. Default when absent: left.
+  label_side: right
   description: 'Ocus40 whole slide scanner with slide holder visible in macro image'
 
 # User-configurable scanner settings (if any)
