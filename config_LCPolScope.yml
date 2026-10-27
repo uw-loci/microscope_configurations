@@ -49,9 +49,13 @@ light_path:
   # where it sits on this stage, so A is this rig's normal placement. The Stage
   # Map names the two options after the drawn side, so the captions say so.
   slide_insertion: A         # A | B
-  # Camera matches the eyepiece, so there is no extra optical parity between
-  # what the operator sees and what the camera records.
-  optical_flip: none
+  # The mirror between the Stage Map's stage frame and the camera. Display only
+  # (Camera View on the Stage Map, the companion's light-path record); alignment
+  # and acquisition use the stage polarity and camera orientation preferences.
+  # Set by looking, not derived: bench 2026-10-27, with "none" the Camera View
+  # macro was mirrored top/bottom against the Live Viewer, so y. ("Camera matches
+  # the eyepiece", 2026-08-19, was about the eyepiece, not this view.)
+  optical_flip: y            # none | x | y | xy
   # Mirror added to the Stage View so it shows the slide as seen looking down
   # at the stage: inverted scope, slide face down, tissue seen through the
   # glass. Bench 2026-10-26: without it Stage View showed the slide face up
