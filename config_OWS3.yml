@@ -503,11 +503,11 @@ stage:
   # shipped a wrong-side -500 on PPM.
   limits:
     x_um:
-      low: -49500.0
-      high: 27500.0
+      low: -53500.0
+      high: 23500.0
     y_um:
-      low: -17652.0
-      high: 13395.0
+      low: -14652.0
+      high: 9395.0
     z_um:
       low: 0.0
       high: 2800.0
