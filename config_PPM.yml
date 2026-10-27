@@ -56,6 +56,14 @@ stage:
   # retract_sign is positive and ~0 is retracted (samples focus near -250). An earlier -500 was
   # WRONG-SIDE, inferred from "focus is near -400, so retract further" without establishing the
   # sign; measure it, never derive it.
+  #
+  # The bound on the OTHER side is per insert: inserts.configurations.<id>.z_limit_um, the
+  # closest the stage may come to the sample with that insert mounted. limits.z_um below is
+  # only the hardware's travel (about seven times wider than any focus range) and stopped
+  # nothing on 2026-10-26, when an approach scan ran 450 um past the focus plane toward the
+  # objective. QPSC refuses Z moves past the limit and sends it with every streaming focus
+  # request (--z-limit). Capture it from Stage Map > Calibrate with the thickest sample the
+  # insert carries in focus, slightly closer than any focus will need. No scope-wide fallback.
   focus:
     retract_sign: positive
   safe_z_um: 0
@@ -141,6 +149,11 @@ stage:
         #    these take precedence over the fixed pitch. Use per-slot when the
         #    holder's slide placement is not trusted to match a fixed pitch.
         # The aperture values below are placeholders -- recapture on the scope.
+        #
+        # z_limit_um: the sample-side Z limit for this holder (see the stage comment above).
+        # Not set: measure it on the rig (Stage Map > Calibrate, "Z limit ... for THIS
+        # insert") with the thickest slide the holder carries in focus. Slides in this holder
+        # have focused between -109 and -459 across sessions, in different Z frames.
         aperture_left_x_um: 47796
         aperture_right_x_um: -60207
         slide_top_y_um: 32441
