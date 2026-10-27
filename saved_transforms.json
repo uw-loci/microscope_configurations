@@ -146,5 +146,42 @@
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
+  },
+  "Ocus40_to_OWS3_20261027": {
+    "name": "Ocus40_to_OWS3_20261027",
+    "microscope": "OWS3",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": -81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": -81.0,
+      "m02": 46978.48037434375,
+      "m12": 12924.086728828126
+    },
+    "createdDate": "Oct 27, 2026, 3:55:30 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": true,
+    "flipMacroY": false,
+    "sourceScanner": "Ocus40",
+    "greenBoxDisplayCenterX": 660.0,
+    "greenBoxDisplayCenterY": 152.5,
+    "stageAnchorX": -6481.51962565625,
+    "stageAnchorY": 571.5867288281252,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
   }
 }
