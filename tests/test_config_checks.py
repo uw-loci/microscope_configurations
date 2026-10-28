@@ -4,6 +4,7 @@ Every regression test copies the repository's configs into a temporary folder, b
 one thing the way it was really broken in October 2026, and expects an error.
 """
 
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -35,6 +36,13 @@ def edit(path: Path, old: str, new: str) -> None:
     path.write_text(text.replace(old, new), encoding="utf-8")
 
 
+def edit_value(path: Path, pattern: str, new: str) -> None:
+    """Replace the one match of ``pattern`` whatever value the live config holds today."""
+    text = path.read_text(encoding="utf-8")
+    assert len(re.findall(pattern, text, re.M)) == 1, f"{pattern!r} must match once in {path.name}"
+    path.write_text(re.sub(pattern, new, text, flags=re.M), encoding="utf-8")
+
+
 def errors(repo_dir):
     return [str(f) for f in config_checks.run(repo_dir).errors]
 
@@ -50,13 +58,13 @@ def test_unchanged_copy_passes(repo):
 
 def test_sibling_drift_is_caught(repo):
     # 10-19: the Oryx config's Z low limit went to -150; the Hamamatsu copy kept 0.
-    edit(repo / LC_HAM, "      low: -150\n      high: 5000", "      low: 0\n      high: 5000")
+    edit_value(repo / LC_HAM, r"^      low: -150$", "      low: 0")
     found = errors(repo)
     assert any("stage.limits.z_um.low" in e and LC_HAM in e for e in found), found
 
 
 def test_allowed_sibling_difference_passes(repo):
-    edit(repo / LC_HAM, "black_level: 103", "black_level: 99")
+    edit_value(repo / LC_HAM, r"^      black_level: \d+$", "      black_level: 7")
     assert errors(repo) == []
 
 
