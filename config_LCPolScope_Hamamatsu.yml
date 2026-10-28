@@ -523,11 +523,10 @@ stage:
   # MM device label for the focus drive (Core-Focus role in the MM config).
   z_stage: ZStage
   limits:
-    # TODO(bench): placeholders. These MUST be MicroManager stage coordinates,
-    # not the ASI controller's own readout. Read the real travel from the ASI
-    # controller (or drive to each physical limit in Live View and record the
-    # MM position) before the first acquisition -- QPSC bounds-checks every
-    # move against these and will happily clip a real region to a fake limit.
+    # MicroManager stage coordinates (not the ASI controller's own readout).
+    # Set on the rig 2026-10-27 (ef29834); the same stage serves both cameras,
+    # so config_LCPolScope.yml and config_LCPolScope_Hamamatsu.yml must agree.
+    # QPSC bounds-checks every move against these.
     x_um:
       low: -21000
       high: 51000
