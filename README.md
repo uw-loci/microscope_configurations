@@ -333,11 +333,20 @@ automatically.
 ### 2. Local pre-commit hook (optional fast-fail)
 
 `githooks/pre-commit` runs the same checks before each local commit so
-developers get feedback without waiting for CI. It's opt-in per clone:
+developers get feedback without waiting for CI: the guide rule above, and the
+[config consistency checks](#config-consistency-checks) whenever a config,
+`_MM2/`, `resources/` or `checks/` file is staged. A setting changed in one
+LC-PolScope config but not its sibling is refused at commit time, with the key
+to copy across, instead of turning up as a failed CI run after the push. It
+needs a Python with PyYAML (`python3`, `python` or `py`; without one it warns
+and lets the commit through). It's opt-in per clone, including the rig's:
 
 ```bash
 git config core.hooksPath githooks
 ```
+
+GitHub Desktop runs it too. Edits made in the GitHub web editor skip it, so
+CI still has the last word.
 
 The CI workflow is the line that actually blocks merges; the local hook
 just catches the mistake a few seconds earlier. To bypass the local
