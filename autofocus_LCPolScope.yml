@@ -88,7 +88,7 @@ autofocus_settings:
   # focus sits on this ASI Z drive. Narrow it after the first good run.
   n_steps: 30
   search_range_um: 30.0
-  n_tiles: 3
+  n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
   # brenner_gradient, not tenengrad: tenengrad read flat on PPM 20x because a
