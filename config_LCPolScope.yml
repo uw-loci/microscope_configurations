@@ -52,10 +52,14 @@ light_path:
   # The mirror between the Stage Map's stage frame and the camera. Display only
   # (Camera View on the Stage Map, the companion's light-path record); alignment
   # and acquisition use the stage polarity and camera orientation preferences.
-  # Set by looking, not derived: bench 2026-10-27, with "none" the Camera View
-  # macro was mirrored top/bottom against the Live Viewer, so y. ("Camera matches
-  # the eyepiece", 2026-08-19, was about the eyepiece, not this view.)
-  optical_flip: y            # none | x | y | xy
+  # Camera View's mirror is camera orientation (a QuPath preference, FLIP_Y on
+  # this rig since 2026-10-19) XOR this value. Judge it by MOTION: moving up in
+  # the Live Viewer must move the Stage Map's field marker up. 2026-10-28 with
+  # "y": camera Y XOR optical Y = no mirror, and the marker moved opposite to
+  # the camera (on the right tissue), so "none". The 2026-10-27 "y" was set by
+  # comparing the macro picture with the live image, before the stage polarity
+  # moved into this file. Display only: nothing but the Stage Map reads it.
+  optical_flip: none         # none | x | y | xy
   # Residual Stage View mirror, on top of the slide rotation and the stage
   # polarity. The Y mirror this rig needed on 2026-10-26 (face down, seen from
   # above) is the stage polarity's inverted Y, which QPSC now applies to Stage
