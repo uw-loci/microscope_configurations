@@ -460,6 +460,11 @@ id_detector:
 
 stage:
   stage_id: 'LOCI_STAGE_001'        # Must match resources_LOCI.yml entry
+  # Which stage axes move opposite to the visual convention for a positive command:
+  # NORMAL | INVERT_X | INVERT_Y | INVERT_XY. Measure it on the rig (Live Viewer >
+  # Calibrate Directions > Manual override writes it here). Missing = NORMAL, with
+  # a warning in the QuPath log.
+  polarity: NORMAL
 
   # Movement limits in micrometers.
   #

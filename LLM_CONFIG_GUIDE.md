@@ -248,6 +248,24 @@ profiles and the oil 60x keeps mapping to `Brightfield_60x` / `Fluorescence_60x`
 Pick the suffix from the objective id's own text (here `WATER_60x`), not an
 arbitrary label -- it has to literally appear in the id to match.
 
+
+### `stage.polarity` (required)
+
+Which stage axes move opposite to the visual convention for a positive command:
+`NORMAL`, `INVERT_X`, `INVERT_Y` or `INVERT_XY`. QPSC reads it for tile order,
+the alignment's directions, the Live Viewer arrows and double-click, and the Stage
+Map. It is a fact about this stage, so it lives here; until 2026-10-27 it was a
+QuPath preference, and a QuPath that switched microscopes carried one rig's value
+to the next. Missing means `NORMAL` with a warning in the QuPath log.
+
+```yaml
+stage:
+  polarity: INVERT_XY   # OWS3; PPM NORMAL; LC-PolScope INVERT_Y
+```
+
+Measure it at the scope; Live Viewer > Calibrate Directions > Manual override
+writes it here.
+
 ### Backward compat
 
 If a Fluorescence profile has **no `channels:` list** AND the modality has **no channel library**, the system falls back to the original single-snap path. This is how brightfield-only and laser-scanning modalities stay unchanged.
