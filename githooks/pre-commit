@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Pre-commit hook: optional fast-fail for LLM_CONFIG_GUIDE.md staleness.
+# Pre-commit hook: optional fast-fail for the config consistency checks and
+# for LLM_CONFIG_GUIDE.md staleness.
 #
 # The AUTHORITATIVE check is the GitHub Actions workflow at
 # .github/workflows/guide-sync.yml, which runs server-side on every
@@ -8,7 +9,13 @@
 # same feedback at commit time instead of waiting for CI. It is
 # opt-in per clone.
 #
-# Rules (matching the CI workflow):
+# Rules (matching the CI workflows):
+#   0. If a config, autofocus/imageprocessing file, _MM2/ or resources/ file
+#      or the checks themselves are staged, run checks/config_checks.py (the
+#      'Config consistency checks' workflow). Errors FAIL the commit -- e.g. a
+#      setting changed in config_LCPolScope_Hamamatsu.yml but not in
+#      config_LCPolScope.yml. Without Python + PyYAML it warns and lets the
+#      commit through (CI still runs the check).
 #   1. If anything under templates/ is modified, LLM_CONFIG_GUIDE.md
 #      must also be touched in the same commit. FAILS the commit.
 #   2. If config_OWS3.yml, config_PPM.yml, or autofocus_*.yml (real
@@ -55,6 +62,43 @@ while IFS= read -r f; do
 done <<< "$STAGED"
 
 exit_code=0
+
+# --- Rule 0: config consistency checks ---------------------------------------
+checks_relevant=0
+while IFS= read -r f; do
+    case "$f" in
+        *.yml|*.yaml|_MM2/*|resources/*|checks/*) checks_relevant=1 ;;
+    esac
+done <<< "$STAGED"
+
+if [ "$checks_relevant" = "1" ]; then
+    # GitHub Desktop and Git Bash on Windows often have 'python' or 'py', not 'python3'.
+    PY=""
+    for cand in python3 python py; do
+        if command -v "$cand" >/dev/null 2>&1 && "$cand" -c "import yaml" >/dev/null 2>&1; then
+            PY="$cand"
+            break
+        fi
+    done
+    repo_root=$(git rev-parse --show-toplevel)
+    if [ -z "$PY" ]; then
+        echo -e "${YELLOW}[pre-commit] Config consistency checks skipped: no Python with PyYAML found.${NC}"
+        echo "  CI runs them on push. To run them here: pip install pyyaml"
+        echo ""
+    elif ! report=$("$PY" "$repo_root/checks/config_checks.py" 2>&1); then
+        echo -e "${RED}[pre-commit] Config consistency checks failed${NC}"
+        echo ""
+        echo "$report" | grep -E '^\[ERROR\]|error\(s\)' | sed 's/^/  /'
+        echo ""
+        echo "Usually a setting changed in one of a pair of sibling files (the LC-PolScope"
+        echo "Oryx and Hamamatsu configs, or their autofocus files) and not in the other."
+        echo "Copy the change to the other file, or, if that setting really belongs to one"
+        echo "camera, add it to the allowed list in checks/config_checks.py."
+        echo "Full report: python checks/config_checks.py"
+        echo ""
+        exit_code=1
+    fi
+fi
 
 if [ "$template_touched" = "1" ] && [ "$guide_touched" = "0" ]; then
     echo -e "${RED}[pre-commit] Template files were modified without updating LLM_CONFIG_GUIDE.md${NC}"

@@ -99,6 +99,12 @@ _*/
 _MM2/*
 !_MM2/config_LCPolScope.cfg
 !_MM2/config_LCPolScope_Hamamatsu.cfg
+# LC-PolScope Meadowlark waves-to-volts table measured on the rig (LCSWEEP 2026-10-28), and the
+# script that built it from the sweep. Not installed by anything: copy it over Micro-Manager's
+# mmgr_dal_MeadowlarkLC.csv by hand. See _MM2/README_meadowlark_table.md.
+!_MM2/mmgr_dal_MeadowlarkLC_measured_20261028.csv
+!_MM2/make_meadowlark_csv.py
+!_MM2/README_meadowlark_table.md
 
 # Testing files
 testing*
