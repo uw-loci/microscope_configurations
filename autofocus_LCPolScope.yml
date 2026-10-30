@@ -98,8 +98,11 @@ autofocus_settings:
   score_metric: brenner_gradient
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 30.0
-  sweep_n_steps: 30
+  # Drift check: 12 um centered on the current Z, 1 um steps (13 frames, ~13 s).
+  # Was 30 um (31 frames, 31 s per tissue tile, 41 of 86 minutes on 2026-10-29);
+  # every correction that run was within +-4 um.
+  sweep_range_um: 12.0
+  sweep_n_steps: 12
   edge_retries: 2
   gap_index_multiplier: 3
   gap_spatial_multiplier: 1.0
