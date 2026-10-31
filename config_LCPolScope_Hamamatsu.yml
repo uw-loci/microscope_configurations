@@ -262,10 +262,11 @@ modalities:
         intercept: 0.9860845130836212
         hue_offset: 0.28
       # Registration of this instrument's angles to PPM's: angle * sign + offset.
-      # TODO(bench): measure both on the PPM sunburst reference slide; until
-      # then the colours are PPM's hues but the angle frame is not verified.
+      # Measured 2026-10-30 on the PPM sunburst reference slide (Hamamatsu, 32
+      # spokes: sign -1, offset +4.47 +/- 0.35 deg). Display only; the 16-bit
+      # orientation image keeps the measured angle. One LC calibration so far.
       display_orientation_sign: -1
-      display_orientation_offset_deg: 0
+      display_orientation_offset_deg: 4.5
       # Estimated background: fit and remove, per tile, a smooth residual the
       # measured background missed (strain elsewhere on the slide, focus,
       # drift), which shows as a few-nm ramp differing between tiles and a
