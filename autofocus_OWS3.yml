@@ -81,9 +81,9 @@ schema_version: 2
 autofocus_settings:
 - objective: 0.5NA_AIR_10x
   calibrated: true
-  n_steps: 100
-  search_range_um: 100.0
-  n_tiles: 3
+  n_steps: 50
+  search_range_um: 50.0
+  n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
   score_metric: tenengrad
