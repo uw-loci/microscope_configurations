@@ -177,6 +177,60 @@ stage:
         slide3_center_y_um: -3883
         slide4_center_x_um: -48255
         slide4_center_y_um: -3883
+      # The two dish carriers below were copied from config_OWS3.yml on 2026-11-11 so the
+      # PPM Stage Map offers them. Their coverslip corners are OWS3 placeholders, not PPM
+      # positions: recalibrate on this stage (Stage Map -> Calibrate...) before use.
+      dish35_well20:
+        name: 35mm Dish (20mm well)
+        description: 35mm petri dish with a 20mm imaging well, square coverslip bottom.
+        kind: dish_holder
+        # Calibrate by driving each COVERSLIP CORNER to the center of the FOV and
+        # capturing the stage position (any order). The imaging rectangle is the
+        # bounding box of the four corners; axis inversion comes from stage polarity.
+        # Values below are placeholders (22mm square centered) -- recapture per dish.
+        coverslip_size_mm: 22
+        coverslip_c1_x_um: -11000
+        coverslip_c1_y_um: -11000
+        coverslip_c2_x_um: 11000
+        coverslip_c2_y_um: -11000
+        coverslip_c3_x_um: 11000
+        coverslip_c3_y_um: 11000
+        coverslip_c4_x_um: -11000
+        coverslip_c4_y_um: 11000
+        # Outer dish outline drawn for context on the Stage Map (purely visual:
+        # not a move target, not a legal zone). Concentric with the well.
+        dish_diameter_mm: 35
+        samples:
+        - kind: well
+          shape: circle
+          label: Well (20mm)
+          well_diameter_mm: 20
+      dish35_well14:
+        name: 35mm Dish (14mm well)
+        description: 35mm petri dish with a 14mm imaging well, square coverslip bottom.
+        kind: dish_holder
+        # Calibrate by driving each COVERSLIP CORNER to the center of the FOV and
+        # capturing the stage position (any order). The imaging rectangle is the
+        # bounding box of the four corners; axis inversion comes from stage polarity.
+        # Values below are placeholders (22mm square near the prior well center) --
+        # recapture per dish.
+        coverslip_size_mm: 22
+        coverslip_c1_x_um: -14336
+        coverslip_c1_y_um: -11562
+        coverslip_c2_x_um: 7664
+        coverslip_c2_y_um: -11562
+        coverslip_c3_x_um: 7664
+        coverslip_c3_y_um: 10438
+        coverslip_c4_x_um: -14336
+        coverslip_c4_y_um: 10438
+        # Outer dish outline drawn for context on the Stage Map (purely visual:
+        # not a move target, not a legal zone). Concentric with the well.
+        dish_diameter_mm: 35
+        samples:
+        - kind: well
+          shape: circle
+          label: Well (14mm)
+          well_diameter_mm: 14
   streaming_af:
     enabled: true
     speed_property: MaxSpeed
