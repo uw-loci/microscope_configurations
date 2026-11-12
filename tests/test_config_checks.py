@@ -57,8 +57,8 @@ def test_unchanged_copy_passes(repo):
 
 
 def test_sibling_drift_is_caught(repo):
-    # 10-19: the Oryx config's Z low limit went to -150; the Hamamatsu copy kept 0.
-    edit_value(repo / LC_HAM, r"^      low: -150$", "      low: 0")
+    # As on 10-19, when the Oryx config's Z low limit changed and the Hamamatsu copy did not.
+    edit_value(repo / LC_HAM, r"^(    z_um:\n      low: )-?\d+$", r"\g<1>12345")
     found = errors(repo)
     assert any("stage.limits.z_um.low" in e and LC_HAM in e for e in found), found
 
