@@ -242,7 +242,7 @@ modalities:
       # OpenPolScope's own images from that session bit-exact used 103, which
       # is the evidence it is right for this camera in this pixel format.
       # TODO(bench): confirm with a lamp-blocked frame at the working exposure.
-      black_level: 56
+      black_level: 51
       # Retardance shown at full brightness in the orientation colour image
       # (hue = orientation, brightness = retardance), and the top of the
       # retardance image's display range when QPSC imports it. Display only;
@@ -281,9 +281,9 @@ modalities:
         block_size: 32
         max_block_retardance_nm: 5
         min_background_fraction: 0.25
-      lc_calibrated_at: '2026-11-01T15:30:51'
-      lc_extinction_ratio: 266.6
-      lc_calibration_file: 'C:\qpsc-extension\data\Testing\calibrations\lcpolscope\lc_calibration_20261101_153051.json'
+      lc_calibrated_at: '2026-11-12T14:34:58'
+      lc_extinction_ratio: 271.4
+      lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261112_143458.json'
 
     # Backgrounds are NOT configured here. Background Collection records the
     # folder in imageprocessing_<scope>.yml (background_correction.lcpolscope),
@@ -366,7 +366,7 @@ modalities:
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
-      # [config-editor] LC calibration 2026-11-01T15:30:51, extinction ratio 266.6.
+      # [config-editor] LC calibration 2026-11-12T14:34:58, extinction ratio 271.4.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts at its Wavelength,
       # [config-editor] which is set first so the palette replays as measured. Written by QPSC.
       device_properties:
@@ -375,10 +375,10 @@ modalities:
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2557
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.5081
+        value: 0.5085
       # LC relaxation is slower than the driver reports busy. TODO(bench):
       # measure the settle time (step the LC, snap a burst, find where the
       # mean stops drifting) and set it here. 50 ms is a guess.
@@ -389,7 +389,7 @@ modalities:
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
-      # [config-editor] LC calibration 2026-11-01T15:30:51, extinction ratio 266.6.
+      # [config-editor] LC calibration 2026-11-12T14:34:58, extinction ratio 271.4.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts at its Wavelength,
       # [config-editor] which is set first so the palette replays as measured. Written by QPSC.
       device_properties:
@@ -398,10 +398,10 @@ modalities:
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2057
+        value: 0.206
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.5081
+        value: 0.5085
       settle_ms: 50
     - id: State2
       display_name: State2
@@ -409,7 +409,7 @@ modalities:
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
-      # [config-editor] LC calibration 2026-11-01T15:30:51, extinction ratio 266.6.
+      # [config-editor] LC calibration 2026-11-12T14:34:58, extinction ratio 271.4.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts at its Wavelength,
       # [config-editor] which is set first so the palette replays as measured. Written by QPSC.
       device_properties:
@@ -418,10 +418,10 @@ modalities:
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2557
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.5566
+        value: 0.5578
       settle_ms: 50
     - id: State3
       display_name: State3
@@ -429,7 +429,7 @@ modalities:
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
-      # [config-editor] LC calibration 2026-11-01T15:30:51, extinction ratio 266.6.
+      # [config-editor] LC calibration 2026-11-12T14:34:58, extinction ratio 271.4.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts at its Wavelength,
       # [config-editor] which is set first so the palette replays as measured. Written by QPSC.
       device_properties:
@@ -438,10 +438,10 @@ modalities:
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.3096
+        value: 0.3106
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.5081
+        value: 0.5085
       settle_ms: 50
     - id: State4
       display_name: State4
@@ -449,7 +449,7 @@ modalities:
       # OpenPolScope's palette, 2026-10-16 16:29 session log, in waves at
       # 549 nm. The adapter wavelength is written first so the waves convert
       # to the volts OpenPolScope used.
-      # [config-editor] LC calibration 2026-11-01T15:30:51, extinction ratio 266.6.
+      # [config-editor] LC calibration 2026-11-12T14:34:58, extinction ratio 271.4.
       # [config-editor] Retardance in WAVES; the MeadowlarkLC adapter converts to volts at its Wavelength,
       # [config-editor] which is set first so the palette replays as measured. Written by QPSC.
       device_properties:
@@ -458,10 +458,10 @@ modalities:
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2557
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.4615
+        value: 0.4616
       settle_ms: 50
 
   # -------------------------------------------------------------------------
@@ -533,8 +533,8 @@ stage:
     # so config_LCPolScope.yml and config_LCPolScope_Hamamatsu.yml must agree.
     # QPSC bounds-checks every move against these.
     x_um:
-      low: -21000
-      high: 51000
+      low: -37200 #-23400 actually -37200
+      high: 37800
     y_um:
       low: -9000
       high: 17000
