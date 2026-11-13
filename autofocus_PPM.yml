@@ -99,7 +99,7 @@ autofocus_settings:
   calibrated: true
   n_steps: 40
   search_range_um: 40.0
-  n_tiles: 9
+  n_tiles: 2
   interp_strength: 100
   interp_kind: quadratic
   # 2026-08-28. Settled after two reversals; the deciding evidence is below, because
@@ -148,9 +148,9 @@ autofocus_settings:
   channel_reduction: green
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  sweep_range_um: 20.0
-  sweep_n_steps: 20
-  edge_retries: 2
+  sweep_range_um: 12.0
+  sweep_n_steps: 12
+  edge_retries: 3
   gap_index_multiplier: 3
   gap_spatial_multiplier: 0.5
   p98_p2_fallback_enabled: true

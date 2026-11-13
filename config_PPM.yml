@@ -75,14 +75,14 @@ stage:
   safe_z_um: 0
   limits:
     x_um:
-      low: -56723 #-36000
+      low: -59723 #-36000
       high: 51571 #35500
     y_um:
       low: -50072 #-39000
       high: 25826 #34000
     z_um:
-      low: -720
-      high: 1000
+      low: -320
+      high: 400
   # XY motion profile: the values the Prior XYStage is held at all session.
   #
   # The adapter comes up at MaxSpeed=100 and Acceleration=100 -- each its own
@@ -177,6 +177,8 @@ stage:
         slide3_center_y_um: -3883
         slide4_center_x_um: -48255
         slide4_center_y_um: -3883
+        safe_z_um: 200
+        z_limit_um: -200
       # The two dish carriers below were copied from config_OWS3.yml on 2026-11-11 so the
       # PPM Stage Map offers them. Their coverslip corners are OWS3 placeholders, not PPM
       # positions: recalibrate on this stage (Stage Map -> Calibrate...) before use.
