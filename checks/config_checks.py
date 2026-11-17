@@ -6,7 +6,9 @@ Two kinds of check, all on files, none on hardware:
    and every objective, detector and acquisition profile it uses resolves -- in the
    config itself or in ``resources/resources_LOCI.yml``, merged entry by entry with the
    config winning, as the server and QPSC both merge them. Every ``per_detector`` block
-   names only the config's own detectors. Its ``autofocus_`` and ``imageprocessing_``
+   names only the config's own detectors, is written in block style (QPSC edits it as
+   text), and gives every camera the same fields; with several cameras every profile
+   carries ``modality``, ``objective`` and ``detector``. Its ``autofocus_`` and ``imageprocessing_``
    companions only name objectives and detectors the config has.
 2. **The YAML against its Micro-Manager configs** in ``_MM2/`` (``MM_CONFIGS``). A
    microscope with two cameras has one YAML and one Micro-Manager config per camera, so
@@ -31,6 +33,7 @@ Run: ``python checks/config_checks.py`` (exit 1 on errors), or ``pytest tests``.
 from __future__ import annotations
 
 import fnmatch
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -229,6 +232,27 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
                 )
             elif not isinstance(values, dict):
                 report.error(name, f"'{path}.{d}' is not a mapping")
+        # QPSC's calibration writers update a field in the active camera's block only
+        # when the block already holds it, so every camera's block names the same fields.
+        fields = {
+            d: _overlay_fields(v) for d, v in node.items() if d in dets and isinstance(v, dict)
+        }
+        if len(fields) > 1:
+            union = set().union(*fields.values())
+            for d, have in fields.items():
+                missing = sorted(union - have)
+                if missing:
+                    report.error(
+                        name,
+                        f"'{path}.{d}' lacks {', '.join(missing)}, which another camera's "
+                        "block sets (each camera's block must hold every per-camera field)",
+                    )
+    for line_no, line in _flow_style_per_detector_lines(repo / name):
+        report.error(
+            name,
+            f"line {line_no}: flow style inside a per_detector block ({line.strip()!r}); "
+            "QPSC edits these blocks as text, so write one key per line",
+        )
 
     modalities = config.get("modalities") or {}
     profiles = config.get("acquisition_profiles") or {}
@@ -245,6 +269,16 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
                     name,
                     f"profile '{pname}' uses detector '{det}', not in hardware.detectors",
                 )
+            if len(dets) > 1:
+                # The second camera's profiles (lcpolscope_20x_oryx) resolve only through
+                # these fields; the <modality>_<objective substring> name rule cannot match.
+                absent = [f for f in ("modality", "objective", "detector") if not prof.get(f)]
+                if absent:
+                    report.error(
+                        name,
+                        f"profile '{pname}' has no {', '.join(absent)}: a config with several "
+                        "cameras picks profiles by these fields",
+                    )
             obj = prof.get("objective")
             if obj and obj not in obj_ids:
                 report.error(
@@ -404,6 +438,45 @@ def per_detector_blocks(x: Any, prefix: str = "") -> Iterable[Tuple[str, Any]]:
     elif isinstance(x, list):
         for i, v in enumerate(x):
             yield from per_detector_blocks(v, f"{prefix}.{i}" if prefix else str(i))
+
+
+def _overlay_fields(values: dict, prefix: str = "") -> set:
+    """The fields a per_detector entry sets: dotted keys, device_properties by pair."""
+    out = set()
+    for k, v in values.items():
+        path = f"{prefix}.{k}" if prefix else str(k)
+        if k == "device_properties" and isinstance(v, list):
+            for e in v:
+                if isinstance(e, dict):
+                    out.add(f"{path}[{e.get('device')}/{e.get('property')}]")
+        elif isinstance(v, dict):
+            out |= _overlay_fields(v, path)
+        else:
+            out.add(path)
+    return out
+
+
+def _flow_style_per_detector_lines(path: Path) -> List[Tuple[int, str]]:
+    """Lines inside a per_detector block that open a flow mapping or sequence."""
+    hits = []
+    block_indent = None
+    for no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        stripped = line.split("#", 1)[0].rstrip()
+        if not stripped.strip():
+            continue
+        indent = len(stripped) - len(stripped.lstrip())
+        if block_indent is not None and indent <= block_indent:
+            block_indent = None
+        key = stripped.strip()
+        if key.startswith("per_detector:"):
+            block_indent = indent
+            rest = key[len("per_detector:") :].strip()
+            if rest:
+                hits.append((no, line))
+            continue
+        if block_indent is not None and re.search(r"(^-\s*|:\s+)[\[{]", key):
+            hits.append((no, line))
+    return hits
 
 
 # ---------------------------------------------------------------- driver

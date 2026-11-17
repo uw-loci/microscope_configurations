@@ -63,7 +63,7 @@ def test_each_camera_is_checked_with_its_own_values(repo):
     # config calls it "Objective Lens". Only the Oryx's per_detector entry makes the
     # Oryx pair pass, so dropping it must fail against config_LCPolScope.cfg alone.
     text = (repo / LC).read_text(encoding="utf-8")
-    old = f"      {ORYX}:\n        mm_preset: {{group: Objective Lens}}\n"
+    old = f"      {ORYX}:\n        mm_preset:\n          group: Objective Lens\n"
     assert text.count(old) == 3
     (repo / LC).write_text(text.replace(old, ""), encoding="utf-8")
     found = errors(repo)
@@ -88,6 +88,33 @@ def test_per_detector_naming_an_unknown_camera_is_caught(repo):
     )
     found = errors(repo)
     assert any("NO_SUCH_CAMERA" in e and "per_detector" in e for e in found), found
+
+
+def test_flow_style_per_detector_is_caught(repo):
+    text = (repo / LC).read_text(encoding="utf-8")
+    old = f"      {HAM}:\n        mm_preset:\n          group: Objective\n"
+    (repo / LC).write_text(
+        text.replace(old, f"      {HAM}:\n        mm_preset: {{group: Objective}}\n", 1),
+        encoding="utf-8",
+    )
+    found = errors(repo)
+    assert any("flow style inside a per_detector block" in e for e in found), found
+
+
+def test_a_camera_block_missing_a_field_is_caught(repo):
+    edit(repo / LC, "          black_level: 99\n", "")
+    found = errors(repo)
+    assert any(f"{ORYX}' lacks black_level" in e for e in found), found
+
+
+def test_profile_without_fields_in_a_two_camera_config_is_caught(repo):
+    edit(
+        repo / LC,
+        "  lcpolscope_20x_oryx:\n    modality: lcpolscope\n",
+        "  lcpolscope_20x_oryx:\n",
+    )
+    found = errors(repo)
+    assert any("lcpolscope_20x_oryx' has no modality" in e for e in found), found
 
 
 def test_cfg_listed_for_the_wrong_camera_is_caught(repo, monkeypatch):
@@ -147,10 +174,10 @@ def test_camera_label_matching_no_detector_is_caught(repo):
 def test_missing_mm_preset_group_is_caught(repo):
     # 10-21: the YAML said "Objective Lens"; the Flash4 config calls the group "Objective".
     text = (repo / LC).read_text(encoding="utf-8")
-    old = f"      {HAM}:\n        mm_preset: {{group: Objective}}\n"
+    old = f"      {HAM}:\n        mm_preset:\n          group: Objective\n"
     assert text.count(old) == 3
     (repo / LC).write_text(
-        text.replace(old, f"      {HAM}:\n        mm_preset: {{group: Objective Lens}}\n"),
+        text.replace(old, f"      {HAM}:\n        mm_preset:\n          group: Objective Lens\n"),
         encoding="utf-8",
     )
     found = errors(repo)

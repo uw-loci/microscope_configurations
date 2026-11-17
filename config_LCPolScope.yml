@@ -265,9 +265,11 @@ hardware:
     pixel_size_z_um: null
     per_detector:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001:
-        mm_preset: {group: Objective}
+        mm_preset:
+          group: Objective
       LCPS_DETECTOR_FLIR_ORYX_001:
-        mm_preset: {group: Objective Lens}
+        mm_preset:
+          group: Objective Lens
   - id: LCPS_OBJECTIVE_4X_001
     mm_preset: {group: Objective, preset: 4x, motorized: false}
     pixel_size_xy_um:
@@ -276,9 +278,11 @@ hardware:
     pixel_size_z_um: null
     per_detector:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001:
-        mm_preset: {group: Objective}
+        mm_preset:
+          group: Objective
       LCPS_DETECTOR_FLIR_ORYX_001:
-        mm_preset: {group: Objective Lens}
+        mm_preset:
+          group: Objective Lens
   - id: LCPS_OBJECTIVE_10X_001
     mm_preset: {group: Objective, preset: 10x, motorized: false}
     pixel_size_xy_um:
@@ -287,9 +291,11 @@ hardware:
     pixel_size_z_um: null
     per_detector:
       LCPS_DETECTOR_HAMAMATSU_FLASH_001:
-        mm_preset: {group: Objective}
+        mm_preset:
+          group: Objective
       LCPS_DETECTOR_FLIR_ORYX_001:
-        mm_preset: {group: Objective Lens}
+        mm_preset:
+          group: Objective Lens
   detectors:
   - LCPS_DETECTOR_HAMAMATSU_FLASH_001
   - LCPS_DETECTOR_FLIR_ORYX_001

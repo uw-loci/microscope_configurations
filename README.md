@@ -35,8 +35,9 @@ in a `per_detector` mapping beside the shared value, keyed by detector ID:
 ```yaml
 reconstruction:
   black_level: 51            # shared default
-  per_detector:
-    LCPS_DETECTOR_FLIR_ORYX_001: {black_level: 99}
+  per_detector:              # block style: QPSC edits these blocks as text
+    LCPS_DETECTOR_FLIR_ORYX_001:
+      black_level: 99
 ```
 
 When that camera is active, its entry is merged into the mapping that holds it: a scalar
@@ -46,7 +47,11 @@ with no entry uses the shared values. QPSC (`MicroscopeConfigManager`), the serv
 (`microscope_control.config.apply_detector_overlay`) and `checks/per_detector.py` apply
 the same rules. Profiles choose their camera through their own `detector` field instead:
 QPSC and the server pick the profile whose modality, objective and detector match the
-active camera.
+active camera, so every profile of a two-camera config carries explicit `modality`,
+`objective` and `detector` fields (a key such as `lcpolscope_20x_oryx` cannot be matched by
+name). Write `per_detector` blocks in block style, one key per line, and give every
+camera's block every camera-specific field: QPSC's calibration writers update a field in
+the active camera's block only when that block already holds it.
 
 ### Resources
 
@@ -382,7 +387,9 @@ hardware, and fails on errors; warnings are listed but pass.
 1. **Structure and references.** Each `config_*.yml` parses, has `microscope.name` and a
    `stage` section, and every detector, objective and acquisition profile it uses
    resolves (in the config, or in `resources/resources_LOCI.yml`). Every `per_detector`
-   block names only detectors in `hardware.detectors`. Its `autofocus_` and
+   block names only detectors in `hardware.detectors`, is block style, and gives every
+   camera the same fields; with several cameras every profile has `modality`,
+   `objective` and `detector`. Its `autofocus_` and
    `imageprocessing_` files only name objectives and detectors the config has. Unread
    top-level keys are warnings.
 2. **The YAML against its Micro-Manager configs.** `MM_CONFIGS` lists each config's

@@ -273,21 +273,45 @@ modalities:
     - id: State0
       exposure_ms: 141.5                 # shared default
       device_properties:
-      - {device: MeadowlarkLC, property: Wavelength, value: 549.0}
-      - {device: MeadowlarkLC, property: 'Retardance LC-A [in waves]', value: 0.256}
+      - device: MeadowlarkLC
+        property: Wavelength             # shared: stays in the base only
+        value: 549.0
+      - device: MeadowlarkLC
+        property: Retardance LC-A [in waves]
+        value: 0.256
       per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:             # merged by (device, property)
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.256
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
-          device_properties:             # merged by (device, property)
-          - {device: MeadowlarkLC, property: 'Retardance LC-A [in waves]', value: 0.2504}
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2504
 hardware:
   objectives:
   - id: LCPS_OBJECTIVE_20X_POL_001
     mm_preset: {group: Objective, preset: 20x, motorized: false}
     per_detector:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        mm_preset:
+          group: Objective
       LCPS_DETECTOR_FLIR_ORYX_001:
-        mm_preset: {group: Objective Lens}   # merged: preset and motorized stay
+        mm_preset:
+          group: Objective Lens          # merged: preset and motorized stay
 ```
+
+Rules for writing them: **block style only** (one key per line, `device_properties` as a
+block list), because QPSC's ConfigYamlEditor edits these blocks as text; and **every
+camera's block holds every camera-specific field** (here exposure_ms and the retardances),
+because the calibration writers update a field in the active camera's block only when the
+block already has it. Shared values (Wavelength, state_order) stay in the base. Every
+profile of a two-camera config carries explicit `modality`, `objective` and `detector`
+fields: the second camera's suffixed keys resolve only through those fields.
 
 When that camera is active its entry is merged into the mapping that holds it: a
 scalar is replaced, a mapping is merged key by key, and a `device_properties` list is
