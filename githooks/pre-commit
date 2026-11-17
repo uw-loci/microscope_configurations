@@ -12,10 +12,10 @@
 # Rules (matching the CI workflows):
 #   0. If a config, autofocus/imageprocessing file, _MM2/ or resources/ file
 #      or the checks themselves are staged, run checks/config_checks.py (the
-#      'Config consistency checks' workflow). Errors FAIL the commit -- e.g. a
-#      setting changed in config_LCPolScope_Hamamatsu.yml but not in
-#      config_LCPolScope.yml. Without Python + PyYAML it warns and lets the
-#      commit through (CI still runs the check).
+#      'Config consistency checks' workflow). Errors FAIL the commit -- e.g. an
+#      objective's mm_preset group that a camera's Micro-Manager config does
+#      not have. Without Python + PyYAML it warns and lets the commit through
+#      (CI still runs the check).
 #   1. If anything under templates/ is modified, LLM_CONFIG_GUIDE.md
 #      must also be touched in the same commit. FAILS the commit.
 #   2. If config_OWS3.yml, config_PPM.yml, or autofocus_*.yml (real
@@ -90,10 +90,9 @@ if [ "$checks_relevant" = "1" ]; then
         echo ""
         echo "$report" | grep -E '^\[ERROR\]|error\(s\)' | sed 's/^/  /'
         echo ""
-        echo "Usually a setting changed in one of a pair of sibling files (the LC-PolScope"
-        echo "Oryx and Hamamatsu configs, or their autofocus files) and not in the other."
-        echo "Copy the change to the other file, or, if that setting really belongs to one"
-        echo "camera, add it to the allowed list in checks/config_checks.py."
+        echo "Usually a reference to something the config does not declare, or a YAML value"
+        echo "(mm_preset, pixel size) that a camera's Micro-Manager config in _MM2/ disagrees"
+        echo "with. A camera-specific value belongs in that camera's per_detector entry."
         echo "Full report: python checks/config_checks.py"
         echo ""
         exit_code=1

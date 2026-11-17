@@ -230,12 +230,23 @@ acquisition_profiles:
 
 ### Profile-key resolution and same-magnification objectives
 
-A profile key does NOT have to spell out the full objective id. At runtime
-`MicroscopeConfigManager.resolveProfileKey(modality, objective)` matches the
-profile whose key is `<Modality>_<suffix>` where `<suffix>` is a **case-insensitive
-substring of the objective id, longest match wins**. That is why OWS3 uses short
-magnification-only keys (`Brightfield_60x`, `Fluorescence_40x`): `60x` is a
-substring of `1.4NA_OIL_60x`, so the lens resolves to that profile.
+At runtime QPSC (`MicroscopeConfigManager.resolveProfileKey`) and the server
+(`microscope_control.config.resolve_profile_key`) pick a profile for a modality,
+an objective and the camera Micro-Manager has active, by one rule:
+
+1. Only the active camera's profiles (`detector` equal to it) and profiles with no
+   `detector` are candidates.
+2. Among them, the first profile in file order whose `modality` field matches
+   (ignoring case) and whose `objective` field equals the objective id exactly.
+3. Otherwise the key is matched by name: a key equal to the modality, else
+   `<Modality>_<suffix>` where `<suffix>` is a **case-insensitive substring of the
+   objective id, longest match wins** (the first in file order on a tie).
+
+So a profile that carries `modality` and `objective` fields can have any key, and a
+two-camera config keeps one profile set per camera (`config_LCPolScope.yml` suffixes
+the Oryx's keys `_oryx`). Profiles without those fields rely on the key. That is why
+OWS3 uses short magnification-only keys (`Brightfield_60x`, `Fluorescence_40x`): `60x`
+is a substring of `1.4NA_OIL_60x`, so the lens resolves to that profile.
 
 The catch: when **two objectives share a magnification** (OWS3 has both
 `1.4NA_OIL_60x` and `1.2NA_WATER_60x`), a bare `_60x` key is ambiguous and the
@@ -248,6 +259,43 @@ profiles and the oil 60x keeps mapping to `Brightfield_60x` / `Fluorescence_60x`
 Pick the suffix from the objective id's own text (here `WATER_60x`), not an
 arbitrary label -- it has to literally appear in the id to match.
 
+
+### Per-camera values: `per_detector`
+
+A microscope with two cameras keeps ONE config. Any value that depends on the camera
+goes in a `per_detector` mapping beside the shared value, keyed by detector ID (every
+key must be in `hardware.detectors`; the config checks refuse others):
+
+```yaml
+modalities:
+  lcpolscope:
+    channels:
+    - id: State0
+      exposure_ms: 141.5                 # shared default
+      device_properties:
+      - {device: MeadowlarkLC, property: Wavelength, value: 549.0}
+      - {device: MeadowlarkLC, property: 'Retardance LC-A [in waves]', value: 0.256}
+      per_detector:
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:             # merged by (device, property)
+          - {device: MeadowlarkLC, property: 'Retardance LC-A [in waves]', value: 0.2504}
+hardware:
+  objectives:
+  - id: LCPS_OBJECTIVE_20X_POL_001
+    mm_preset: {group: Objective, preset: 20x, motorized: false}
+    per_detector:
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        mm_preset: {group: Objective Lens}   # merged: preset and motorized stay
+```
+
+When that camera is active its entry is merged into the mapping that holds it: a
+scalar is replaced, a mapping is merged key by key, and a `device_properties` list is
+merged by `(device, property)` (a matching entry replaced in place, a new one
+appended). A camera with no entry uses the shared values. `per_detector` works at any
+depth, including inside each item of a list such as `channels` or `objectives`.
+Values already keyed by detector need no `per_detector`: `pixel_size_xy_um`,
+`imaging_profiles` in `imageprocessing_<scope>.yml`, and a profile's `detector` field.
 
 ### `stage.polarity` (required)
 

@@ -1,7 +1,8 @@
 name: Config consistency checks
 
-# Structure and references, YAML against its Micro-Manager config in _MM2/, and
-# sibling configs (one microscope, two cameras) that must not drift.
+# Structure and references (per_detector blocks name real detectors), and each
+# YAML against its Micro-Manager configs in _MM2/ (one per camera, checked with
+# that camera's per_detector values merged in).
 # See checks/config_checks.py for the rules and README.md for what to do when
 # one fails.
 

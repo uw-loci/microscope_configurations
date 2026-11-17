@@ -17,8 +17,10 @@ sys.path.insert(0, str(REPO))
 from checks import config_checks, mmcfg  # noqa: E402
 
 LC = "config_LCPolScope.yml"
-LC_HAM = "config_LCPolScope_Hamamatsu.yml"
 HAM_CFG = "_MM2/config_LCPolScope_Hamamatsu.cfg"
+ORYX_CFG = "_MM2/config_LCPolScope.cfg"
+HAM = "LCPS_DETECTOR_HAMAMATSU_FLASH_001"
+ORYX = "LCPS_DETECTOR_FLIR_ORYX_001"
 
 
 @pytest.fixture
@@ -56,26 +58,66 @@ def test_unchanged_copy_passes(repo):
     assert errors(repo) == []
 
 
-def test_sibling_drift_is_caught(repo):
-    # As on 10-19, when the Oryx config's Z low limit changed and the Hamamatsu copy did not.
-    edit_value(repo / LC_HAM, r"^(    z_um:\n      low: )-?\d+$", r"\g<1>12345")
+def test_each_camera_is_checked_with_its_own_values(repo):
+    # The base mm_preset group is the Hamamatsu's ("Objective"); the Oryx's Micro-Manager
+    # config calls it "Objective Lens". Only the Oryx's per_detector entry makes the
+    # Oryx pair pass, so dropping it must fail against config_LCPolScope.cfg alone.
+    text = (repo / LC).read_text(encoding="utf-8")
+    old = f"      {ORYX}:\n        mm_preset: {{group: Objective Lens}}\n"
+    assert text.count(old) == 3
+    (repo / LC).write_text(text.replace(old, ""), encoding="utf-8")
     found = errors(repo)
-    assert any("stage.limits.z_um.low" in e and LC_HAM in e for e in found), found
+    assert found and all("no such group" in e and ORYX_CFG in e for e in found), found
 
 
-def test_allowed_sibling_difference_passes(repo):
-    edit_value(repo / LC_HAM, r"^      black_level: \d+$", "      black_level: 7")
+def test_shared_values_overridden_for_every_camera_do_not_matter(repo):
+    # Both cameras override the group, so the shared value is never seen by a .cfg.
+    text = (repo / LC).read_text(encoding="utf-8")
+    (repo / LC).write_text(
+        text.replace("mm_preset: {group: Objective,", "mm_preset: {group: Unused,"),
+        encoding="utf-8",
+    )
     assert errors(repo) == []
 
 
-def test_autofocus_drift_is_caught(repo):
-    af = repo / "autofocus_LCPolScope_Hamamatsu.yml"
-    text = af.read_text(encoding="utf-8")
-    af.write_text(
-        text.replace("search_range_um: 30.0", "search_range_um: 100.0", 1), encoding="utf-8"
+def test_per_detector_naming_an_unknown_camera_is_caught(repo):
+    edit(
+        repo / LC,
+        "      per_detector:\n        LCPS_DETECTOR_HAMAMATSU_FLASH_001:\n          black_level",
+        "      per_detector:\n        NO_SUCH_CAMERA:\n          black_level",
     )
     found = errors(repo)
-    assert any("search_range_um" in e for e in found), found
+    assert any("NO_SUCH_CAMERA" in e and "per_detector" in e for e in found), found
+
+
+def test_cfg_listed_for_the_wrong_camera_is_caught(repo, monkeypatch):
+    monkeypatch.setitem(config_checks.MM_CONFIGS, LC, [(HAM_CFG, ORYX), (ORYX_CFG, HAM)])
+    found = errors(repo)
+    assert any("is listed as" in e and HAM_CFG in e for e in found), found
+
+
+def test_overlay_copy_matches_the_rules():
+    from checks.per_detector import apply_detector_overlay
+
+    cfg = {
+        "x": 1,
+        "dp": [{"device": "d", "property": "p", "value": 0}],
+        "per_detector": {
+            "A": {
+                "x": 2,
+                "device_properties": [{"device": "d", "property": "q", "value": 1}],
+            }
+        },
+        "device_properties": [{"device": "d", "property": "p", "value": 0}],
+    }
+    out = apply_detector_overlay(cfg, "A")
+    assert out["x"] == 2
+    assert out["device_properties"] == [
+        {"device": "d", "property": "p", "value": 0},
+        {"device": "d", "property": "q", "value": 1},
+    ]
+    assert apply_detector_overlay(cfg, "B") == cfg
+    assert cfg["x"] == 1
 
 
 def test_missing_pixel_size_presets_are_caught(repo):
@@ -94,7 +136,9 @@ def test_missing_pixel_size_presets_are_caught(repo):
 def test_camera_label_matching_no_detector_is_caught(repo):
     # 10-21: the Flash4 config renamed the camera; resources still said HamamatsuHam_DCAM.
     edit(
-        repo / "resources" / "resources_LOCI.yml", "device: 'Flash4'", "device: 'HamamatsuHam_DCAM'"
+        repo / "resources" / "resources_LOCI.yml",
+        "device: 'Flash4'",
+        "device: 'HamamatsuHam_DCAM'",
     )
     found = errors(repo)
     assert any("'Flash4' matches no detector" in e for e in found), found
@@ -102,12 +146,15 @@ def test_camera_label_matching_no_detector_is_caught(repo):
 
 def test_missing_mm_preset_group_is_caught(repo):
     # 10-21: the YAML said "Objective Lens"; the Flash4 config calls the group "Objective".
-    text = (repo / LC_HAM).read_text(encoding="utf-8")
-    (repo / LC_HAM).write_text(
-        text.replace("group: Objective,", "group: Objective Lens,"), encoding="utf-8"
+    text = (repo / LC).read_text(encoding="utf-8")
+    old = f"      {HAM}:\n        mm_preset: {{group: Objective}}\n"
+    assert text.count(old) == 3
+    (repo / LC).write_text(
+        text.replace(old, f"      {HAM}:\n        mm_preset: {{group: Objective Lens}}\n"),
+        encoding="utf-8",
     )
     found = errors(repo)
-    assert any("no such group" in e for e in found), found
+    assert any("no such group" in e and HAM_CFG in e for e in found), found
 
 
 def test_pixel_size_disagreement_is_caught(repo):

@@ -24,9 +24,29 @@ Located in the `templates/` folder:
 Located in the root directory:
 
 - **`config_PPM.yml`** - PPM (Polarized light) microscope example configuration
-- **`config_LCPolScope.yml`** - LC-PolScope (Meadowlark universal compensator) through the Teledyne FLIR Oryx; 4x, 10x and 20x. Micro-Manager config: `_MM2/config_LCPolScope.cfg`
-- **`config_LCPolScope_Hamamatsu.yml`** - the same LC-PolScope through its other camera, the Hamamatsu ORCA-Flash4.0 V2 that OpenPolScope drives. A separate config because QPSC picks profiles by modality and objective only, and each camera needs its own LC palette, black level, backgrounds, exposures and pixel sizes. Switch between the two with Utilities > Switch Microscope after loading the matching Micro-Manager config (`_MM2/config_LCPolScope_Hamamatsu.cfg`). Its pixel sizes are estimates scaled from the Oryx until measured
+- **`config_LCPolScope.yml`** - LC-PolScope (Meadowlark universal compensator); 4x, 10x and 20x. One config for both camera ports, the Hamamatsu ORCA-Flash4.0 V2 (the camera in use) and the Teledyne FLIR Oryx. Each camera runs its own Micro-Manager config (`_MM2/config_LCPolScope_Hamamatsu.cfg`, `_MM2/config_LCPolScope.cfg`); QPSC and the server read which camera Micro-Manager has active and use that camera's values: its LC palette, black level, exposures and `mm_preset` group (in `per_detector` blocks, see below), its pixel sizes, its acquisition profiles (one set per camera, the Oryx keys ending `_oryx`) and its backgrounds and `imaging_profiles`. The Hamamatsu's 4x and 10x pixel sizes are estimates until measured
 - **`config_CAMM.yml`** - CAMM (Multi-modal) microscope example configuration
+
+#### Per-camera values: `per_detector`
+
+A microscope with two cameras keeps one config. A value that depends on the camera sits
+in a `per_detector` mapping beside the shared value, keyed by detector ID:
+
+```yaml
+reconstruction:
+  black_level: 51            # shared default
+  per_detector:
+    LCPS_DETECTOR_FLIR_ORYX_001: {black_level: 99}
+```
+
+When that camera is active, its entry is merged into the mapping that holds it: a scalar
+is replaced, a mapping is merged key by key, and a `device_properties` list is merged by
+`(device, property)` (a matching entry is replaced in place, a new one appended). A camera
+with no entry uses the shared values. QPSC (`MicroscopeConfigManager`), the server
+(`microscope_control.config.apply_detector_overlay`) and `checks/per_detector.py` apply
+the same rules. Profiles choose their camera through their own `detector` field instead:
+QPSC and the server pick the profile whose modality, objective and detector match the
+active camera.
 
 ### Resources
 
@@ -335,9 +355,9 @@ automatically.
 `githooks/pre-commit` runs the same checks before each local commit so
 developers get feedback without waiting for CI: the guide rule above, and the
 [config consistency checks](#config-consistency-checks) whenever a config,
-`_MM2/`, `resources/` or `checks/` file is staged. A setting changed in one
-LC-PolScope config but not its sibling is refused at commit time, with the key
-to copy across, instead of turning up as a failed CI run after the push. It
+`_MM2/`, `resources/` or `checks/` file is staged. A broken reference or an
+`mm_preset` Micro-Manager does not have is refused at commit time instead of
+turning up as a failed CI run after the push. It
 needs a Python with PyYAML (`python3`, `python` or `py`; without one it warns
 and lets the commit through). It's opt-in per clone, including the rig's:
 
@@ -361,20 +381,21 @@ hardware, and fails on errors; warnings are listed but pass.
 
 1. **Structure and references.** Each `config_*.yml` parses, has `microscope.name` and a
    `stage` section, and every detector, objective and acquisition profile it uses
-   resolves (in the config, or in `resources/resources_LOCI.yml`). Its `autofocus_` and
+   resolves (in the config, or in `resources/resources_LOCI.yml`). Every `per_detector`
+   block names only detectors in `hardware.detectors`. Its `autofocus_` and
    `imageprocessing_` files only name objectives and detectors the config has. Unread
    top-level keys are warnings.
-2. **The YAML against its Micro-Manager config.** For each pair in `MM_CONFIGS`: the
-   `.cfg`'s Core camera must be some detector's `device` (the server finds the camera by
-   that exact label), each objective's `mm_preset` group and preset must exist, and the
-   objective's pixel size must agree with the matching Micro-Manager pixel-size preset to
-   within 1%. A missing pixel-size preset is an error: Micro-Manager would report 0.
-3. **Siblings do not drift.** Pairs in `SIBLINGS` (today the Oryx and Hamamatsu
-   LC-PolScope files) must be identical apart from the paths listed as allowed to differ
-   per camera.
+2. **The YAML against its Micro-Manager configs.** `MM_CONFIGS` lists each config's
+   `.cfg` files with the detector each one runs (a two-camera scope has one per camera).
+   Each pair is checked with that camera's `per_detector` values merged in: the `.cfg`'s
+   Core camera must be that detector's `device` (the server finds the camera by that
+   exact label), each objective's `mm_preset` group and preset must exist, and the
+   objective's pixel size for that camera must agree with the matching Micro-Manager
+   pixel-size preset to within 1%. A missing pixel-size preset is an error: Micro-Manager
+   would report 0.
 
-When a check fails: fix the file, or, if the difference is intended, say so in the
-script (`allowed` for a sibling, `DRAFTS` for a config not yet in service). The checks
+When a check fails: fix the file, or, for a config not yet in service, list it in
+`DRAFTS` in the script. The checks
 only see the `_MM2/` copy, so save the rig's `.cfg` here whenever it changes.
 
 ## Configuration Guide

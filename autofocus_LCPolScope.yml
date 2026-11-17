@@ -82,25 +82,21 @@ schema_version: 2
 autofocus_settings:
 - objective: LCPS_OBJECTIVE_20X_POL_001
   calibrated: true
-  # Starting values copied from the PPM scope's current 20x polarized
-  # objective (LOCI_OBJECTIVE_OLYMPUS_20X_POL_001), not measured here.
-  # Search range is deliberately wide: nothing is known yet about where
-  # focus sits on this ASI Z drive. Narrow it after the first good run.
+  # Shared by both cameras (autofocus depends on the objective). Calibrated on the
+  # Oryx port 2026-10-19; if the Hamamatsu port focuses more than ~15 um away,
+  # widen search_range_um for the first run there.
   n_steps: 30
   search_range_um: 30.0
   n_tiles: 1
   interp_strength: 100
   interp_kind: quadratic
-  # brenner_gradient, not tenengrad: tenengrad read flat on PPM 20x because a
-  # bright background swamped the gradient, and brenner stayed robust to dust.
-  # channel_reduction is omitted on purpose: the Oryx is monochrome, so there
-  # are no colour planes to choose between.
+  # brenner_gradient: tenengrad read flat on PPM 20x (a bright background
+  # swamped the gradient). No channel_reduction: both cameras are monochrome.
   score_metric: brenner_gradient
   texture_threshold: 0.005
   tissue_area_threshold: 0.2
-  # Drift check: 12 um centered on the current Z, 1 um steps (13 frames, ~13 s).
-  # Was 30 um (31 frames, 31 s per tissue tile, 41 of 86 minutes on 2026-10-29);
-  # every correction that run was within +-4 um.
+  # Drift check: 12 um around the current Z, 1 um steps (~13 s per tissue tile).
+  # Every correction on 2026-10-29 was within +-4 um.
   sweep_range_um: 12.0
   sweep_n_steps: 12
   edge_retries: 2
@@ -109,8 +105,7 @@ autofocus_settings:
   p98_p2_fallback_enabled: true
 - objective: LCPS_OBJECTIVE_10X_001
   calibrated: true
-  # Uncalibrated starting values. NA 0.5 gives a depth of field close to the
-  # 20x's (NA 0.4), so the same sweep is a reasonable start.
+  # Starting values. NA 0.5: depth of field close to the 20x's (NA 0.4).
   n_steps: 100
   search_range_um: 100.0
   n_tiles: 1
@@ -127,8 +122,7 @@ autofocus_settings:
   p98_p2_fallback_enabled: true
 - objective: LCPS_OBJECTIVE_4X_001
   calibrated: true
-  # Uncalibrated starting values. NA 0.13: depth of field ~30 um, ten times
-  # the 20x's, so a wider, coarser sweep.
+  # Starting values. NA 0.13: depth of field ~30 um, so a wider, coarser sweep.
   n_steps: 60
   search_range_um: 300.0
   n_tiles: 1
@@ -167,21 +161,18 @@ strategies:
     on_failure: manual
 
 modalities:
-  # Bindings are matched longest-prefix-wins, case-insensitive, against the
-  # modality name from config_LCPolScope.yml.
+  # Matched longest-prefix-wins, case-insensitive, against the modality names
+  # in config_LCPolScope.yml.
   lcpolscope:
     strategy: dense_texture
     overrides:
       validity_params:
-        # Polarized transmitted light spreads intensity over a wider range
-        # than brightfield and birefringent structures sit outside the
-        # ordinary tissue band -- same widening PPM needed.
+        # Polarized light spreads intensity wider than brightfield (as on PPM).
         tissue_mask_range:
         - 0.05
         - 0.95
         texture_threshold: 0.005
-        # A polarization image is mostly dark background even on a bright
-        # state, so the standard 20% tissue-area floor rejects valid fields.
+        # Mostly dark background even on a bright state: a 20% floor rejects valid fields.
         tissue_area_threshold: 0.1
   brightfield:
     strategy: dense_texture

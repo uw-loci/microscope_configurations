@@ -1,5 +1,13 @@
-# LC-PolScope, Oryx camera port. Same stand as config_LCPolScope_Hamamatsu.yml:
-# keep stage, LC and objective settings identical in both (the config CI checks it).
+# LC-PolScope: one config for both camera ports, the Hamamatsu Flash4 and the FLIR Oryx.
+# Each camera runs its own Micro-Manager config (_MM2/config_LCPolScope_Hamamatsu.cfg,
+# _MM2/config_LCPolScope.cfg); QPSC and the server read which camera Micro-Manager has
+# active and use that camera's values.
+#
+# per_detector: camera-specific values, keyed by detector ID, beside the values they
+# change. The active camera's entry is merged into the mapping that holds it: a scalar
+# is replaced, a mapping is merged key by key, and device_properties entries replace
+# the entry with the same device and property. The values beside it are the shared
+# defaults (here the Hamamatsu's, the camera in use); a camera with no entry uses them.
 # Background and history of these settings: claude-reports/design/2026-11-12_lcpolscope-config-notes.md (QPSC monorepo).
 
 microscope:
@@ -38,7 +46,7 @@ modalities:
       method: openpolscope
 
       # Camera counts subtracted from every state, in the acquisition pixel format; the LC calibration measures it and Apply offers it.
-      black_level: 99
+      black_level: 51
       # display_* settings change the imported images' look only, never the numbers.
       display_retardance_ceiling_nm: 20
       display_colormap: ppm
@@ -56,107 +64,234 @@ modalities:
         block_size: 32
         max_block_retardance_nm: 5
         min_background_fraction: 0.25
-      lc_calibrated_at: '2026-10-26T18:01:14'
-      lc_extinction_ratio: 275.0
-      lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261026_180114.json'
+      lc_calibrated_at: '2026-11-12T14:34:58'
+      lc_extinction_ratio: 271.4
+      lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261112_143458.json'
+      # Black level and LC calibration are measured per camera.
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          black_level: 51
+          lc_calibrated_at: '2026-11-12T14:34:58'
+          lc_extinction_ratio: 271.4
+          lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261112_143458.json'
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          black_level: 99
+          lc_calibrated_at: '2026-10-26T18:01:14'
+          lc_extinction_ratio: 275.0
+          lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261026_180114.json'
 
     # Exposure must be the same for all five states (the Stokes math assumes one scale).
-    # Apply to acquisition (LC calibration) rewrites each state's device_properties.
+    # Apply to acquisition (LC calibration) rewrites each state's retardances, per camera.
     channels:
     - id: State0
       display_name: State0 (extinction)
-      exposure_ms: 30
+      exposure_ms: 141.5
       device_properties:
       - device: MeadowlarkLC
         property: Wavelength
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2504
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.438
+        value: 0.5085
       # TODO(bench): measure the LC settle time; 50 ms is a guess.
       settle_ms: 50
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.256
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.5085
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2504
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.438
     - id: State1
       display_name: State1
-      exposure_ms: 30
+      exposure_ms: 141.5
       device_properties:
       - device: MeadowlarkLC
         property: Wavelength
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2204
+        value: 0.206
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.438
+        value: 0.5085
       settle_ms: 50
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.206
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.5085
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2204
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.438
     - id: State2
       display_name: State2
-      exposure_ms: 30
+      exposure_ms: 141.5
       device_properties:
       - device: MeadowlarkLC
         property: Wavelength
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2504
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.4522
+        value: 0.5578
       settle_ms: 50
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.256
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.5578
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2504
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.4522
     - id: State3
       display_name: State3
-      exposure_ms: 30
+      exposure_ms: 141.5
       device_properties:
       - device: MeadowlarkLC
         property: Wavelength
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2804
+        value: 0.3106
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.438
+        value: 0.5085
       settle_ms: 50
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.3106
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.5085
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2804
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.438
     - id: State4
       display_name: State4
-      exposure_ms: 30
+      exposure_ms: 141.5
       device_properties:
       - device: MeadowlarkLC
         property: Wavelength
         value: 549.0
       - device: MeadowlarkLC
         property: Retardance LC-A [in waves]
-        value: 0.2504
+        value: 0.256
       - device: MeadowlarkLC
         property: Retardance LC-B [in waves]
-        value: 0.4129
+        value: 0.4616
       settle_ms: 50
+      per_detector:
+        LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+          exposure_ms: 141.5
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.256
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.4616
+        LCPS_DETECTOR_FLIR_ORYX_001:
+          exposure_ms: 30
+          device_properties:
+          - device: MeadowlarkLC
+            property: Retardance LC-A [in waves]
+            value: 0.2504
+          - device: MeadowlarkLC
+            property: Retardance LC-B [in waves]
+            value: 0.4129
 
   brightfield:
     type: brightfield
 
 hardware:
   # Nosepiece turned by hand; mm_preset only selects Micro-Manager's pixel-size preset.
+  # The preset group differs per camera because each runs its own Micro-Manager config.
   objectives:
   - id: LCPS_OBJECTIVE_20X_POL_001
-    mm_preset: {group: Objective Lens, preset: 20x, motorized: false}
+    mm_preset: {group: Objective, preset: 20x, motorized: false}
     pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.2695  # measured 2026-10-21
       LCPS_DETECTOR_FLIR_ORYX_001: 0.1725
     pixel_size_z_um: null
+    per_detector:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        mm_preset: {group: Objective}
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        mm_preset: {group: Objective Lens}
   - id: LCPS_OBJECTIVE_4X_001
-    mm_preset: {group: Objective Lens, preset: 4x, motorized: false}
+    mm_preset: {group: Objective, preset: 4x, motorized: false}
     pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 1.3452  # ESTIMATE
       LCPS_DETECTOR_FLIR_ORYX_001: 0.856
     pixel_size_z_um: null
+    per_detector:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        mm_preset: {group: Objective}
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        mm_preset: {group: Objective Lens}
   - id: LCPS_OBJECTIVE_10X_001
-    mm_preset: {group: Objective Lens, preset: 10x, motorized: false}
+    mm_preset: {group: Objective, preset: 10x, motorized: false}
     pixel_size_xy_um:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001: 0.5452  # ESTIMATE
       LCPS_DETECTOR_FLIR_ORYX_001: 0.3469
     pixel_size_z_um: null
+    per_detector:
+      LCPS_DETECTOR_HAMAMATSU_FLASH_001:
+        mm_preset: {group: Objective}
+      LCPS_DETECTOR_FLIR_ORYX_001:
+        mm_preset: {group: Objective Lens}
   detectors:
+  - LCPS_DETECTOR_HAMAMATSU_FLASH_001
   - LCPS_DETECTOR_FLIR_ORYX_001
 
 stage:
@@ -186,39 +321,77 @@ slide_size_um:
   x: 75000
   y: 25000
 
-# Key: <modality>_<objective substring>. No channel_overrides on lcpolscope profiles.
+# One profile set per camera: QPSC and the server pick the profile whose modality,
+# objective and detector match the active camera (the <modality>_<objective substring>
+# key is the fallback). No channel_overrides on lcpolscope profiles.
 acquisition_profiles:
   lcpolscope_20x:
     modality: lcpolscope
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
     objective: LCPS_OBJECTIVE_20X_POL_001
     channels: [State0, State1, State2, State3, State4]
 
   brightfield_20x:
     modality: brightfield
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
     objective: LCPS_OBJECTIVE_20X_POL_001
     exposure_ms: 20  # TODO(bench)
 
   lcpolscope_10x:
     modality: lcpolscope
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
     objective: LCPS_OBJECTIVE_10X_001
     channels: [State0, State1, State2, State3, State4]
 
   lcpolscope_4x:
     modality: lcpolscope
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
     objective: LCPS_OBJECTIVE_4X_001
     channels: [State0, State1, State2, State3, State4]
 
   brightfield_10x:
     modality: brightfield
-    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
     objective: LCPS_OBJECTIVE_10X_001
     exposure_ms: 20  # TODO(bench)
 
   brightfield_4x:
+    modality: brightfield
+    detector: LCPS_DETECTOR_HAMAMATSU_FLASH_001
+    objective: LCPS_OBJECTIVE_4X_001
+    exposure_ms: 20  # TODO(bench)
+
+  lcpolscope_20x_oryx:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    channels: [State0, State1, State2, State3, State4]
+
+  brightfield_20x_oryx:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_20X_POL_001
+    exposure_ms: 20  # TODO(bench)
+
+  lcpolscope_10x_oryx:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  lcpolscope_4x_oryx:
+    modality: lcpolscope
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_4X_001
+    channels: [State0, State1, State2, State3, State4]
+
+  brightfield_10x_oryx:
+    modality: brightfield
+    detector: LCPS_DETECTOR_FLIR_ORYX_001
+    objective: LCPS_OBJECTIVE_10X_001
+    exposure_ms: 20  # TODO(bench)
+
+  brightfield_4x_oryx:
     modality: brightfield
     detector: LCPS_DETECTOR_FLIR_ORYX_001
     objective: LCPS_OBJECTIVE_4X_001

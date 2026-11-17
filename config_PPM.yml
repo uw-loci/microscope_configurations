@@ -59,9 +59,11 @@ stage:
   # do not sit at the same height. Set them from Stage Map > Calibrate.
   #
   # PPM, measured 2026-08-26: increasing Z moves the stage DOWN, away from the objective, so
-  # retract_sign is positive and ~0 is retracted (samples focus near -250). An earlier -500 was
-  # WRONG-SIDE, inferred from "focus is near -400, so retract further" without establishing the
-  # sign; measure it, never derive it.
+  # retract_sign is positive and a larger Z is retracted. An earlier -500 was WRONG-SIDE,
+  # inferred from "focus is near -400, so retract further" without establishing the sign;
+  # measure it, never derive it. Since the 2026-11-13 Z re-zero samples focus near -26, so the
+  # fallback is 200 (as the quad_v insert's), about 225 um retracted from focus. The Z frame
+  # moves whenever the Prior controller is power-cycled: recheck after one.
   #
   # The bound on the OTHER side is per insert: inserts.configurations.<id>.z_limit_um, the
   # closest the stage may come to the sample with that insert mounted. limits.z_um below is
@@ -72,7 +74,7 @@ stage:
   # insert carries in focus, slightly closer than any focus will need. No scope-wide fallback.
   focus:
     retract_sign: positive
-  safe_z_um: 0
+  safe_z_um: 200
   limits:
     x_um:
       low: -59723 #-36000

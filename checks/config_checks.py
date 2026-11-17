@@ -1,25 +1,26 @@
 """Consistency checks for the microscope configs in this repository.
 
-Three kinds of check, all on files, none on hardware:
+Two kinds of check, all on files, none on hardware:
 
 1. **Structure and references.** Every ``config_*.yml`` parses, names its microscope,
    and every objective, detector and acquisition profile it uses resolves -- in the
    config itself or in ``resources/resources_LOCI.yml``, merged entry by entry with the
-   config winning, as the server and QPSC both merge them. Its ``autofocus_`` and
-   ``imageprocessing_`` companions only name objectives and detectors the config has.
-2. **The YAML against its Micro-Manager config** in ``_MM2/`` (pairs in ``MM_CONFIGS``):
-   the Core camera is one of the config's detectors (the server finds the detector by
-   that exact label), each objective's ``mm_preset`` exists, and its pixel size agrees
-   with the Micro-Manager pixel-size preset to within ``PIXEL_SIZE_TOLERANCE``.
-3. **Sibling configs do not drift.** Files describing the same microscope through
-   different cameras (``SIBLINGS``) must be identical except where ``allowed`` says a
-   camera may differ. Each file's own detector IDs are replaced by ``<DETECTOR>``
-   first, so a per-camera key does not count as a difference by itself.
+   config winning, as the server and QPSC both merge them. Every ``per_detector`` block
+   names only the config's own detectors. Its ``autofocus_`` and ``imageprocessing_``
+   companions only name objectives and detectors the config has.
+2. **The YAML against its Micro-Manager configs** in ``_MM2/`` (``MM_CONFIGS``). A
+   microscope with two cameras has one YAML and one Micro-Manager config per camera, so
+   each pair is checked with that camera's ``per_detector`` values merged in, as QPSC
+   and the server merge them when that camera is active: the Core camera is the
+   declared detector (the server finds the detector by that exact label), each
+   objective's ``mm_preset`` exists, and its pixel size agrees with the Micro-Manager
+   pixel-size preset to within ``PIXEL_SIZE_TOLERANCE``.
 
 Written 2026-10-21 after a run of problems no single file shows: the Hamamatsu
-LC-PolScope config missed two changes made to the Oryx copy; a Micro-Manager config
-had no pixel-size presets and a camera label no detector matched; an ``mm_preset``
-named a group Micro-Manager did not have.
+LC-PolScope config missed two changes made to the Oryx copy (the two files are one
+since 2026-11-17, with per_detector values); a Micro-Manager config had no pixel-size
+presets and a camera label no detector matched; an ``mm_preset`` named a group
+Micro-Manager did not have.
 
 The checks see the repository's files only. The rig runs whatever Micro-Manager file
 is loaded there, so keep ``_MM2/`` in step with the rig.
@@ -33,25 +34,30 @@ import fnmatch
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from checks import mmcfg  # noqa: E402
+from checks.per_detector import PER_DETECTOR_KEY, apply_detector_overlay  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
-#: Each tracked config and the Micro-Manager config the rig loads with it.
-MM_CONFIGS: Dict[str, str] = {
-    "config_LCPolScope.yml": "_MM2/config_LCPolScope.cfg",
-    "config_LCPolScope_Hamamatsu.yml": "_MM2/config_LCPolScope_Hamamatsu.cfg",
+#: Each tracked config and the Micro-Manager configs the rig loads with it, as
+#: (.cfg, detector) pairs: the detector whose camera that .cfg runs, or None for a
+#: single-camera scope (the .cfg's camera is then whichever detector it matches).
+MM_CONFIGS: Dict[str, List[Tuple[str, Optional[str]]]] = {
+    "config_LCPolScope.yml": [
+        ("_MM2/config_LCPolScope_Hamamatsu.cfg", "LCPS_DETECTOR_HAMAMATSU_FLASH_001"),
+        ("_MM2/config_LCPolScope.cfg", "LCPS_DETECTOR_FLIR_ORYX_001"),
+    ],
     # config_PPM.yml is deliberately absent: _MM2/config_PPM.cfg dates from 2025-05 and
     # names a PVCAM MicroPublisher6, while the rig's 2026-04 device dump
     # (mm_device_properties_PPM_20260422.txt) shows it runs JAICamera. Add the pair back
     # when the rig's current .cfg is saved here.
-    "config_CAMM.yml": "_MM2/OpenScan-CAMM-cal.cfg",
+    "config_CAMM.yml": [("_MM2/OpenScan-CAMM-cal.cfg", None)],
 }
 
 #: Configs that are not in service yet: their problems are reported, not failed on.
@@ -65,53 +71,6 @@ SCANNER_CONFIGS = {"config_Ocus40.yml"}
 #: How far a YAML pixel size may sit from Micro-Manager's before it is an error.
 PIXEL_SIZE_TOLERANCE = 0.01
 
-
-@dataclass(frozen=True)
-class Sibling:
-    """Two files for one microscope seen through different cameras."""
-
-    a: str
-    b: str
-    allowed: tuple  # fnmatch patterns over flattened paths ("a.b.0.c")
-    why: str
-
-
-_LC_CONFIG_ALLOWED = (
-    "microscope.name",  # keeps slide alignments apart per camera
-    "hardware.objectives.*.mm_preset.group",  # each camera has its own MM config
-    "hardware.objectives.*.pixel_size_xy_um.<DETECTOR>",
-    "modalities.lcpolscope.channels.*.device_properties.*",  # LC palette per camera
-    "modalities.lcpolscope.channels.*.exposure_ms",
-    "modalities.lcpolscope.reconstruction.black_level",
-    "modalities.lcpolscope.reconstruction.state_order.*",
-    "modalities.lcpolscope.reconstruction.lc_calibrat*",
-    "modalities.lcpolscope.reconstruction.lc_extinction_ratio",
-)
-
-SIBLINGS: List[Sibling] = [
-    Sibling(
-        "config_LCPolScope.yml",
-        "config_LCPolScope_Hamamatsu.yml",
-        _LC_CONFIG_ALLOWED,
-        "LC-PolScope, Oryx and Hamamatsu ports: same stage, LCs, objectives",
-    ),
-    Sibling(
-        "autofocus_LCPolScope.yml",
-        "autofocus_LCPolScope_Hamamatsu.yml",
-        ("autofocus_settings.*.calibrated",),
-        "autofocus depends on the objective, not the camera",
-    ),
-    Sibling(
-        "imageprocessing_LCPolScope.yml",
-        "imageprocessing_LCPolScope_Hamamatsu.yml",
-        (
-            "background_correction.base_folder",
-            "background_correction.*.enabled",
-            "imaging_profiles.*.*.<DETECTOR>.*",
-        ),
-        "backgrounds and exposures are per camera; the rest is shared",
-    ),
-]
 
 #: Top-level keys some code reads. Anything else is reported as unread.
 KNOWN_TOP_LEVEL = {
@@ -247,12 +206,29 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
         oid = o.get("id")
         if oid not in id_obj:
             # Only the display name comes from there; the UI falls back to the raw ID.
-            report.warn(name, f"objective '{oid}' has no id_objective_lens entry (no display name)")
+            report.warn(
+                name,
+                f"objective '{oid}' has no id_objective_lens entry (no display name)",
+            )
         for d in o.get("pixel_size_xy_um") or {}:
             if d not in dets:
                 report.error(
-                    name, f"objective '{oid}' has a pixel size for '{d}', not a detector here"
+                    name,
+                    f"objective '{oid}' has a pixel size for '{d}', not a detector here",
                 )
+
+    for path, node in per_detector_blocks(config):
+        if not isinstance(node, dict):
+            report.error(name, f"'{path}' is not a mapping of detector ID to values")
+            continue
+        for d, values in node.items():
+            if d not in dets:
+                report.error(
+                    name,
+                    f"'{path}' names '{d}', not in hardware.detectors ({', '.join(dets)})",
+                )
+            elif not isinstance(values, dict):
+                report.error(name, f"'{path}.{d}' is not a mapping")
 
     modalities = config.get("modalities") or {}
     profiles = config.get("acquisition_profiles") or {}
@@ -266,12 +242,14 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
             det = prof.get("detector")
             if det and det not in dets:
                 report.error(
-                    name, f"profile '{pname}' uses detector '{det}', not in hardware.detectors"
+                    name,
+                    f"profile '{pname}' uses detector '{det}', not in hardware.detectors",
                 )
             obj = prof.get("objective")
             if obj and obj not in obj_ids:
                 report.error(
-                    name, f"profile '{pname}' uses objective '{obj}', not in hardware.objectives"
+                    name,
+                    f"profile '{pname}' uses objective '{obj}', not in hardware.objectives",
                 )
 
     af_name = companion(name, "autofocus")
@@ -288,7 +266,8 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
             for oid, per_det in (per_obj or {}).items():
                 if oid not in obj_ids:
                     report.error(
-                        ip_name, f"imaging_profiles.{mod} names objective '{oid}', not in {name}"
+                        ip_name,
+                        f"imaging_profiles.{mod} names objective '{oid}', not in {name}",
                     )
                     continue
                 for d in per_det or {}:
@@ -304,9 +283,18 @@ def check_structure(repo: Path, name: str, report: Report) -> Optional[dict]:
 
 
 def check_against_mm(repo: Path, name: str, config: dict, report: Report) -> None:
-    cfg_rel = MM_CONFIGS.get(name)
-    if not cfg_rel:
-        return
+    for cfg_rel, detector in MM_CONFIGS.get(name, []):
+        _check_one_mm(repo, name, config, cfg_rel, detector, report)
+
+
+def _check_one_mm(
+    repo: Path,
+    name: str,
+    config: dict,
+    cfg_rel: str,
+    detector: Optional[str],
+    report: Report,
+) -> None:
     cfg_path = repo / cfg_rel
     if not cfg_path.exists():
         report.error(name, f"its Micro-Manager config {cfg_rel} is missing")
@@ -329,11 +317,28 @@ def check_against_mm(repo: Path, name: str, config: dict, report: Report) -> Non
             f"{cfg_rel}'s camera '{mm.core_camera}' matches no detector's 'device' "
             f"({', '.join(sorted(by_device)) or 'none'}); the server could not find it",
         )
-    for dev, d in by_device.items():
-        if dev not in mm.devices:
-            report.warn(name, f"detector '{d}' (device '{dev}') is not a device in {cfg_rel}")
+    elif detector is not None and active != detector:
+        report.error(
+            name,
+            f"{cfg_rel} is listed as {detector}'s Micro-Manager config, but its camera "
+            f"'{mm.core_camera}' is {active}'s",
+        )
+    if detector is None:
+        for dev, d in by_device.items():
+            if dev not in mm.devices:
+                report.warn(
+                    name,
+                    f"detector '{d}' (device '{dev}') is not a device in {cfg_rel}",
+                )
+    elif detector not in detectors(config):
+        report.error(name, f"MM_CONFIGS lists {cfg_rel} for '{detector}', not a detector here")
 
-    for o in objectives(config):
+    # The config as QPSC and the server see it while this .cfg's camera is active.
+    camera = detector if detector is not None else active
+    seen = apply_detector_overlay(config, camera)
+    where = f"{cfg_rel} ({camera})" if detector is not None else cfg_rel
+
+    for o in objectives(seen):
         oid = o.get("id")
         spec = o.get("mm_preset")
         if not spec:
@@ -350,17 +355,17 @@ def check_against_mm(repo: Path, name: str, config: dict, report: Report) -> Non
             report.error(
                 name,
                 f"objective '{oid}' mm_preset [{group}] '{preset}': no such {what} in "
-                f"{cfg_rel} (it has: {have})",
+                f"{where} (it has: {have})",
             )
             continue
-        if active is None:
+        if camera is None:
             continue
-        yaml_px = (o.get("pixel_size_xy_um") or {}).get(active)
+        yaml_px = (o.get("pixel_size_xy_um") or {}).get(camera)
         matches = mm.pixel_size_for(settings)
         if not matches:
             report.error(
                 name,
-                f"objective '{oid}': {cfg_rel} has no pixel-size preset for [{group}] '{preset}' "
+                f"objective '{oid}': {where} has no pixel-size preset for [{group}] '{preset}' "
                 "(Micro-Manager would report pixel size 0)",
             )
         elif yaml_px is not None:
@@ -368,12 +373,12 @@ def check_against_mm(repo: Path, name: str, config: dict, report: Report) -> Non
                 if abs(px - yaml_px) > PIXEL_SIZE_TOLERANCE * yaml_px:
                     report.error(
                         name,
-                        f"objective '{oid}': pixel size {yaml_px} for {active} disagrees with "
+                        f"objective '{oid}': pixel size {yaml_px} for {camera} disagrees with "
                         f"{cfg_rel}'s '{pname}' = {px}",
                     )
 
 
-# ---------------------------------------------------------------- check 3
+# ---------------------------------------------------------------- helpers
 
 
 def flatten(x: Any, prefix: str = "") -> Iterable:
@@ -387,44 +392,18 @@ def flatten(x: Any, prefix: str = "") -> Iterable:
         yield prefix, x
 
 
-def _normalised(data: Any, own_detectors: Iterable[str]) -> Dict[str, Any]:
-    own = set(own_detectors)
-    out = {}
-    for path, value in flatten(data):
-        parts = ["<DETECTOR>" if p in own else p for p in path.split(".")]
-        if isinstance(value, str) and value in own:
-            value = "<DETECTOR>"
-        out[".".join(parts)] = value
-    return out
-
-
-def _detectors_for(repo: Path, file: str) -> List[str]:
-    """The detectors of the config a file belongs to (itself, or config_<stem>.yml)."""
-    for kind in ("autofocus_", "imageprocessing_"):
-        if file.startswith(kind):
-            file = "config_" + file[len(kind) :]
-            break
-    path = repo / file
-    return detectors(load_yaml(path) or {}) if path.exists() else []
-
-
-def check_siblings(repo: Path, report: Report, siblings: Iterable[Sibling] = None) -> None:
-    for s in siblings if siblings is not None else SIBLINGS:
-        if not ((repo / s.a).exists() and (repo / s.b).exists()):
-            continue
-        a = _normalised(load_yaml(repo / s.a), _detectors_for(repo, s.a))
-        b = _normalised(load_yaml(repo / s.b), _detectors_for(repo, s.b))
-        for path in sorted(set(a) | set(b)):
-            if a.get(path, "<missing>") == b.get(path, "<missing>"):
-                continue
-            if any(fnmatch.fnmatchcase(path, pat) for pat in s.allowed):
-                continue
-            report.error(
-                s.b,
-                f"differs from {s.a} at '{path}': {a.get(path, '<missing>')!r} vs "
-                f"{b.get(path, '<missing>')!r} ({s.why}; copy the change across, or add the "
-                "path to the sibling's allowed list in checks/config_checks.py)",
-            )
+def per_detector_blocks(x: Any, prefix: str = "") -> Iterable[Tuple[str, Any]]:
+    """Every ``per_detector`` value in the tree, with its dotted path."""
+    if isinstance(x, dict):
+        for k, v in x.items():
+            path = f"{prefix}.{k}" if prefix else str(k)
+            if k == PER_DETECTOR_KEY:
+                yield path, v
+            else:
+                yield from per_detector_blocks(v, path)
+    elif isinstance(x, list):
+        for i, v in enumerate(x):
+            yield from per_detector_blocks(v, f"{prefix}.{i}" if prefix else str(i))
 
 
 # ---------------------------------------------------------------- driver
@@ -436,7 +415,6 @@ def run(repo: Path = REPO) -> Report:
         config = check_structure(repo, name, report)
         if config is not None:
             check_against_mm(repo, name, config, report)
-    check_siblings(repo, report)
     return report
 
 
