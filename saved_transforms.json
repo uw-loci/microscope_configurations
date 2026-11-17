@@ -76,6 +76,7 @@
   "Ocus40_to_LCPolScope_20261019": {
     "name": "Ocus40_to_LCPolScope_20261019",
     "microscope": "LCPolScope",
+    "detector": "LCPS_DETECTOR_FLIR_ORYX_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
@@ -112,7 +113,8 @@
   },
   "Ocus40_to_LCPolScope_Hamamatsu_20261026": {
     "name": "Ocus40_to_LCPolScope_Hamamatsu_20261026",
-    "microscope": "LCPolScope_Hamamatsu",
+    "microscope": "LCPolScope",
+    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
@@ -186,7 +188,8 @@
   },
   "Ocus40_to_LCPolScope_Hamamatsu_20261028": {
     "name": "Ocus40_to_LCPolScope_Hamamatsu_20261028",
-    "microscope": "LCPolScope_Hamamatsu",
+    "microscope": "LCPolScope",
+    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
