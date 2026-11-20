@@ -37,7 +37,9 @@ modalities:
       # Used by the LC calibration only; the server refuses MM-Voltage.
       lc_control_mode: MM-Retardance
       scheme: 5-State  # must match the calibration's scheme
-
+      drift_correction:
+        tile_glass: true
+        reference_interval_min: 10
       # Order the states are fed to the reconstruction (extinction, +S1, +S2, -S1, -S2).
       # Apply to acquisition resets it; a wrong order rotates orientation without any error.
       state_order: [State0, State1, State2, State3, State4]
@@ -70,10 +72,10 @@ modalities:
       # Black level and LC calibration are measured per camera.
       per_detector:
         LCPS_DETECTOR_HAMAMATSU_FLASH_001:
-          black_level: 51
-          lc_calibrated_at: '2026-11-12T14:34:58'
-          lc_extinction_ratio: 271.4
-          lc_calibration_file: 'C:\qpsc-extension\data\LiverTests\JOVE_PPM\calibrations\lcpolscope\lc_calibration_20261112_143458.json'
+          black_level: 49
+          lc_calibrated_at: '2026-11-20T16:12:22'
+          lc_extinction_ratio: 263.5
+          lc_calibration_file: 'C:\qpsc-extension\data\MH_384\calibrations\lcpolscope\lc_calibration_20261120_161222.json'
         LCPS_DETECTOR_FLIR_ORYX_001:
           black_level: 99
           lc_calibrated_at: '2026-10-26T18:01:14'
@@ -103,11 +105,14 @@ modalities:
           exposure_ms: 141.5
           device_properties:
           - device: MeadowlarkLC
+            property: Wavelength
+            value: 549.0
+          - device: MeadowlarkLC
             property: Retardance LC-A [in waves]
-            value: 0.256
+            value: 0.2553
           - device: MeadowlarkLC
             property: Retardance LC-B [in waves]
-            value: 0.5085
+            value: 0.5077
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
           device_properties:
@@ -136,11 +141,14 @@ modalities:
           exposure_ms: 141.5
           device_properties:
           - device: MeadowlarkLC
+            property: Wavelength
+            value: 549.0
+          - device: MeadowlarkLC
             property: Retardance LC-A [in waves]
-            value: 0.206
+            value: 0.2053
           - device: MeadowlarkLC
             property: Retardance LC-B [in waves]
-            value: 0.5085
+            value: 0.5077
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
           device_properties:
@@ -169,11 +177,14 @@ modalities:
           exposure_ms: 141.5
           device_properties:
           - device: MeadowlarkLC
+            property: Wavelength
+            value: 549.0
+          - device: MeadowlarkLC
             property: Retardance LC-A [in waves]
-            value: 0.256
+            value: 0.2553
           - device: MeadowlarkLC
             property: Retardance LC-B [in waves]
-            value: 0.5578
+            value: 0.5564
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
           device_properties:
@@ -202,11 +213,14 @@ modalities:
           exposure_ms: 141.5
           device_properties:
           - device: MeadowlarkLC
+            property: Wavelength
+            value: 549.0
+          - device: MeadowlarkLC
             property: Retardance LC-A [in waves]
-            value: 0.3106
+            value: 0.309
           - device: MeadowlarkLC
             property: Retardance LC-B [in waves]
-            value: 0.5085
+            value: 0.5077
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
           device_properties:
@@ -235,11 +249,14 @@ modalities:
           exposure_ms: 141.5
           device_properties:
           - device: MeadowlarkLC
+            property: Wavelength
+            value: 549.0
+          - device: MeadowlarkLC
             property: Retardance LC-A [in waves]
-            value: 0.256
+            value: 0.2553
           - device: MeadowlarkLC
             property: Retardance LC-B [in waves]
-            value: 0.4616
+            value: 0.4612
         LCPS_DETECTOR_FLIR_ORYX_001:
           exposure_ms: 30
           device_properties:
@@ -299,6 +316,8 @@ hardware:
   detectors:
   - LCPS_DETECTOR_HAMAMATSU_FLASH_001
   - LCPS_DETECTOR_FLIR_ORYX_001
+  camera_orientation:
+    LCPS_DETECTOR_HAMAMATSU_FLASH_001: FLIP_V
 
 stage:
   stage_id: LCPS_STAGE_ASI_001

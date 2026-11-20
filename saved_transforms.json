@@ -76,7 +76,6 @@
   "Ocus40_to_LCPolScope_20261019": {
     "name": "Ocus40_to_LCPolScope_20261019",
     "microscope": "LCPolScope",
-    "detector": "LCPS_DETECTOR_FLIR_ORYX_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
@@ -103,6 +102,7 @@
     "flipMacroX": false,
     "flipMacroY": true,
     "sourceScanner": "Ocus40",
+    "detector": "LCPS_DETECTOR_FLIR_ORYX_001",
     "greenBoxDisplayCenterX": 295.0,
     "greenBoxDisplayCenterY": 155.0,
     "stageAnchorX": -678.0094866250001,
@@ -114,7 +114,6 @@
   "Ocus40_to_LCPolScope_Hamamatsu_20261026": {
     "name": "Ocus40_to_LCPolScope_Hamamatsu_20261026",
     "microscope": "LCPolScope",
-    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
@@ -141,6 +140,7 @@
     "flipMacroX": false,
     "flipMacroY": true,
     "sourceScanner": "Ocus40",
+    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "greenBoxDisplayCenterX": 278.0,
     "greenBoxDisplayCenterY": 159.5,
     "stageAnchorX": -1284.978227312502,
@@ -189,7 +189,6 @@
   "Ocus40_to_LCPolScope_Hamamatsu_20261028": {
     "name": "Ocus40_to_LCPolScope_Hamamatsu_20261028",
     "microscope": "LCPolScope",
-    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "mountingMethod": "Ocus40",
     "transform": {
       "m00": 81.0,
@@ -216,10 +215,49 @@
     "flipMacroX": false,
     "flipMacroY": true,
     "sourceScanner": "Ocus40",
+    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
     "greenBoxDisplayCenterX": 272.0,
     "greenBoxDisplayCenterY": 155.0,
     "stageAnchorX": -2038.89376,
     "stageAnchorY": 3988.35598234375,
+    "macroDisplayWidth": 938,
+    "macroDisplayHeight": 312,
+    "macroPixelSizeUm": 81.0
+  },
+  "Ocus40_to_LCPolScope_20261117": {
+    "name": "Ocus40_to_LCPolScope_20261117",
+    "microscope": "LCPolScope",
+    "mountingMethod": "Ocus40",
+    "transform": {
+      "m00": 81.0,
+      "m10": 0.0,
+      "m01": 0.0,
+      "m11": 81.0,
+      "m02": -15272.395976828126,
+      "m12": -9176.072871171875
+    },
+    "createdDate": "Nov 17, 2026, 5:02:34 PM",
+    "notes": "Transform from Ocus40 macro to stage. Macro: 938x312, Green box detected, Validation: WARNING",
+    "greenBoxParams": {
+      "greenThreshold": 0.4,
+      "saturationMin": 0.3,
+      "brightnessMin": 0.3,
+      "brightnessMax": 0.9,
+      "hueMin": 0.25,
+      "hueMax": 0.42,
+      "minBoxWidth": 20,
+      "minBoxHeight": 20,
+      "edgeThickness": 3,
+      "requireRectangle": true
+    },
+    "flipMacroX": false,
+    "flipMacroY": true,
+    "sourceScanner": "Ocus40",
+    "detector": "LCPS_DETECTOR_HAMAMATSU_FLASH_001",
+    "greenBoxDisplayCenterX": 278.0,
+    "greenBoxDisplayCenterY": 158.5,
+    "stageAnchorX": 7245.604023171874,
+    "stageAnchorY": 3662.427128828125,
     "macroDisplayWidth": 938,
     "macroDisplayHeight": 312,
     "macroPixelSizeUm": 81.0
